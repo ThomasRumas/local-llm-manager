@@ -1,6 +1,6 @@
 {
   "name": "@thomasrumas/llm-client",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "CLI client to remotely manage local LLM inference servers",
   "license": "ISC",
   "author": "",
