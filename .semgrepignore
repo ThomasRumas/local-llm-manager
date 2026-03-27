@@ -1,6 +1,9 @@
 # Semgrep ignore file — paths excluded from security scanning
 # Syntax follows .gitignore conventions
 
+# Skills
+.agents/**/*
+
 # Build artifacts
 dist/
 *.min.js
