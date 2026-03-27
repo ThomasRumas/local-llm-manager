@@ -1,0 +1,22 @@
+# Semgrep ignore file — paths excluded from security scanning
+# Syntax follows .gitignore conventions
+
+# Build artifacts
+dist/
+*.min.js
+
+# Dependencies
+node_modules/
+
+# Test coverage reports
+coverage/
+
+# Test files — avoid false positives from test-only patterns (e.g. eval, dangerouslySetInnerHTML in tests)
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+**/test-setup.ts
+
+# Lock files
+package-lock.json

@@ -1,0 +1,17 @@
+{
+  "name": "local-llm-manager-root",
+  "version": "0.0.1",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w packages/manager && npm run build -w packages/client-cli",
+    "build:manager": "npm run build -w packages/manager",
+    "build:client": "npm run build -w packages/client-cli",
+    "start:manager": "npm run start -w packages/manager",
+    "dev:manager": "npm run dev -w packages/manager",
+    "test": "npm run test -w packages/manager && npm run test -w packages/client-cli",
+    "test:coverage": "npm run test:coverage -w packages/manager && npm run test:coverage -w packages/client-cli"
+  }
+}

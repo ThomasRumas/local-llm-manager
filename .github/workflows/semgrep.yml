@@ -1,0 +1,132 @@
+name: Semgrep Security
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+# Minimal permissions following least-privilege principle
+permissions:
+  contents: read
+  security-events: write # Required for SARIF upload to Code Scanning
+  pull-requests: write   # Required to post/update PR comments
+
+jobs:
+  semgrep:
+    name: Semgrep Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Semgrep
+        run: pip install semgrep
+
+      - name: Run Semgrep scan
+        id: scan
+        env:
+          SEMGREP_SEND_METRICS: "off" # Disable telemetry for CE usage
+        run: |
+          semgrep scan \
+            --config "p/typescript" \
+            --config "p/react" \
+            --config "p/nodejs" \
+            --config "p/security-audit" \
+            --config "p/javascript" \
+            --sarif \
+            --output semgrep-results.sarif \
+            .
+        # continue-on-error so SARIF upload and PR comment always run,
+        # even when Semgrep exits with code 1 (findings present)
+        continue-on-error: true
+
+      # Uploads results to GitHub Code Scanning (Security tab + inline PR annotations)
+      # NOTE: on private repos this requires GitHub Advanced Security (GHAS).
+      # On public repos it is free and always available.
+      - name: Upload SARIF to GitHub Code Scanning
+        if: always() && hashFiles('semgrep-results.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep-results.sarif
+          category: semgrep
+
+      # Posts (or updates) a summary comment on the PR with severity breakdown
+      - name: Post PR comment summary
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            let results = [];
+            try {
+              const sarif = JSON.parse(fs.readFileSync('semgrep-results.sarif', 'utf8'));
+              results = sarif.runs?.[0]?.results ?? [];
+            } catch {
+              // SARIF file missing or malformed — skip comment
+              core.warning('Could not read semgrep-results.sarif — skipping PR comment.');
+              return;
+            }
+
+            const counts = { error: 0, warning: 0, note: 0 };
+            for (const result of results) {
+              const level = result.level ?? 'warning';
+              counts[level] = (counts[level] ?? 0) + 1;
+            }
+
+            const total = results.length;
+            const scanUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/security/code-scanning`;
+            const statusIcon = total === 0 ? '✅' : '⚠️';
+
+            const lines = [
+              '<!-- semgrep-scan-result -->',
+              `## ${statusIcon} Semgrep Security Scan`,
+              '',
+              total === 0
+                ? '_No security issues detected._'
+                : `Found **${total}** potential issue${total !== 1 ? 's' : ''}:`,
+            ];
+
+            if (total > 0) {
+              lines.push(
+                '',
+                '| Severity | Count |',
+                '|:---------|------:|',
+                `| 🔴 Error | ${counts.error} |`,
+                `| 🟡 Warning | ${counts.warning} |`,
+                `| 🔵 Note | ${counts.note} |`,
+              );
+            }
+
+            lines.push('', `[View full report in Code Scanning →](${scanUrl})`);
+
+            const body = lines.join('\n');
+            const marker = '<!-- semgrep-scan-result -->';
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const existing = comments.find(c => c.body?.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }

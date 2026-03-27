@@ -1,0 +1,36 @@
+{
+  "name": "@thomasrumas/llm-manager",
+  "version": "0.0.1",
+  "description": "A TUI to manage LLM powered by Llama.cpp",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@huggingface/hub": "^1.1.2",
+    "ink": "^6.8.0",
+    "react": "^19.2.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.16.4",
+    "@types/react": "^19.2.14",
+    "@vitest/coverage-v8": "^4.1.2",
+    "ink-testing-library": "^4.0.0",
+    "typescript": "^6.0.2",
+    "vitest": "^4.1.2"
+  }
+}
