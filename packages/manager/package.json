@@ -6,6 +6,9 @@
   "author": "",
   "type": "module",
   "main": "dist/index.js",
+  "bin": {
+    "llm-manager": "dist/index.js"
+  },
   "files": [
     "dist"
   ],
