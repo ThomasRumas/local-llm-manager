@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - 'rc-*'
 
 permissions:
   contents: write
@@ -57,14 +56,7 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Publish (stable)
-        if: ${{ github.ref_name == 'main' }}
+      - name: Publish
         run: npm publish --workspaces --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish (RC)
-        if: ${{ startsWith(github.ref_name, 'rc-') }}
-        run: npm publish --workspaces --access public --tag rc
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
