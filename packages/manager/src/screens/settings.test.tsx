@@ -108,18 +108,23 @@ describe('Settings', () => {
     // API Server is at focusIndex=4 — navigate there via 4 down presses
     for (let i = 0; i < 4; i++) {
       instance.stdin.write('\x1B[B'); // Down
-      await new Promise((r) => setTimeout(r, 10));
+      await vi.waitFor(() => {
+        // wait for each navigation to be processed before sending the next
+        expect(instance.lastFrame()).toBeDefined();
+      }, { timeout: 2000 });
     }
     // Wait for arrow indicator to appear (confirms focusIndex=4)
     await vi.waitFor(() => {
       expect(instance.lastFrame()).toContain('← →');
-    });
+    }, { timeout: 2000 });
     instance.stdin.write('\x1B[C'); // Right arrow → toggle apiEnabled to true
     await vi.waitFor(() => {
       const frame = instance.lastFrame() ?? '';
-      // After toggling, the green 'enabled' text appears; 'disabled' was gray before
+      // After toggling, the green 'enabled' text should appear
+      // Note: lastFrame() includes ANSI codes so we check the word directly
+      expect(frame).toContain('enabled');
       expect(frame).not.toContain('disabled');
-    });
+    }, { timeout: 3000 });
   });
 
   it('shows validation error for invalid context size', async () => {

@@ -1,8 +1,0 @@
-#!/usr/bin/env node
-import React from 'react';
-import { render } from 'ink';
-import { App } from './app.js';
-
-process.stdout.write('\x1b[?1049h\x1b[2J\x1b[H');
-process.on('exit', () => { process.stdout.write('\x1b[?1049l'); });
-render(React.createElement(App));
