@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/ThomasRumas/local-llm-manager/compare/manager-v1.0.0...manager-v1.0.1) (2026-03-27)
+
+
+### Bug Fixes
+
+* **manager:** add bin to expose cli ([bcffae2](https://github.com/ThomasRumas/local-llm-manager/commit/bcffae213c4bdf8a1dc2b0bd5754af3381eddf4f))
+
 ## 1.0.0 (2026-03-27)
 
 
