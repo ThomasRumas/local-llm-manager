@@ -1,6 +1,6 @@
 {
   "name": "@thomasrumas/llm-manager",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "A TUI to manage LLM powered by Llama.cpp",
   "license": "ISC",
   "author": "",
