@@ -1,7 +1,7 @@
 ---
 name: ink-tui
-description: "Build Terminal User Interfaces (TUI) with Ink and React. Use when creating CLI apps, terminal UIs, interactive command-line tools, or working with Ink components, hooks, and layouts. Covers Ink API, Flexbox terminal layouts, keyboard input, focus management, accessibility, and TUI best practices."
-argument-hint: "Describe the TUI component or feature to build"
+description: 'Build Terminal User Interfaces (TUI) with Ink and React. Use when creating CLI apps, terminal UIs, interactive command-line tools, or working with Ink components, hooks, and layouts. Covers Ink API, Flexbox terminal layouts, keyboard input, focus management, accessibility, and TUI best practices.'
+argument-hint: 'Describe the TUI component or feature to build'
 ---
 
 # Ink TUI — React for Terminal User Interfaces
@@ -27,15 +27,15 @@ npm install ink react
 ```
 
 ```tsx
-import React, {useState, useEffect} from 'react';
-import {render, Text} from 'ink';
+import React, { useState, useEffect } from 'react';
+import { render, Text } from 'ink';
 
 const App = () => {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCount(prev => prev + 1);
+      setCount((prev) => prev + 1);
     }, 100);
     return () => clearInterval(timer);
   }, []);
@@ -59,12 +59,13 @@ render(<App />);
 ### App Lifecycle
 
 ```tsx
-const {waitUntilExit} = render(<MyApp />);
+const { waitUntilExit } = render(<MyApp />);
 await waitUntilExit();
 console.log('App exited');
 ```
 
 Exit methods:
+
 - Press **Ctrl+C** (enabled by default via `exitOnCtrlC`)
 - Call `exit()` from `useApp()` inside a component
 - Call `unmount()` on the render instance

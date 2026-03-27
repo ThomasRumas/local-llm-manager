@@ -3,10 +3,10 @@
 ## configure()
 
 ```ts
-import { configure } from "@testing-library/react";
+import { configure } from '@testing-library/react';
 
 configure({
-  testIdAttribute: "data-testid",
+  testIdAttribute: 'data-testid',
   asyncUtilTimeout: 1000,
   defaultHidden: false,
   throwSuggestions: false,
@@ -25,11 +25,11 @@ configure({
 Custom attribute for `getByTestId`:
 
 ```ts
-configure({ testIdAttribute: "data-my-test-id" });
+configure({ testIdAttribute: 'data-my-test-id' });
 
 // Now queries use data-my-test-id
 // <div data-my-test-id="my-element">
-screen.getByTestId("my-element");
+screen.getByTestId('my-element');
 ```
 
 Default: `'data-testid'`
@@ -44,7 +44,7 @@ Global timeout for async utilities:
 configure({ asyncUtilTimeout: 5000 }); // 5 seconds
 
 // Affects findBy*, waitFor, waitForElementToBeRemoved
-await screen.findByText("Slow content"); // waits up to 5s
+await screen.findByText('Slow content'); // waits up to 5s
 ```
 
 Default: `1000` (1 second)
@@ -59,7 +59,7 @@ Include hidden elements in `getByRole` by default:
 configure({ defaultHidden: true });
 
 // Now includes aria-hidden elements
-screen.getByRole("button"); // includes hidden buttons
+screen.getByRole('button'); // includes hidden buttons
 ```
 
 Default: `false`
@@ -74,14 +74,14 @@ Fail tests when better queries exist:
 configure({ throwSuggestions: true });
 
 // This will throw an error suggesting getByRole
-screen.getByTestId("submit-button");
+screen.getByTestId('submit-button');
 // Error: A better query is available: getByRole('button', { name: /submit/i })
 ```
 
 Disable per query:
 
 ```ts
-screen.getByTestId("element", { suggest: false });
+screen.getByTestId('element', { suggest: false });
 ```
 
 Default: `false`
@@ -93,7 +93,7 @@ Default: `false`
 Elements to ignore in queries and error output:
 
 ```ts
-configure({ defaultIgnore: "script, style, svg" });
+configure({ defaultIgnore: 'script, style, svg' });
 ```
 
 Default: `'script, style'`
@@ -107,8 +107,10 @@ Custom error formatting:
 ```ts
 configure({
   getElementError: (message, container) => {
-    const error = new Error([message, prettyDOM(container), "Custom debug info here"].join("\n\n"));
-    error.name = "TestingLibraryError";
+    const error = new Error(
+      [message, prettyDOM(container), 'Custom debug info here'].join('\n\n'),
+    );
+    error.name = 'TestingLibraryError';
     return error;
   },
 });
@@ -172,11 +174,11 @@ Apply configuration globally:
 
 ```ts
 // setupTests.ts
-import { configure } from "@testing-library/react";
-import "@testing-library/jest-dom";
+import { configure } from '@testing-library/react';
+import '@testing-library/jest-dom';
 
 configure({
-  testIdAttribute: "data-test-id",
+  testIdAttribute: 'data-test-id',
   asyncUtilTimeout: 3000,
 });
 ```
@@ -186,7 +188,7 @@ Jest config:
 ```js
 // jest.config.js
 module.exports = {
-  setupFilesAfterEnv: ["<rootDir>/setupTests.ts"],
+  setupFilesAfterEnv: ['<rootDir>/setupTests.ts'],
 };
 ```
 
@@ -196,7 +198,7 @@ Vitest config:
 // vitest.config.ts
 export default defineConfig({
   test: {
-    setupFiles: ["./setupTests.ts"],
+    setupFiles: ['./setupTests.ts'],
   },
 });
 ```
@@ -234,7 +236,7 @@ RTL_SKIP_AUTO_CLEANUP=true npm test
 Or import:
 
 ```ts
-import "@testing-library/react/dont-cleanup-after-each";
+import '@testing-library/react/dont-cleanup-after-each';
 ```
 
 ---
@@ -246,7 +248,7 @@ import "@testing-library/react/dont-cleanup-after-each";
 ```js
 // jest.config.js
 module.exports = {
-  testEnvironment: "jsdom", // Required for Jest 27+
+  testEnvironment: 'jsdom', // Required for Jest 27+
 };
 ```
 
@@ -263,9 +265,9 @@ Or per file:
 ```js
 // jest.config.js
 module.exports = {
-  moduleDirectories: ["node_modules", "utils"],
+  moduleDirectories: ['node_modules', 'utils'],
   moduleNameMapper: {
-    "^test-utils$": "<rootDir>/utils/test-utils",
+    '^test-utils$': '<rootDir>/utils/test-utils',
   },
 };
 ```
@@ -276,13 +278,13 @@ module.exports = {
 
 ```ts
 // vitest.config.ts
-import { defineConfig } from "vitest/config";
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
-    environment: "jsdom",
+    environment: 'jsdom',
     globals: true, // Enables auto-cleanup
-    setupFiles: ["./setupTests.ts"],
+    setupFiles: ['./setupTests.ts'],
   },
 });
 ```
@@ -291,8 +293,8 @@ export default defineConfig({
 
 ```ts
 // setupTests.ts
-import { cleanup } from "@testing-library/react";
-import { afterEach } from "vitest";
+import { cleanup } from '@testing-library/react';
+import { afterEach } from 'vitest';
 
 afterEach(cleanup);
 ```

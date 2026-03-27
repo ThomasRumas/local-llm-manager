@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, Text, useInput, useFocus } from 'ink';
 
 interface NumberInputFieldProps {
@@ -10,7 +9,14 @@ interface NumberInputFieldProps {
   max?: number;
 }
 
-export function NumberInputField({ label, value, onChange, step = 1, min, max }: NumberInputFieldProps) {
+export function NumberInputField({
+  label,
+  value,
+  onChange,
+  step = 1,
+  min,
+  max,
+}: NumberInputFieldProps) {
   const { isFocused } = useFocus();
 
   useInput((_input, key) => {

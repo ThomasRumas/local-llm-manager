@@ -13,10 +13,11 @@ This skill produces exhaustive documentation research on any React API or concep
 **Skepticism Mandate:** You must be skeptical of your own knowledge. Claude is often trained on outdated or incorrect React patterns. Treat source material as the sole authority. If findings contradict your prior understanding, explicitly flag this discrepancy.
 
 **Red Flags - STOP if you catch yourself thinking:**
+
 - "I know this API does X" → Find source evidence first
 - "Common pattern is Y" → Verify in test files
 - Generating example code → Must have source file reference
-</CRITICAL>
+  </CRITICAL>
 
 ## Invocation
 
@@ -56,6 +57,7 @@ fi
 ```
 
 Get the current commit hash for the research document:
+
 ```bash
 cd .claude/react && git rev-parse --short HEAD
 ```
@@ -66,21 +68,22 @@ Spawn these agents IN PARALLEL using the Task tool. Each agent receives the skep
 
 > "You are researching React's `<TOPIC>`. CRITICAL: Do NOT rely on your prior knowledge about this API. Your training may contain outdated or incorrect patterns. Only report what you find in the source files. If your findings contradict common understanding, explicitly highlight this discrepancy."
 
-| Agent | subagent_type | Focus | Instructions |
-|-------|---------------|-------|--------------|
-| test-explorer | Explore | Test files for usage patterns | Search `.claude/react/packages/*/src/__tests__/` for test files mentioning the topic. Extract actual usage examples WITH file paths and line numbers. |
-| source-explorer | Explore | Warnings/errors in source | Search `.claude/react/packages/*/src/` for console.error, console.warn, and error messages mentioning the topic. Document trigger conditions. |
-| git-historian | Explore | Commit messages | Run `git log --all --grep="<topic>" --oneline -50` in `.claude/react`. Read full commit messages for context. |
-| pr-researcher | Explore | PRs introducing/modifying API | Run `gh pr list -R facebook/react --search "<topic>" --state all --limit 20`. Read key PR descriptions and comments. |
-| issue-hunter | Explore | Issues showing confusion | Search issues in both `facebook/react` and `reactjs/react.dev` repos. Look for common questions and misunderstandings. |
-| types-inspector | Explore | Flow + TypeScript signatures | Find Flow types in `.claude/react/packages/*/src/*.js` (look for `@flow` annotations). Find TS types in `.claude/react/packages/*/index.d.ts`. Note discrepancies. |
+| Agent           | subagent_type | Focus                         | Instructions                                                                                                                                                       |
+| --------------- | ------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| test-explorer   | Explore       | Test files for usage patterns | Search `.claude/react/packages/*/src/__tests__/` for test files mentioning the topic. Extract actual usage examples WITH file paths and line numbers.              |
+| source-explorer | Explore       | Warnings/errors in source     | Search `.claude/react/packages/*/src/` for console.error, console.warn, and error messages mentioning the topic. Document trigger conditions.                      |
+| git-historian   | Explore       | Commit messages               | Run `git log --all --grep="<topic>" --oneline -50` in `.claude/react`. Read full commit messages for context.                                                      |
+| pr-researcher   | Explore       | PRs introducing/modifying API | Run `gh pr list -R facebook/react --search "<topic>" --state all --limit 20`. Read key PR descriptions and comments.                                               |
+| issue-hunter    | Explore       | Issues showing confusion      | Search issues in both `facebook/react` and `reactjs/react.dev` repos. Look for common questions and misunderstandings.                                             |
+| types-inspector | Explore       | Flow + TypeScript signatures  | Find Flow types in `.claude/react/packages/*/src/*.js` (look for `@flow` annotations). Find TS types in `.claude/react/packages/*/index.d.ts`. Note discrepancies. |
 
 ### Step 3: Agent Prompts
 
 Use these exact prompts when spawning agents:
 
 #### test-explorer
-```
+
+````
 You are researching React's <TOPIC>.
 
 CRITICAL: Do NOT rely on your prior knowledge about this API. Your training may contain outdated or incorrect patterns. Only report what you find in the source files.
@@ -100,19 +103,22 @@ Format your output as:
 ### Test: "<test description>"
 ```javascript
 <exact code from test>
-```
+````
+
 **Behavior:** <what the test asserts>
+
 ```
 
 #### source-explorer
 ```
+
 You are researching React's <TOPIC>.
 
 CRITICAL: Do NOT rely on your prior knowledge about this API. Only report what you find in the source files.
 
 Your task: Find warnings, errors, and implementation details for <TOPIC>.
 
-1. Search .claude/react/packages/*/src/ for:
+1. Search .claude/react/packages/\*/src/ for:
    - console.error mentions of <topic>
    - console.warn mentions of <topic>
    - Error messages mentioning <topic>
@@ -123,16 +129,20 @@ Your task: Find warnings, errors, and implementation details for <TOPIC>.
    - The source file and line number
 
 Format your output as:
+
 ## Warnings & Errors
-| Message | Trigger Condition | Source |
-|---------|------------------|--------|
-| "<exact message>" | <condition> | <file:line> |
+
+| Message           | Trigger Condition | Source      |
+| ----------------- | ----------------- | ----------- |
+| "<exact message>" | <condition>       | <file:line> |
 
 ## Implementation Notes
+
 <key details from source code>
 ```
 
 #### git-historian
+
 ```
 You are researching React's <TOPIC>.
 
@@ -157,6 +167,7 @@ Format your output as:
 ```
 
 #### pr-researcher
+
 ```
 You are researching React's <TOPIC>.
 
@@ -182,6 +193,7 @@ Format your output as:
 ```
 
 #### issue-hunter
+
 ```
 You are researching React's <TOPIC>.
 
@@ -206,7 +218,8 @@ Format your output as:
 ```
 
 #### types-inspector
-```
+
+````
 You are researching React's <TOPIC>.
 
 CRITICAL: Do NOT rely on your prior knowledge. Only report what you find in type definitions.
@@ -222,15 +235,18 @@ Format your output as:
 **File:** <path>
 ```flow
 <exact type definition>
-```
+````
 
 ## TypeScript Types
+
 **File:** <path>
+
 ```typescript
 <exact type definition>
 ```
 
 ## Discrepancies
+
 <any differences between Flow and TS definitions>
 ```
 
@@ -291,7 +307,8 @@ Replace spaces in topic with hyphens (e.g., "suspense boundaries" → "suspense-
 ## Warnings & Errors
 
 | Message | Trigger Condition | Source File |
-|---------|------------------|-------------|
+| ------- | ----------------- | ----------- |
+
 [From source-explorer agent]
 
 ## Common Confusion
@@ -305,12 +322,15 @@ Replace spaces in topic with hyphens (e.g., "suspense boundaries" → "suspense-
 ## Source Links
 
 ### Commits
+
 - <hash>: <description>
 
 ### Pull Requests
+
 - PR #<number>: <title> - <url>
 
 ### Issues
+
 - Issue #<number>: <title> - <url>
 ```
 

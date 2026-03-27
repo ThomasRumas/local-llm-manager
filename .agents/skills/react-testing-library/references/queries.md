@@ -27,34 +27,34 @@
 
 ```ts
 // Buttons
-getByRole("button", { name: /submit/i });
+getByRole('button', { name: /submit/i });
 
 // Form fields
-getByRole("textbox", { name: /email/i });
-getByRole("checkbox", { name: /remember me/i });
-getByRole("combobox", { name: /country/i });
+getByRole('textbox', { name: /email/i });
+getByRole('checkbox', { name: /remember me/i });
+getByRole('combobox', { name: /country/i });
 
 // Headings
-getByRole("heading", { name: /welcome/i });
-getByRole("heading", { level: 2 });
+getByRole('heading', { name: /welcome/i });
+getByRole('heading', { level: 2 });
 
 // Navigation
-getByRole("link", { name: /home/i });
-getByRole("navigation");
+getByRole('link', { name: /home/i });
+getByRole('navigation');
 
 // Lists
-getByRole("list");
-getByRole("listitem");
+getByRole('list');
+getByRole('listitem');
 
 // Dialogs
-getByRole("dialog");
-getByRole("alertdialog");
+getByRole('dialog');
+getByRole('alertdialog');
 ```
 
 **Role Options:**
 
 ```ts
-getByRole("button", {
+getByRole('button', {
   name: /submit/i, // accessible name (text, aria-label)
   description: /text/, // aria-describedby content
   hidden: true, // include hidden elements (default: false)
@@ -62,7 +62,7 @@ getByRole("button", {
   checked: true, // checkbox/radio checked state
   pressed: true, // toggle button pressed state
   expanded: true, // aria-expanded state
-  current: "page", // aria-current value
+  current: 'page', // aria-current value
   busy: false, // aria-busy state
   level: 2, // heading level (h1=1, h2=2, etc.)
   value: { now: 50, min: 0, max: 100 }, // slider/spinbutton value
@@ -73,29 +73,29 @@ getByRole("button", {
 #### `getByLabelText` — Best for form fields
 
 ```ts
-getByLabelText("Username");
+getByLabelText('Username');
 getByLabelText(/email/i);
-getByLabelText("Password", { selector: "input" });
+getByLabelText('Password', { selector: 'input' });
 ```
 
 #### `getByPlaceholderText` — When no label available
 
 ```ts
-getByPlaceholderText("Enter email");
+getByPlaceholderText('Enter email');
 ```
 
 #### `getByText` — For non-interactive content
 
 ```ts
-getByText("Welcome back!");
+getByText('Welcome back!');
 getByText(/loading/i);
-getByText((content, element) => content.startsWith("Hello"));
+getByText((content, element) => content.startsWith('Hello'));
 ```
 
 #### `getByDisplayValue` — Current form value
 
 ```ts
-getByDisplayValue("john@example.com");
+getByDisplayValue('john@example.com');
 ```
 
 ### 2. Semantic Queries
@@ -103,14 +103,14 @@ getByDisplayValue("john@example.com");
 #### `getByAltText` — Images
 
 ```ts
-getByAltText("Company logo");
+getByAltText('Company logo');
 getByAltText(/avatar/i);
 ```
 
 #### `getByTitle` — Title attribute (less reliable)
 
 ```ts
-getByTitle("Close");
+getByTitle('Close');
 ```
 
 ### 3. Test IDs (Escape Hatch)
@@ -118,8 +118,8 @@ getByTitle("Close");
 #### `getByTestId` — Last resort
 
 ```ts
-getByTestId("submit-button");
-getByTestId("custom-element");
+getByTestId('submit-button');
+getByTestId('custom-element');
 ```
 
 ---
@@ -130,10 +130,10 @@ Queries accept strings, regex, or functions:
 
 ```ts
 // Exact string
-getByText("Hello World");
+getByText('Hello World');
 
 // Substring (case-insensitive)
-getByText("hello", { exact: false });
+getByText('hello', { exact: false });
 
 // Regex
 getByText(/hello world/i);
@@ -141,21 +141,21 @@ getByText(/^hello/i); // starts with
 
 // Custom function
 getByText((content, element) => {
-  return element.tagName === "SPAN" && content.includes("Hello");
+  return element.tagName === 'SPAN' && content.includes('Hello');
 });
 ```
 
 ### Options
 
 ```ts
-getByText("text", {
+getByText('text', {
   exact: false, // substring match, case-insensitive
   normalizer: (str) => str.trim().toLowerCase(), // custom normalizer
 });
 
 // Default normalizer options
-import { getDefaultNormalizer } from "@testing-library/react";
-getByText("text", {
+import { getDefaultNormalizer } from '@testing-library/react';
+getByText('text', {
   normalizer: getDefaultNormalizer({ trim: false, collapseWhitespace: true }),
 });
 ```
@@ -183,14 +183,14 @@ const { getByRole } = render(<MyComponent />);
 ## Query Within Elements
 
 ```ts
-import { within, screen } from "@testing-library/react";
+import { within, screen } from '@testing-library/react';
 
-const modal = screen.getByRole("dialog");
-const submitBtn = within(modal).getByRole("button", { name: /submit/i });
+const modal = screen.getByRole('dialog');
+const submitBtn = within(modal).getByRole('button', { name: /submit/i });
 
 // Alternative
-const form = screen.getByRole("form");
-within(form).getByLabelText("Email");
+const form = screen.getByRole('form');
+within(form).getByLabelText('Email');
 ```
 
 ---
@@ -227,9 +227,9 @@ within(form).getByLabelText("Email");
 
 ```ts
 // Faster alternatives when accessibility isn't the focus
-getByLabelText("Email"); // faster than getByRole('textbox', { name: 'Email' })
-getByText("Submit"); // faster than getByRole('button', { name: 'Submit' })
+getByLabelText('Email'); // faster than getByRole('textbox', { name: 'Email' })
+getByText('Submit'); // faster than getByRole('button', { name: 'Submit' })
 
 // Or skip visibility checks
-getByRole("button", { hidden: true });
+getByRole('button', { hidden: true });
 ```

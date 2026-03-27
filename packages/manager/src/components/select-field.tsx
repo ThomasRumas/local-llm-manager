@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, Text, useInput, useFocus } from 'ink';
 
 interface SelectFieldProps {
@@ -8,7 +7,12 @@ interface SelectFieldProps {
   onChange: (value: string) => void;
 }
 
-export function SelectField({ label, options, value, onChange }: SelectFieldProps) {
+export function SelectField({
+  label,
+  options,
+  value,
+  onChange,
+}: SelectFieldProps) {
   const { isFocused } = useFocus();
 
   useInput((_input, key) => {
@@ -17,7 +21,8 @@ export function SelectField({ label, options, value, onChange }: SelectFieldProp
     const currentIndex = options.indexOf(value);
     if (key.leftArrow || key.rightArrow) {
       const direction = key.rightArrow ? 1 : -1;
-      const nextIndex = (currentIndex + direction + options.length) % options.length;
+      const nextIndex =
+        (currentIndex + direction + options.length) % options.length;
       onChange(options[nextIndex]!);
     }
   });

@@ -12,7 +12,7 @@ on:
 permissions:
   contents: read
   security-events: write # Required for SARIF upload to Code Scanning
-  pull-requests: write   # Required to post/update PR comments
+  pull-requests: write # Required to post/update PR comments
 
 jobs:
   semgrep:
@@ -29,7 +29,7 @@ jobs:
       - name: Run Semgrep scan
         id: scan
         env:
-          SEMGREP_SEND_METRICS: "off" # Disable telemetry for CE usage
+          SEMGREP_SEND_METRICS: 'off' # Disable telemetry for CE usage
         run: |
           semgrep scan \
             --config "p/typescript" \

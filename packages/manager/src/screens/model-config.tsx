@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Box, Text, useInput } from 'ink';
 import { StatusBadge } from '../components/status-badge.js';
 import { configService } from '../modules/config/config.service.js';
@@ -13,17 +13,51 @@ interface ModelConfigProps {
   onNavigate: (screen: Screen, params?: ScreenParams) => void;
 }
 
-type Field = 'alias' | 'temp' | 'topP' | 'topK' | 'minP' | 'port' | 'ctxSize' |
-  'cacheTypeK' | 'cacheTypeV' | 'flashAttn' | 'fit' | 'extraFlags';
+type Field =
+  | 'alias'
+  | 'temp'
+  | 'topP'
+  | 'topK'
+  | 'minP'
+  | 'port'
+  | 'ctxSize'
+  | 'cacheTypeK'
+  | 'cacheTypeV'
+  | 'flashAttn'
+  | 'fit'
+  | 'extraFlags';
 
 const FIELDS: Field[] = [
-  'alias', 'temp', 'topP', 'topK', 'minP', 'port', 'ctxSize',
-  'cacheTypeK', 'cacheTypeV', 'flashAttn', 'fit', 'extraFlags',
+  'alias',
+  'temp',
+  'topP',
+  'topK',
+  'minP',
+  'port',
+  'ctxSize',
+  'cacheTypeK',
+  'cacheTypeV',
+  'flashAttn',
+  'fit',
+  'extraFlags',
 ];
 
-const CACHE_TYPES = ['f16', 'f32', 'q8_0', 'q4_0', 'q4_1', 'q5_0', 'q5_1'] as const;
+const CACHE_TYPES = [
+  'f16',
+  'f32',
+  'q8_0',
+  'q4_0',
+  'q4_1',
+  'q5_0',
+  'q5_1',
+] as const;
 
-export function ModelConfig({ modelFile, configName = 'default', onBack, onNavigate }: ModelConfigProps) {
+export function ModelConfig({
+  modelFile,
+  configName = 'default',
+  onBack,
+  onNavigate,
+}: ModelConfigProps) {
   const modelsDir = configService.getModelsDirectory();
   const modelPath = `${modelsDir}/${modelFile}`;
   const initial = configService.getEffective(modelFile, modelPath, configName);
@@ -41,13 +75,18 @@ export function ModelConfig({ modelFile, configName = 'default', onBack, onNavig
   // (reset-during-render avoids the double render caused by useEffect + setState)
   if (prevConfigName !== selectedConfigName) {
     setPrevConfigName(selectedConfigName);
-    setConfig(configService.getEffective(modelFile, modelPath, selectedConfigName));
+    setConfig(
+      configService.getEffective(modelFile, modelPath, selectedConfigName),
+    );
   }
 
-  const updateField = useCallback(<K extends keyof ResolvedConfig>(field: K, value: ResolvedConfig[K]) => {
-    setConfig((prev) => ({ ...prev, [field]: value }));
-    setSaved(false);
-  }, []);
+  const updateField = useCallback(
+    <K extends keyof ResolvedConfig>(field: K, value: ResolvedConfig[K]) => {
+      setConfig((prev) => ({ ...prev, [field]: value }));
+      setSaved(false);
+    },
+    [],
+  );
 
   const handleSave = useCallback(async () => {
     const { modelPath: _mp, ...rest } = config;
@@ -59,7 +98,11 @@ export function ModelConfig({ modelFile, configName = 'default', onBack, onNavig
     await handleSave();
     const modelsDir2 = configService.getModelsDirectory();
     const modelPath2 = `${modelsDir2}/${modelFile}`;
-    const resolved = configService.getEffective(modelFile, modelPath2, selectedConfigName);
+    const resolved = configService.getEffective(
+      modelFile,
+      modelPath2,
+      selectedConfigName,
+    );
     server.start(resolved, modelFile, selectedConfigName);
     onNavigate('model-launch', { modelFile, configName: selectedConfigName });
   }, [handleSave, onNavigate, modelFile, selectedConfigName, server]);
@@ -81,7 +124,8 @@ export function ModelConfig({ modelFile, configName = 'default', onBack, onNavig
       if (key.leftArrow || key.rightArrow) {
         const idx = availableConfigs.indexOf(selectedConfigName);
         const dir = key.rightArrow ? 1 : -1;
-        const next = (idx + dir + availableConfigs.length) % availableConfigs.length;
+        const next =
+          (idx + dir + availableConfigs.length) % availableConfigs.length;
         setSelectedConfigName(availableConfigs[next]!);
       }
     }
@@ -103,7 +147,9 @@ export function ModelConfig({ modelFile, configName = 'default', onBack, onNavig
     <Box flexDirection="column" gap={0}>
       <Box>
         <Text color={focusIndex === 0 ? 'cyan' : 'white'}>Config: </Text>
-        <Text color={focusIndex === 0 ? 'white' : 'gray'}>{selectedConfigName}</Text>
+        <Text color={focusIndex === 0 ? 'white' : 'gray'}>
+          {selectedConfigName}
+        </Text>
         {focusIndex === 0 && <Text color="gray"> (←/→ to switch)</Text>}
       </Box>
 
@@ -144,17 +190,23 @@ export function ModelConfig({ modelFile, configName = 'default', onBack, onNavig
         </Box>
         <Box>
           <Text color={isFocused(7) ? 'cyan' : 'white'}>Cache Type K: </Text>
-          <Text color={isFocused(7) ? 'white' : 'gray'}>{config.cacheTypeK}</Text>
+          <Text color={isFocused(7) ? 'white' : 'gray'}>
+            {config.cacheTypeK}
+          </Text>
           {isFocused(7) && <Text color="gray"> (←/→)</Text>}
         </Box>
         <Box>
           <Text color={isFocused(8) ? 'cyan' : 'white'}>Cache Type V: </Text>
-          <Text color={isFocused(8) ? 'white' : 'gray'}>{config.cacheTypeV}</Text>
+          <Text color={isFocused(8) ? 'white' : 'gray'}>
+            {config.cacheTypeV}
+          </Text>
           {isFocused(8) && <Text color="gray"> (←/→)</Text>}
         </Box>
         <Box>
           <Text color={isFocused(9) ? 'cyan' : 'white'}>Flash Attention: </Text>
-          <Text color={isFocused(9) ? 'white' : 'gray'}>{config.flashAttn}</Text>
+          <Text color={isFocused(9) ? 'white' : 'gray'}>
+            {config.flashAttn}
+          </Text>
           {isFocused(9) && <Text color="gray"> (←/→)</Text>}
         </Box>
         <Box>
@@ -164,7 +216,9 @@ export function ModelConfig({ modelFile, configName = 'default', onBack, onNavig
         </Box>
         <Box>
           <Text color={isFocused(11) ? 'cyan' : 'white'}>Extra Flags: </Text>
-          <Text color={isFocused(11) ? 'white' : 'gray'}>{config.extraFlags || '(none)'}</Text>
+          <Text color={isFocused(11) ? 'white' : 'gray'}>
+            {config.extraFlags || '(none)'}
+          </Text>
         </Box>
       </Box>
 
@@ -177,7 +231,7 @@ export function ModelConfig({ modelFile, configName = 'default', onBack, onNavig
 
       <Box marginTop={1}>
         <Text color={focusIndex === FIELDS.length + 1 ? 'cyan' : 'white'}>
-          {'  '}[S] Save  [L] Save & Launch
+          {'  '}[S] Save [L] Save & Launch
         </Text>
       </Box>
 
@@ -189,7 +243,10 @@ export function ModelConfig({ modelFile, configName = 'default', onBack, onNavig
 interface FieldEditorProps {
   focusIndex: number;
   config: ResolvedConfig;
-  updateField: <K extends keyof ResolvedConfig>(field: K, value: ResolvedConfig[K]) => void;
+  updateField: <K extends keyof ResolvedConfig>(
+    field: K,
+    value: ResolvedConfig[K],
+  ) => void;
 }
 
 function FieldEditor({ focusIndex, config, updateField }: FieldEditorProps) {
@@ -205,40 +262,63 @@ function FieldEditor({ focusIndex, config, updateField }: FieldEditorProps) {
       case 'extraFlags':
         if (key.backspace || key.delete) {
           updateField(field, (config[field] as string).slice(0, -1));
-        } else if (!key.ctrl && !key.meta && !key.upArrow && !key.downArrow && !key.return && !key.tab && !key.escape) {
+        } else if (
+          !key.ctrl &&
+          !key.meta &&
+          !key.upArrow &&
+          !key.downArrow &&
+          !key.return &&
+          !key.tab &&
+          !key.escape
+        ) {
           updateField(field, (config[field] as string) + input);
         }
         break;
 
       case 'temp':
-        if (key.leftArrow) updateField('temp', Math.max(0, +(config.temp - 0.1).toFixed(2)));
-        if (key.rightArrow) updateField('temp', +(config.temp + 0.1).toFixed(2));
+        if (key.leftArrow)
+          updateField('temp', Math.max(0, +(config.temp - 0.1).toFixed(2)));
+        if (key.rightArrow)
+          updateField('temp', +(config.temp + 0.1).toFixed(2));
         break;
       case 'topP':
-        if (key.leftArrow) updateField('topP', Math.max(0, +(config.topP - 0.05).toFixed(2)));
-        if (key.rightArrow) updateField('topP', Math.min(1, +(config.topP + 0.05).toFixed(2)));
+        if (key.leftArrow)
+          updateField('topP', Math.max(0, +(config.topP - 0.05).toFixed(2)));
+        if (key.rightArrow)
+          updateField('topP', Math.min(1, +(config.topP + 0.05).toFixed(2)));
         break;
       case 'topK':
         if (key.leftArrow) updateField('topK', Math.max(0, config.topK - 1));
         if (key.rightArrow) updateField('topK', config.topK + 1);
         break;
       case 'minP':
-        if (key.leftArrow) updateField('minP', Math.max(0, +(config.minP - 0.01).toFixed(3)));
-        if (key.rightArrow) updateField('minP', Math.min(1, +(config.minP + 0.01).toFixed(3)));
+        if (key.leftArrow)
+          updateField('minP', Math.max(0, +(config.minP - 0.01).toFixed(3)));
+        if (key.rightArrow)
+          updateField('minP', Math.min(1, +(config.minP + 0.01).toFixed(3)));
         break;
       case 'port':
         if (key.leftArrow) updateField('port', Math.max(1, config.port - 1));
-        if (key.rightArrow) updateField('port', Math.min(65535, config.port + 1));
+        if (key.rightArrow)
+          updateField('port', Math.min(65535, config.port + 1));
         break;
       case 'ctxSize':
-        if (key.leftArrow) updateField('ctxSize', Math.max(1024, config.ctxSize - 1024));
+        if (key.leftArrow)
+          updateField('ctxSize', Math.max(1024, config.ctxSize - 1024));
         if (key.rightArrow) updateField('ctxSize', config.ctxSize + 1024);
         break;
       case 'cacheTypeK':
       case 'cacheTypeV': {
-        const idx = CACHE_TYPES.indexOf(config[field] as typeof CACHE_TYPES[number]);
-        if (key.leftArrow) updateField(field, CACHE_TYPES[(idx - 1 + CACHE_TYPES.length) % CACHE_TYPES.length]!);
-        if (key.rightArrow) updateField(field, CACHE_TYPES[(idx + 1) % CACHE_TYPES.length]!);
+        const idx = CACHE_TYPES.indexOf(
+          config[field] as (typeof CACHE_TYPES)[number],
+        );
+        if (key.leftArrow)
+          updateField(
+            field,
+            CACHE_TYPES[(idx - 1 + CACHE_TYPES.length) % CACHE_TYPES.length]!,
+          );
+        if (key.rightArrow)
+          updateField(field, CACHE_TYPES[(idx + 1) % CACHE_TYPES.length]!);
         break;
       }
       case 'flashAttn':

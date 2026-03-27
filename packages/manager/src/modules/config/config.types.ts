@@ -49,7 +49,10 @@ export interface ResolvedConfig {
   extraFlags: string;
 }
 
-export const HARDCODED_DEFAULTS: Required<Omit<ModelConfig, 'port' | 'ctxSize'>> & Pick<Defaults, 'port' | 'ctxSize'> = {
+export const HARDCODED_DEFAULTS: Required<
+  Omit<ModelConfig, 'port' | 'ctxSize'>
+> &
+  Pick<Defaults, 'port' | 'ctxSize'> = {
   alias: '',
   temp: 0.6,
   topP: 0.95,

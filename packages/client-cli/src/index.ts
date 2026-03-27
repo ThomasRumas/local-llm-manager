@@ -14,13 +14,27 @@ const c = {
   gray: '\x1b[90m',
 };
 
-function bold(s: string) { return `${c.bold}${s}${c.reset}`; }
-function cyan(s: string) { return `${c.cyan}${s}${c.reset}`; }
-function green(s: string) { return `${c.green}${s}${c.reset}`; }
-function yellow(s: string) { return `${c.yellow}${s}${c.reset}`; }
-function red(s: string) { return `${c.red}${s}${c.reset}`; }
-function gray(s: string) { return `${c.gray}${s}${c.reset}`; }
-function dim(s: string) { return `${c.dim}${s}${c.reset}`; }
+function bold(s: string) {
+  return `${c.bold}${s}${c.reset}`;
+}
+function cyan(s: string) {
+  return `${c.cyan}${s}${c.reset}`;
+}
+function green(s: string) {
+  return `${c.green}${s}${c.reset}`;
+}
+function yellow(s: string) {
+  return `${c.yellow}${s}${c.reset}`;
+}
+function red(s: string) {
+  return `${c.red}${s}${c.reset}`;
+}
+function gray(s: string) {
+  return `${c.gray}${s}${c.reset}`;
+}
+function dim(s: string) {
+  return `${c.dim}${s}${c.reset}`;
+}
 
 function displayModelName(filename: string): string {
   return filename.replace(/\.gguf$/, '');
@@ -74,8 +88,12 @@ async function cmdConfigShow() {
   const config = await loadConfig();
   console.log(`\n${bold('Client Configuration')}`);
   console.log(`  ${cyan('remote-url')}      ${config.remoteUrl}`);
-  console.log(`  ${cyan('default-model')}   ${config.defaultModel ?? gray('(not set)')}`);
-  console.log(`  ${cyan('default-config')}  ${config.defaultConfig ?? gray('default')}\n`);
+  console.log(
+    `  ${cyan('default-model')}   ${config.defaultModel ?? gray('(not set)')}`,
+  );
+  console.log(
+    `  ${cyan('default-config')}  ${config.defaultConfig ?? gray('default')}\n`,
+  );
 }
 
 async function cmdConfigSet(args: string[]) {
@@ -85,11 +103,12 @@ async function cmdConfigSet(args: string[]) {
     process.exit(1);
   }
 
-  const keyMap: Record<string, 'remoteUrl' | 'defaultModel' | 'defaultConfig'> = {
-    'remote-url': 'remoteUrl',
-    'default-model': 'defaultModel',
-    'default-config': 'defaultConfig',
-  };
+  const keyMap: Record<string, 'remoteUrl' | 'defaultModel' | 'defaultConfig'> =
+    {
+      'remote-url': 'remoteUrl',
+      'default-model': 'defaultModel',
+      'default-config': 'defaultConfig',
+    };
 
   const key = keyMap[keyRaw];
   if (!key) {
@@ -100,7 +119,9 @@ async function cmdConfigSet(args: string[]) {
 
   const normalizedValue = value;
   await setConfigValue(key, normalizedValue);
-  console.log(`${green('\u2714')} Set ${cyan(keyRaw)} = ${yellow(normalizedValue)}`);
+  console.log(
+    `${green('\u2714')} Set ${cyan(keyRaw)} = ${yellow(normalizedValue)}`,
+  );
 }
 
 async function cmdList() {
@@ -131,7 +152,8 @@ async function cmdList() {
       model.configs.some((c) => c.alias === defaultVal);
 
     // Use the alias from the default config if available, otherwise fallback to stripped filename
-    const defaultCfg = model.configs.find((c) => c.name === 'default') ?? model.configs[0];
+    const defaultCfg =
+      model.configs.find((c) => c.name === 'default') ?? model.configs[0];
     const displayName = defaultCfg?.alias ?? modelDisplay;
 
     console.log(`  ${isDefault ? green('\u276f') : ' '} ${cyan(displayName)}`);
@@ -155,7 +177,6 @@ async function cmdStart(args: string[]) {
 
   // Parse --config flag
   let configName = config.defaultConfig ?? 'default';
-  let modelArg: string | undefined;
   const remaining: string[] = [];
 
   for (let i = 0; i < args.length; i++) {
@@ -167,11 +188,13 @@ async function cmdStart(args: string[]) {
     }
   }
 
-  modelArg = remaining[0] ?? config.defaultModel;
+  const modelArg = remaining[0] ?? config.defaultModel;
 
   if (!modelArg) {
     console.error(red('✖ No model specified and no default-model configured.'));
-    console.error(`  Use: ${cyan('llm-client config set default-model <name>')}`);
+    console.error(
+      `  Use: ${cyan('llm-client config set default-model <name>')}`,
+    );
     console.error(`   or: ${cyan('llm-client start <model-name>')}`);
     process.exit(1);
   }
@@ -181,7 +204,9 @@ async function cmdStart(args: string[]) {
   const displayLabel = modelIdentifier.replace(/\.gguf$/, '');
   const configLabel = dim(`(config: ${configName})`);
   const remoteStartLabel = dim(`on ${config.remoteUrl}...`);
-  console.log(`${dim('Starting')} ${cyan(displayLabel)} ${configLabel} ${remoteStartLabel}`);
+  console.log(
+    `${dim('Starting')} ${cyan(displayLabel)} ${configLabel} ${remoteStartLabel}`,
+  );
 
   let result;
   try {
@@ -220,7 +245,9 @@ async function cmdStatus() {
   }
 
   console.log(`  ${green('●')} Running`);
-  console.log(`  ${cyan('model')}    ${status.modelFile ? displayModelName(status.modelFile) : '—'}`);
+  console.log(
+    `  ${cyan('model')}    ${status.modelFile ? displayModelName(status.modelFile) : '—'}`,
+  );
   console.log(`  ${cyan('config')}   ${status.configName ?? '—'}`);
   console.log(`  ${cyan('port')}     ${status.port ?? '—'}`);
   console.log(`  ${cyan('pid')}      ${status.pid ?? '—'}`);
@@ -256,7 +283,12 @@ async function main() {
   const args = process.argv.slice(2);
   const command = args[0];
 
-  if (!command || command === 'help' || command === '--help' || command === '-h') {
+  if (
+    !command ||
+    command === 'help' ||
+    command === '--help' ||
+    command === '-h'
+  ) {
     printHelp();
     return;
   }
@@ -269,7 +301,9 @@ async function main() {
       await cmdConfigSet(args.slice(2));
     } else {
       console.error(red(`Unknown config sub-command: ${sub ?? ''}`));
-      console.error(`  Use: ${cyan('llm-client config show')} or ${cyan('llm-client config set <key> <value>')}`);
+      console.error(
+        `  Use: ${cyan('llm-client config show')} or ${cyan('llm-client config set <key> <value>')}`,
+      );
       process.exit(1);
     }
     return;
@@ -303,6 +337,10 @@ async function main() {
 try {
   await main();
 } catch (err) {
-  console.error(red(`Unexpected error: ${err instanceof Error ? err.message : String(err)}`));
+  console.error(
+    red(
+      `Unexpected error: ${err instanceof Error ? err.message : String(err)}`,
+    ),
+  );
   process.exit(1);
 }

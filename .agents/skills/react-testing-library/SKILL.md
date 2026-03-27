@@ -1,9 +1,9 @@
 ---
 name: react-testing-library
-description: "React Testing Library: user-centric component testing with queries, user-event simulation, async utilities, and accessibility-first API. Use when writing React component tests, selecting elements by role/label/text, simulating user events, or testing async UI behavior. Keywords: React Testing Library, @testing-library/react, user-event, queries, render."
+description: 'React Testing Library: user-centric component testing with queries, user-event simulation, async utilities, and accessibility-first API. Use when writing React component tests, selecting elements by role/label/text, simulating user events, or testing async UI behavior. Keywords: React Testing Library, @testing-library/react, user-event, queries, render.'
 metadata:
-  version: "16.3.2"
-  release_date: "2026-01-19"
+  version: '16.3.2'
+  release_date: '2026-01-19'
 ---
 
 # React Testing Library Skill
@@ -52,31 +52,31 @@ Use queries in this order of preference:
 
 ```ts
 // Best — by ARIA role
-getByRole("button", { name: /submit/i });
-getByRole("textbox", { name: /email/i });
+getByRole('button', { name: /submit/i });
+getByRole('textbox', { name: /email/i });
 
 // Form fields — by label
-getByLabelText("Email");
+getByLabelText('Email');
 
 // Non-interactive content — by text
-getByText("Welcome back!");
+getByText('Welcome back!');
 ```
 
 ### 2. Semantic Queries
 
 ```ts
 // Images
-getByAltText("Company logo");
+getByAltText('Company logo');
 
 // Title attribute (less reliable)
-getByTitle("Close");
+getByTitle('Close');
 ```
 
 ### 3. Test IDs (Escape Hatch)
 
 ```ts
 // Only when other queries don't work
-getByTestId("custom-element");
+getByTestId('custom-element');
 ```
 
 ---
@@ -103,16 +103,16 @@ getByTestId("custom-element");
 ## Basic Test Pattern
 
 ```tsx
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
-test("shows greeting after login", async () => {
+test('shows greeting after login', async () => {
   const user = userEvent.setup();
   render(<App />);
 
   // Act — simulate user interactions
-  await user.type(screen.getByLabelText(/username/i), "john");
-  await user.click(screen.getByRole("button", { name: /login/i }));
+  await user.type(screen.getByLabelText(/username/i), 'john');
+  await user.click(screen.getByRole('button', { name: /login/i }));
 
   // Assert — verify outcome
   expect(await screen.findByText(/welcome, john/i)).toBeInTheDocument();
@@ -126,9 +126,9 @@ test("shows greeting after login", async () => {
 Always use `@testing-library/user-event` over `fireEvent`:
 
 ```ts
-import userEvent from "@testing-library/user-event";
+import userEvent from '@testing-library/user-event';
 
-test("user interactions", async () => {
+test('user interactions', async () => {
   const user = userEvent.setup();
 
   // Click
@@ -137,15 +137,15 @@ test("user interactions", async () => {
   await user.tripleClick(element);
 
   // Type
-  await user.type(input, "Hello");
+  await user.type(input, 'Hello');
   await user.clear(input);
 
   // Select
-  await user.selectOptions(select, ["option1", "option2"]);
+  await user.selectOptions(select, ['option1', 'option2']);
 
   // Keyboard
-  await user.keyboard("{Enter}");
-  await user.keyboard("[ShiftLeft>]a[/ShiftLeft]"); // Shift+A
+  await user.keyboard('{Enter}');
+  await user.keyboard('[ShiftLeft>]a[/ShiftLeft]'); // Shift+A
 
   // Clipboard
   await user.copy();
@@ -165,7 +165,7 @@ test("user interactions", async () => {
 
 ```ts
 await waitFor(() => {
-  expect(screen.getByText("Loaded")).toBeInTheDocument();
+  expect(screen.getByText('Loaded')).toBeInTheDocument();
 });
 
 // With options
@@ -179,13 +179,13 @@ await waitFor(() => expect(callback).toHaveBeenCalled(), {
 
 ```ts
 // Equivalent to: await waitFor(() => getByText('Loaded'))
-const element = await screen.findByText("Loaded");
+const element = await screen.findByText('Loaded');
 ```
 
 ### waitForElementToBeRemoved
 
 ```ts
-await waitForElementToBeRemoved(() => screen.queryByText("Loading..."));
+await waitForElementToBeRemoved(() => screen.queryByText('Loading...'));
 ```
 
 ---
@@ -196,9 +196,9 @@ await waitForElementToBeRemoved(() => screen.queryByText("Loading..."));
 
 ```tsx
 // test-utils.tsx
-import { render } from "@testing-library/react";
-import { ThemeProvider } from "./ThemeProvider";
-import { AuthProvider } from "./AuthProvider";
+import { render } from '@testing-library/react';
+import { ThemeProvider } from './ThemeProvider';
+import { AuthProvider } from './AuthProvider';
 
 function AllProviders({ children }) {
   return (
@@ -208,18 +208,19 @@ function AllProviders({ children }) {
   );
 }
 
-const customRender = (ui, options) => render(ui, { wrapper: AllProviders, ...options });
+const customRender = (ui, options) =>
+  render(ui, { wrapper: AllProviders, ...options });
 
-export * from "@testing-library/react";
+export * from '@testing-library/react';
 export { customRender as render };
 ```
 
 ### Testing Hooks
 
 ```ts
-import { renderHook, act } from "@testing-library/react";
+import { renderHook, act } from '@testing-library/react';
 
-test("useCounter increments", () => {
+test('useCounter increments', () => {
   const { result } = renderHook(() => useCounter());
 
   expect(result.current.count).toBe(0);
@@ -245,10 +246,10 @@ expect(screen.getByText("Count: 2")).toBeInTheDocument();
 ### Query Within Container
 
 ```ts
-import { within } from "@testing-library/react";
+import { within } from '@testing-library/react';
 
-const modal = screen.getByRole("dialog");
-const submitBtn = within(modal).getByRole("button", { name: /submit/i });
+const modal = screen.getByRole('dialog');
+const submitBtn = within(modal).getByRole('button', { name: /submit/i });
 ```
 
 ---
@@ -260,10 +261,10 @@ const submitBtn = within(modal).getByRole("button", { name: /submit/i });
 screen.debug();
 
 // Print specific element
-screen.debug(screen.getByRole("button"));
+screen.debug(screen.getByRole('button'));
 
 // Log available roles
-import { logRoles } from "@testing-library/react";
+import { logRoles } from '@testing-library/react';
 logRoles(container);
 
 // With prettyDOM options
@@ -275,16 +276,16 @@ screen.debug(undefined, 10000); // max length
 ## jest-dom Matchers
 
 ```ts
-import "@testing-library/jest-dom";
+import '@testing-library/jest-dom';
 
 expect(element).toBeInTheDocument();
 expect(element).toBeVisible();
 expect(element).toBeEnabled();
 expect(element).toBeDisabled();
-expect(element).toHaveTextContent("Hello");
-expect(element).toHaveValue("input value");
-expect(element).toHaveAttribute("href", "/home");
-expect(element).toHaveClass("active");
+expect(element).toHaveTextContent('Hello');
+expect(element).toHaveValue('input value');
+expect(element).toHaveAttribute('href', '/home');
+expect(element).toHaveClass('active');
 expect(element).toHaveFocus();
 expect(element).toBeChecked();
 ```
@@ -294,11 +295,11 @@ expect(element).toBeChecked();
 ## Configuration
 
 ```ts
-import { configure } from "@testing-library/react";
+import { configure } from '@testing-library/react';
 
 configure({
   // Custom test ID attribute
-  testIdAttribute: "data-my-test-id",
+  testIdAttribute: 'data-my-test-id',
 
   // Async timeout
   asyncUtilTimeout: 5000,
@@ -372,17 +373,17 @@ getByRole("button", { name: /submit/i });
 
 ```ts
 // Exact match (default)
-getByText("Hello World");
+getByText('Hello World');
 
 // Substring match
-getByText("llo Worl", { exact: false });
+getByText('llo Worl', { exact: false });
 
 // Regex
 getByText(/hello world/i);
 
 // Custom function
 getByText((content, element) => {
-  return element.tagName === "SPAN" && content.startsWith("Hello");
+  return element.tagName === 'SPAN' && content.startsWith('Hello');
 });
 ```
 

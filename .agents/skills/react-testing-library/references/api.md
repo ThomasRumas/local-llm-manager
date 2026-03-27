@@ -11,11 +11,11 @@ const result = render(ui, options?)
 ### Basic Usage
 
 ```tsx
-import { render, screen } from "@testing-library/react";
+import { render, screen } from '@testing-library/react';
 
-test("renders greeting", () => {
+test('renders greeting', () => {
   render(<Greeting name="World" />);
-  expect(screen.getByText("Hello, World!")).toBeInTheDocument();
+  expect(screen.getByText('Hello, World!')).toBeInTheDocument();
 });
 ```
 
@@ -67,23 +67,23 @@ const {
 Handle errors in tests with React 19 error callbacks:
 
 ```tsx
-test("catches error boundary errors", () => {
+test('catches error boundary errors', () => {
   const errors: Error[] = [];
 
   render(<ComponentWithErrorBoundary />, {
     onCaughtError: (error, errorInfo) => {
       errors.push(error);
-      console.log("Caught:", error.message);
-      console.log("Component stack:", errorInfo.componentStack);
+      console.log('Caught:', error.message);
+      console.log('Component stack:', errorInfo.componentStack);
     },
   });
 
   // Trigger error and verify
-  fireEvent.click(screen.getByRole("button", { name: /throw/i }));
+  fireEvent.click(screen.getByRole('button', { name: /throw/i }));
   expect(errors).toHaveLength(1);
 });
 
-test("handles recoverable errors", () => {
+test('handles recoverable errors', () => {
   const recoverableErrors: Error[] = [];
 
   render(<HydratedComponent />, {
@@ -129,10 +129,10 @@ Update props without remounting:
 
 ```tsx
 const { rerender } = render(<Counter count={1} />);
-expect(screen.getByText("Count: 1")).toBeInTheDocument();
+expect(screen.getByText('Count: 1')).toBeInTheDocument();
 
 rerender(<Counter count={2} />);
-expect(screen.getByText("Count: 2")).toBeInTheDocument();
+expect(screen.getByText('Count: 2')).toBeInTheDocument();
 ```
 
 ---
@@ -155,7 +155,7 @@ Create snapshot of current DOM state:
 const { asFragment } = render(<Component />);
 
 const firstRender = asFragment();
-fireEvent.click(screen.getByRole("button"));
+fireEvent.click(screen.getByRole('button'));
 
 // Snapshot diff
 expect(firstRender).toMatchDiffSnapshot(asFragment());
@@ -168,12 +168,12 @@ expect(firstRender).toMatchDiffSnapshot(asFragment());
 Unmounts all rendered components. Called automatically in Jest/Vitest.
 
 ```ts
-import { cleanup, render } from "@testing-library/react";
+import { cleanup, render } from '@testing-library/react';
 
 afterEach(cleanup); // Usually not needed
 
 // Or skip auto-cleanup
-import "@testing-library/react/dont-cleanup-after-each";
+import '@testing-library/react/dont-cleanup-after-each';
 ```
 
 ---
@@ -183,7 +183,7 @@ import "@testing-library/react/dont-cleanup-after-each";
 Wrap state updates:
 
 ```ts
-import { act } from "@testing-library/react";
+import { act } from '@testing-library/react';
 
 await act(async () => {
   // Trigger state updates
@@ -201,9 +201,9 @@ await act(async () => {
 Test custom hooks:
 
 ```ts
-import { renderHook, act } from "@testing-library/react";
+import { renderHook, act } from '@testing-library/react';
 
-test("useCounter", () => {
+test('useCounter', () => {
   const { result } = renderHook(() => useCounter());
 
   expect(result.current.count).toBe(0);
@@ -219,12 +219,14 @@ test("useCounter", () => {
 ### With Initial Props
 
 ```ts
-const { result, rerender } = renderHook((props) => useUser(props.id), { initialProps: { id: 1 } });
+const { result, rerender } = renderHook((props) => useUser(props.id), {
+  initialProps: { id: 1 },
+});
 
-expect(result.current.name).toBe("User 1");
+expect(result.current.name).toBe('User 1');
 
 rerender({ id: 2 });
-expect(result.current.name).toBe("User 2");
+expect(result.current.name).toBe('User 2');
 ```
 
 ### With Wrapper
@@ -252,10 +254,10 @@ const {
 Set global options:
 
 ```ts
-import { configure } from "@testing-library/react";
+import { configure } from '@testing-library/react';
 
 configure({
-  testIdAttribute: "data-my-test-id",
+  testIdAttribute: 'data-my-test-id',
   asyncUtilTimeout: 5000,
   defaultHidden: false,
   throwSuggestions: true,
@@ -269,9 +271,9 @@ configure({
 
 ```tsx
 // test-utils.tsx
-import { render, RenderOptions } from "@testing-library/react";
-import { ThemeProvider } from "./ThemeProvider";
-import { AuthProvider } from "./AuthProvider";
+import { render, RenderOptions } from '@testing-library/react';
+import { ThemeProvider } from './ThemeProvider';
+import { AuthProvider } from './AuthProvider';
 
 const AllProviders = ({ children }) => (
   <ThemeProvider>
@@ -279,18 +281,21 @@ const AllProviders = ({ children }) => (
   </ThemeProvider>
 );
 
-const customRender = (ui: React.ReactElement, options?: Omit<RenderOptions, "wrapper">) => render(ui, { wrapper: AllProviders, ...options });
+const customRender = (
+  ui: React.ReactElement,
+  options?: Omit<RenderOptions, 'wrapper'>,
+) => render(ui, { wrapper: AllProviders, ...options });
 
-export * from "@testing-library/react";
+export * from '@testing-library/react';
 export { customRender as render };
 ```
 
 Usage:
 
 ```tsx
-import { render, screen } from "./test-utils";
+import { render, screen } from './test-utils';
 
-test("works with providers", () => {
+test('works with providers', () => {
   render(<MyComponent />);
   // Component has access to ThemeProvider and AuthProvider
 });
@@ -303,15 +308,15 @@ test("works with providers", () => {
 ```js
 // jest.config.js
 module.exports = {
-  testEnvironment: "jsdom", // Required for Jest 27+
-  setupFilesAfterEnv: ["<rootDir>/setupTests.js"],
-  moduleDirectories: ["node_modules", "utils"],
+  testEnvironment: 'jsdom', // Required for Jest 27+
+  setupFilesAfterEnv: ['<rootDir>/setupTests.js'],
+  moduleDirectories: ['node_modules', 'utils'],
 };
 ```
 
 ```js
 // setupTests.js
-import "@testing-library/jest-dom";
+import '@testing-library/jest-dom';
 ```
 
 ---
@@ -320,18 +325,18 @@ import "@testing-library/jest-dom";
 
 ```ts
 // vitest.config.ts
-import { defineConfig } from "vitest/config";
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
-    environment: "jsdom",
+    environment: 'jsdom',
     globals: true, // Enable auto-cleanup
-    setupFiles: "./setupTests.ts",
+    setupFiles: './setupTests.ts',
   },
 });
 ```
 
 ```ts
 // setupTests.ts
-import "@testing-library/jest-dom";
+import '@testing-library/jest-dom';
 ```

@@ -1,5 +1,4 @@
 import { describe, it, expect, vi } from 'vitest';
-import React from 'react';
 import { render } from 'ink-testing-library';
 import { TextInputField } from './text-input-field.js';
 
@@ -17,14 +16,24 @@ describe('TextInputField', () => {
 
   it('renders placeholder when value is empty', () => {
     const { lastFrame } = render(
-      <TextInputField label="Name" value="" onChange={vi.fn()} placeholder="type here" />,
+      <TextInputField
+        label="Name"
+        value=""
+        onChange={vi.fn()}
+        placeholder="type here"
+      />,
     );
     expect(lastFrame()).toContain('type here');
   });
 
   it('does not render placeholder when value is set', () => {
     const { lastFrame } = render(
-      <TextInputField label="Name" value="test" onChange={vi.fn()} placeholder="type here" />,
+      <TextInputField
+        label="Name"
+        value="test"
+        onChange={vi.fn()}
+        placeholder="type here"
+      />,
     );
     expect(lastFrame()).not.toContain('type here');
   });

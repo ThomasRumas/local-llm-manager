@@ -13,9 +13,12 @@ export function useApiServer(): ApiServerState {
   });
 
   useEffect(() => {
-    const onchange = () => setState({ isRunning: apiServer.isRunning, port: apiServer.port });
+    const onchange = () =>
+      setState({ isRunning: apiServer.isRunning, port: apiServer.port });
     apiServer.on('change', onchange);
-    return () => { apiServer.off('change', onchange); };
+    return () => {
+      apiServer.off('change', onchange);
+    };
   }, []);
 
   return state;

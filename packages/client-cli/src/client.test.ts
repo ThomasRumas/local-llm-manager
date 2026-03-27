@@ -44,7 +44,9 @@ describe('Client HTTP functions', () => {
   // ── startModel() ──────────────────────────────────────────────────────────
   describe('startModel()', () => {
     it('posts to correct URL with encoded filename', async () => {
-      mockFetch.mockResolvedValueOnce(makeResponse({ success: true, port: 8001, pid: 1234 }));
+      mockFetch.mockResolvedValueOnce(
+        makeResponse({ success: true, port: 8001, pid: 1234 }),
+      );
       await startModel(BASE_URL, 'my model.gguf', 'default');
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining(encodeURIComponent('my model.gguf')),
@@ -53,7 +55,9 @@ describe('Client HTTP functions', () => {
     });
 
     it('returns port and pid on success', async () => {
-      mockFetch.mockResolvedValueOnce(makeResponse({ success: true, port: 8001, pid: 9999 }));
+      mockFetch.mockResolvedValueOnce(
+        makeResponse({ success: true, port: 8001, pid: 9999 }),
+      );
       const result = await startModel(BASE_URL, 'test.gguf');
       expect(result.port).toBe(8001);
       expect(result.pid).toBe(9999);
@@ -81,7 +85,15 @@ describe('Client HTTP functions', () => {
 
     it('returns running=false when server is stopped', async () => {
       mockFetch.mockResolvedValueOnce(
-        makeResponse({ running: false, modelFile: null, configName: null, port: null, pid: null, uptimeSeconds: 0, error: null }),
+        makeResponse({
+          running: false,
+          modelFile: null,
+          configName: null,
+          port: null,
+          pid: null,
+          uptimeSeconds: 0,
+          error: null,
+        }),
       );
       const status = await getStatus(BASE_URL);
       expect(status.running).toBe(false);
@@ -100,7 +112,9 @@ describe('Client HTTP functions', () => {
   // ── timeout handling ──────────────────────────────────────────────────────
   describe('timeout / connection error handling', () => {
     it('throws "timed out" on AbortError', async () => {
-      mockFetch.mockRejectedValueOnce(Object.assign(new Error('Aborted'), { name: 'AbortError' }));
+      mockFetch.mockRejectedValueOnce(
+        Object.assign(new Error('Aborted'), { name: 'AbortError' }),
+      );
       await expect(listModels(BASE_URL)).rejects.toThrow('timed out');
     });
 

@@ -22,7 +22,9 @@ export class ModelsService {
         }),
       );
 
-      return models.sort((a, b) => b.lastModified.getTime() - a.lastModified.getTime());
+      return models.sort(
+        (a, b) => b.lastModified.getTime() - a.lastModified.getTime(),
+      );
     } catch {
       return [];
     }

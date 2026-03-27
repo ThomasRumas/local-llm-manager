@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Box, Text, useInput, useApp } from 'ink';
 import { useServer } from '../contexts/server-context.js';
 import { configService } from '../modules/config/config.service.js';
@@ -12,10 +12,20 @@ interface DashboardProps {
 type Action = { key: string; shortcut: string; screen: Screen; label: string };
 
 const ACTIONS: Action[] = [
-  { key: '1', shortcut: '1', screen: 'install',    label: 'Install / Check llama.cpp' },
-  { key: '2', shortcut: '2', screen: 'search',     label: 'Search Models (Hugging Face)' },
-  { key: '3', shortcut: '3', screen: 'my-models',  label: 'My Models' },
-  { key: '4', shortcut: '4', screen: 'settings',   label: 'Settings' },
+  {
+    key: '1',
+    shortcut: '1',
+    screen: 'install',
+    label: 'Install / Check llama.cpp',
+  },
+  {
+    key: '2',
+    shortcut: '2',
+    screen: 'search',
+    label: 'Search Models (Hugging Face)',
+  },
+  { key: '3', shortcut: '3', screen: 'my-models', label: 'My Models' },
+  { key: '4', shortcut: '4', screen: 'settings', label: 'Settings' },
 ];
 
 function formatUptime(seconds: number): string {
@@ -40,7 +50,10 @@ export function Dashboard({ onNavigate }: Readonly<DashboardProps>) {
   const hasHfToken = !!hfToken;
 
   useInput((input, key) => {
-    if (input === 'q') { exit(); return; }
+    if (input === 'q') {
+      exit();
+      return;
+    }
 
     if (key.upArrow) {
       setSelectedIndex((prev) => (prev > 0 ? prev - 1 : ACTIONS.length - 1));
@@ -72,45 +85,71 @@ export function Dashboard({ onNavigate }: Readonly<DashboardProps>) {
           paddingX={1}
         >
           <Text bold color={hasHfToken ? 'green' : 'yellow'}>
-            {hasHfToken ? '● Hugging Face Token Set' : '○ No Hugging Face Token'}
+            {hasHfToken
+              ? '● Hugging Face Token Set'
+              : '○ No Hugging Face Token'}
           </Text>
           {hasHfToken ? (
             <Text dimColor>
               {`hf_${'*'.repeat(Math.max(0, hfToken.length - 3))}${hfToken.slice(-3)}`}
             </Text>
           ) : (
-            <Text dimColor>Set a token in Settings [4] to access private repos</Text>
+            <Text dimColor>
+              Set a token in Settings [4] to access private repos
+            </Text>
           )}
         </Box>
 
         {/* Server Status Panel */}
-        <Box borderStyle="round" borderColor={server.running ? 'green' : 'gray'} flexDirection="column" paddingX={1}>
+        <Box
+          borderStyle="round"
+          borderColor={server.running ? 'green' : 'gray'}
+          flexDirection="column"
+          paddingX={1}
+        >
           <Text bold color={server.running ? 'green' : 'gray'}>
             {server.running ? '● Server Running' : '○ No Server Running'}
           </Text>
           {server.running ? (
             <Box flexDirection="column" marginTop={1} gap={0}>
               <Box gap={2}>
-                <Box width={12}><Text dimColor>Model</Text></Box>
-                <Text wrap="truncate">{server.modelFile ? configService.getModelDisplayName(server.modelFile, server.configName ?? 'default') : '—'}</Text>
+                <Box width={12}>
+                  <Text dimColor>Model</Text>
+                </Box>
+                <Text wrap="truncate">
+                  {server.modelFile
+                    ? configService.getModelDisplayName(
+                        server.modelFile,
+                        server.configName ?? 'default',
+                      )
+                    : '—'}
+                </Text>
               </Box>
               <Box gap={2}>
-                <Box width={12}><Text dimColor>Port</Text></Box>
+                <Box width={12}>
+                  <Text dimColor>Port</Text>
+                </Box>
                 <Text color="cyan">:{server.port}</Text>
               </Box>
               <Box gap={2}>
-                <Box width={12}><Text dimColor>Uptime</Text></Box>
+                <Box width={12}>
+                  <Text dimColor>Uptime</Text>
+                </Box>
                 <Text color="green">{formatUptime(server.uptimeSeconds)}</Text>
               </Box>
               {server.pid && (
                 <Box gap={2}>
-                  <Box width={12}><Text dimColor>PID</Text></Box>
+                  <Box width={12}>
+                    <Text dimColor>PID</Text>
+                  </Box>
                   <Text color="gray">{server.pid}</Text>
                 </Box>
               )}
               {server.configName && (
                 <Box gap={2}>
-                  <Box width={12}><Text dimColor>Config</Text></Box>
+                  <Box width={12}>
+                    <Text dimColor>Config</Text>
+                  </Box>
                   <Text color="gray">{server.configName}</Text>
                 </Box>
               )}
@@ -121,22 +160,38 @@ export function Dashboard({ onNavigate }: Readonly<DashboardProps>) {
         </Box>
 
         {/* System Resources Panel */}
-        <Box borderStyle="single" borderColor="gray" flexDirection="column" paddingX={1}>
-          <Text bold dimColor>System Resources</Text>
+        <Box
+          borderStyle="single"
+          borderColor="gray"
+          flexDirection="column"
+          paddingX={1}
+        >
+          <Text bold dimColor>
+            System Resources
+          </Text>
           {stats ? (
             <Box flexDirection="column" gap={0}>
               <Box gap={1}>
-                <Box width={6}><Text dimColor>CPU</Text></Box>
+                <Box width={6}>
+                  <Text dimColor>CPU</Text>
+                </Box>
                 <Text color={stats.cpuPercent > 80 ? 'red' : 'green'}>
                   {stats.cpuPercent}%
                 </Text>
               </Box>
               <Box gap={1}>
-                <Box width={6}><Text dimColor>RAM</Text></Box>
-                <Text>{formatGb(stats.ramUsedBytes)} / {formatGb(stats.ramTotalBytes)}</Text>
+                <Box width={6}>
+                  <Text dimColor>RAM</Text>
+                </Box>
+                <Text>
+                  {formatGb(stats.ramUsedBytes)} /{' '}
+                  {formatGb(stats.ramTotalBytes)}
+                </Text>
               </Box>
               <Box gap={1}>
-                <Box width={6}><Text dimColor>VRAM</Text></Box>
+                <Box width={6}>
+                  <Text dimColor>VRAM</Text>
+                </Box>
                 <Text color="gray">{stats.vramLabel}</Text>
               </Box>
             </Box>
@@ -147,38 +202,63 @@ export function Dashboard({ onNavigate }: Readonly<DashboardProps>) {
 
         {/* Recent logs — only when server has logs */}
         {server.logs.length > 0 && (
-          <Box borderStyle="single" borderColor="gray" flexDirection="column" paddingX={1} flexGrow={1}>
-            <Text bold dimColor>Recent Logs</Text>
+          <Box
+            borderStyle="single"
+            borderColor="gray"
+            flexDirection="column"
+            paddingX={1}
+            flexGrow={1}
+          >
+            <Text bold dimColor>
+              Recent Logs
+            </Text>
             <Box flexDirection="column" overflow="hidden">
               {recentLogs.map((line, i) => (
-                <Text key={server.logs.length - recentLogs.length + i} color="gray" wrap="truncate">{line.trim()}</Text>
+                <Text
+                  key={server.logs.length - recentLogs.length + i}
+                  color="gray"
+                  wrap="truncate"
+                >
+                  {line.trim()}
+                </Text>
               ))}
             </Box>
-            {server.running && (
-              <Text dimColor>[m] open monitor</Text>
-            )}
+            {server.running && <Text dimColor>[m] open monitor</Text>}
           </Box>
         )}
       </Box>
 
       {/* Right column — quick actions */}
       <Box flexDirection="column" width="50%">
-        <Box borderStyle="round" borderColor="cyan" flexDirection="column" paddingX={1}>
-          <Text bold color="cyan">Quick Actions</Text>
+        <Box
+          borderStyle="round"
+          borderColor="cyan"
+          flexDirection="column"
+          paddingX={1}
+        >
+          <Text bold color="cyan">
+            Quick Actions
+          </Text>
           <Box flexDirection="column" marginTop={1}>
             {ACTIONS.map((action, i) => (
               <Box key={action.key} gap={1}>
                 <Text color={i === selectedIndex ? 'cyan' : 'gray'}>
                   {i === selectedIndex ? '❯' : ' '}
                 </Text>
-                <Text bold color="yellow">[{action.shortcut}]</Text>
-                <Text color={i === selectedIndex ? 'cyan' : 'white'}>{action.label}</Text>
+                <Text bold color="yellow">
+                  [{action.shortcut}]
+                </Text>
+                <Text color={i === selectedIndex ? 'cyan' : 'white'}>
+                  {action.label}
+                </Text>
               </Box>
             ))}
             {server.running && (
               <Box gap={1} marginTop={1}>
                 <Text color="gray"> </Text>
-                <Text bold color="yellow">[m]</Text>
+                <Text bold color="yellow">
+                  [m]
+                </Text>
                 <Text color="green">Monitor Server</Text>
               </Box>
             )}

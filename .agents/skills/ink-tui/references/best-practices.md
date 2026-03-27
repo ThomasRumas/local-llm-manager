@@ -33,12 +33,12 @@ Required Node.js 22+. Ink is ESM-only — use `"type": "module"` in `package.jso
 ### Responsive Layouts
 
 ```tsx
-const {columns} = useWindowSize();
+const { columns } = useWindowSize();
 
 <Box flexDirection={columns < 80 ? 'column' : 'row'}>
   <Sidebar />
   <MainContent />
-</Box>
+</Box>;
 ```
 
 ### Common Layout Patterns
@@ -87,15 +87,15 @@ const {columns} = useWindowSize();
 ### Keyboard Navigation Pattern
 
 ```tsx
-const MenuList = ({items}) => {
+const MenuList = ({ items }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   useInput((input, key) => {
     if (key.upArrow) {
-      setSelectedIndex(prev => Math.max(0, prev - 1));
+      setSelectedIndex((prev) => Math.max(0, prev - 1));
     }
     if (key.downArrow) {
-      setSelectedIndex(prev => Math.min(items.length - 1, prev + 1));
+      setSelectedIndex((prev) => Math.min(items.length - 1, prev + 1));
     }
     if (key.return) {
       onSelect(items[selectedIndex]);
@@ -122,10 +122,13 @@ const MenuList = ({items}) => {
 When multiple components use `useInput`, guard with `isActive` to prevent double handling:
 
 ```tsx
-const Panel = ({isActive}) => {
-  useInput((input, key) => {
-    // Only fires when this panel is active
-  }, {isActive});
+const Panel = ({ isActive }) => {
+  useInput(
+    (input, key) => {
+      // Only fires when this panel is active
+    },
+    { isActive },
+  );
 };
 ```
 
@@ -148,18 +151,23 @@ usePaste((text) => {
 ### Tab Navigation
 
 ```tsx
-const FocusableInput = ({label, onSubmit}) => {
-  const {isFocused} = useFocus();
+const FocusableInput = ({ label, onSubmit }) => {
+  const { isFocused } = useFocus();
 
-  useInput((input, key) => {
-    if (key.return && isFocused) {
-      onSubmit();
-    }
-  }, {isActive: isFocused});
+  useInput(
+    (input, key) => {
+      if (key.return && isFocused) {
+        onSubmit();
+      }
+    },
+    { isActive: isFocused },
+  );
 
   return (
-    <Box borderStyle={isFocused ? 'round' : 'single'}
-         borderColor={isFocused ? 'green' : undefined}>
+    <Box
+      borderStyle={isFocused ? 'round' : 'single'}
+      borderColor={isFocused ? 'green' : undefined}
+    >
       <Text>{label}</Text>
     </Box>
   );
@@ -170,7 +178,7 @@ const FocusableInput = ({label, onSubmit}) => {
 
 ```tsx
 const FormWizard = () => {
-  const {focus} = useFocusManager();
+  const { focus } = useFocusManager();
 
   const handleNext = () => {
     focus('step-2'); // Jump to specific field
@@ -197,7 +205,7 @@ For logs, completed tasks, or any output that won't change — use `<Static>` to
 ```tsx
 <>
   <Static items={completedTasks}>
-    {task => (
+    {(task) => (
       <Box key={task.id}>
         <Text color="green">✔ {task.title}</Text>
       </Box>
@@ -217,15 +225,15 @@ For logs, completed tasks, or any output that won't change — use `<Static>` to
 
 ```tsx
 render(<App />, {
-  maxFps: 15,                  // Lower FPS for CPU savings
-  incrementalRendering: true,  // Only update changed lines
+  maxFps: 15, // Lower FPS for CPU savings
+  incrementalRendering: true, // Only update changed lines
 });
 ```
 
 ### Alternate Screen for Full-Screen Apps
 
 ```tsx
-render(<App />, {alternateScreen: true});
+render(<App />, { alternateScreen: true });
 // Restores original terminal on exit (like vim/htop)
 ```
 
@@ -235,7 +243,7 @@ render(<App />, {alternateScreen: true});
 
 ```tsx
 const App = () => {
-  const {exit} = useApp();
+  const { exit } = useApp();
 
   useInput((input, key) => {
     if (input === 'q' || (key.ctrl && input === 'c')) {
@@ -277,7 +285,7 @@ const App = () => {
 ### Screen Reader Adaptation
 
 ```tsx
-const StatusIndicator = ({status}) => {
+const StatusIndicator = ({ status }) => {
   const isScreenReaderEnabled = useIsScreenReaderEnabled();
 
   if (isScreenReaderEnabled) {
@@ -308,17 +316,17 @@ const StatusIndicator = ({status}) => {
 Use `ink-testing-library` for unit testing Ink components:
 
 ```tsx
-import {render} from 'ink-testing-library';
-import {Text} from 'ink';
+import { render } from 'ink-testing-library';
+import { Text } from 'ink';
 
 test('renders text', () => {
-  const {lastFrame} = render(<Text>Hello</Text>);
+  const { lastFrame } = render(<Text>Hello</Text>);
   expect(lastFrame()).toBe('Hello');
 });
 
 // Test with input
 test('handles keyboard input', async () => {
-  const {lastFrame, stdin} = render(<MyComponent />);
+  const { lastFrame, stdin } = render(<MyComponent />);
 
   // Simulate key press
   stdin.write('q');
@@ -327,10 +335,10 @@ test('handles keyboard input', async () => {
 });
 
 // String rendering for snapshots
-import {renderToString} from 'ink';
+import { renderToString } from 'ink';
 
 test('snapshot test', () => {
-  const output = renderToString(<MyLayout />, {columns: 80});
+  const output = renderToString(<MyLayout />, { columns: 80 });
   expect(output).toMatchSnapshot();
 });
 ```
@@ -350,6 +358,7 @@ npx react-devtools
 ## CI Behavior
 
 Ink auto-detects CI environments (via `CI` env var):
+
 - Only renders the last frame on exit
 - Disables terminal resize listeners
 - Disables ANSI erase sequences
@@ -360,18 +369,18 @@ Override with `CI=false node my-cli.js` if your CI supports full terminal render
 
 ## Common Pitfalls
 
-| Problem | Cause | Fix |
-|---------|-------|-----|
-| Raw text crashes | Text outside `<Text>` | Wrap all strings in `<Text>` |
-| `<Box>` inside `<Text>` | Invalid nesting | `<Text>` only accepts text and nested `<Text>` |
-| `console.log` garbles output | Direct stdout writes mix with Ink | Use `useStdout().write()` or `<Static>` |
-| App exits immediately | No async work in event loop | Add `useInput`, timers, or promises |
-| Focus doesn't work | Missing `useFocus()` in component | Call `useFocus()` in focusable components |
-| Layout wrong after resize | Not using `useWindowSize` | Add `useWindowSize` for responsive layouts |
-| `measureElement` returns 0 | Called during render | Call from `useEffect` / `useLayoutEffect` |
-| Input handled twice | Multiple `useInput` without guards | Use `isActive` option |
-| `<Static>` items re-render | Modifying previously rendered items | Only append new items; old ones are frozen |
-| Ctrl+C doesn't work | Custom raw mode | Use Ink's `setRawMode` from `useStdin`, not `process.stdin.setRawMode` |
+| Problem                      | Cause                               | Fix                                                                    |
+| ---------------------------- | ----------------------------------- | ---------------------------------------------------------------------- |
+| Raw text crashes             | Text outside `<Text>`               | Wrap all strings in `<Text>`                                           |
+| `<Box>` inside `<Text>`      | Invalid nesting                     | `<Text>` only accepts text and nested `<Text>`                         |
+| `console.log` garbles output | Direct stdout writes mix with Ink   | Use `useStdout().write()` or `<Static>`                                |
+| App exits immediately        | No async work in event loop         | Add `useInput`, timers, or promises                                    |
+| Focus doesn't work           | Missing `useFocus()` in component   | Call `useFocus()` in focusable components                              |
+| Layout wrong after resize    | Not using `useWindowSize`           | Add `useWindowSize` for responsive layouts                             |
+| `measureElement` returns 0   | Called during render                | Call from `useEffect` / `useLayoutEffect`                              |
+| Input handled twice          | Multiple `useInput` without guards  | Use `isActive` option                                                  |
+| `<Static>` items re-render   | Modifying previously rendered items | Only append new items; old ones are frozen                             |
+| Ctrl+C doesn't work          | Custom raw mode                     | Use Ink's `setRawMode` from `useStdin`, not `process.stdin.setRawMode` |
 
 ---
 
@@ -380,7 +389,7 @@ Override with `CI=false node my-cli.js` if your CI supports full terminal render
 Enable for Suspense, `useTransition`, and `useDeferredValue`:
 
 ```tsx
-render(<App />, {concurrent: true});
+render(<App />, { concurrent: true });
 ```
 
 ### Suspense Example
@@ -398,7 +407,7 @@ const App = () => (
   </Suspense>
 );
 
-render(<App />, {concurrent: true});
+render(<App />, { concurrent: true });
 ```
 
 ---
@@ -410,7 +419,7 @@ Enhanced keyboard support for compatible terminals (kitty, WezTerm, Ghostty):
 ```tsx
 render(<App />, {
   kittyKeyboard: {
-    mode: 'auto',  // 'auto' | 'enabled' | 'disabled'
+    mode: 'auto', // 'auto' | 'enabled' | 'disabled'
     flags: ['disambiguateEscapeCodes', 'reportEventTypes'],
   },
 });

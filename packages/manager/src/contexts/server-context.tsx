@@ -1,11 +1,21 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import type { ResolvedConfig } from '../modules/config/config.types.js';
 import { serverManager } from '../modules/server/server-manager.js';
 import type { ServerState } from '../modules/server/server-manager.types.js';
 export type { ServerState } from '../modules/server/server-manager.types.js';
 
 interface ServerContextValue extends ServerState {
-  start: (config: ResolvedConfig, modelFile: string, configName: string) => void;
+  start: (
+    config: ResolvedConfig,
+    modelFile: string,
+    configName: string,
+  ) => void;
   stop: () => void;
 }
 
@@ -19,7 +29,9 @@ export function useServer() {
   return useContext(ServerContext);
 }
 
-export function ServerProvider({ children }: Readonly<{ children: React.ReactNode }>) {
+export function ServerProvider({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   const [state, setState] = useState<ServerState>(serverManager.getState());
 
   useEffect(() => {
@@ -31,13 +43,15 @@ export function ServerProvider({ children }: Readonly<{ children: React.ReactNod
   }, []);
 
   const value = useMemo(
-    () => ({ ...state, start: serverManager.start.bind(serverManager), stop: serverManager.stop.bind(serverManager) }),
+    () => ({
+      ...state,
+      start: serverManager.start.bind(serverManager),
+      stop: serverManager.stop.bind(serverManager),
+    }),
     [state],
   );
 
   return (
-    <ServerContext.Provider value={value}>
-      {children}
-    </ServerContext.Provider>
+    <ServerContext.Provider value={value}>{children}</ServerContext.Provider>
   );
 }

@@ -12,7 +12,10 @@ let cachedConfig: ClientConfig | null = null;
 export async function loadConfig(): Promise<ClientConfig> {
   try {
     const raw = await readFile(CONFIG_FILE, 'utf-8');
-    cachedConfig = { ...DEFAULT_CLIENT_CONFIG, ...(JSON.parse(raw) as Partial<ClientConfig>) };
+    cachedConfig = {
+      ...DEFAULT_CLIENT_CONFIG,
+      ...(JSON.parse(raw) as Partial<ClientConfig>),
+    };
   } catch {
     cachedConfig = { ...DEFAULT_CLIENT_CONFIG };
   }
@@ -32,7 +35,10 @@ export async function saveConfig(config: ClientConfig): Promise<void> {
   await writeFile(CONFIG_FILE, JSON.stringify(config, null, 2), 'utf-8');
 }
 
-export async function setConfigValue(key: keyof ClientConfig, value: string): Promise<void> {
+export async function setConfigValue(
+  key: keyof ClientConfig,
+  value: string,
+): Promise<void> {
   const config = await loadConfig();
   (config as unknown as Record<string, string>)[key] = value;
   await saveConfig(config);

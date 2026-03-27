@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import React from 'react';
 import { render } from 'ink-testing-library';
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
@@ -30,22 +29,38 @@ import { useSystemStats } from '../hooks/use-system-stats.js';
 import { Dashboard } from './dashboard.js';
 
 const SERVER_STOPPED = {
-  running: false, modelFile: null, configName: null,
-  port: null, pid: null, uptimeSeconds: 0, logs: [], error: null,
-  start: vi.fn(), stop: vi.fn(),
+  running: false,
+  modelFile: null,
+  configName: null,
+  port: null,
+  pid: null,
+  uptimeSeconds: 0,
+  logs: [],
+  error: null,
+  start: vi.fn(),
+  stop: vi.fn(),
 };
 
 const SERVER_RUNNING = {
-  running: true, modelFile: 'model-a.gguf', configName: 'default',
-  port: 8080, pid: 1234, uptimeSeconds: 90, logs: ['Server started'], error: null,
-  start: vi.fn(), stop: vi.fn(),
+  running: true,
+  modelFile: 'model-a.gguf',
+  configName: 'default',
+  port: 8080,
+  pid: 1234,
+  uptimeSeconds: 90,
+  logs: ['Server started'],
+  error: null,
+  start: vi.fn(),
+  stop: vi.fn(),
 };
 
 describe('Dashboard', () => {
   beforeEach(() => {
     vi.mocked(useServer).mockReturnValue(SERVER_STOPPED as any);
     vi.mocked(configService.getHfToken).mockReturnValue(undefined);
-    vi.mocked(configService.getModelDisplayName).mockImplementation((f: string) => f);
+    vi.mocked(configService.getModelDisplayName).mockImplementation(
+      (f: string) => f,
+    );
     vi.mocked(useSystemStats).mockReturnValue(null);
   });
 
@@ -142,6 +157,8 @@ describe('Dashboard', () => {
     const onNavigate = vi.fn();
     const { stdin } = render(<Dashboard onNavigate={onNavigate} />);
     stdin.write('m');
-    await vi.waitFor(() => expect(onNavigate).toHaveBeenCalledWith('model-launch'));
+    await vi.waitFor(() =>
+      expect(onNavigate).toHaveBeenCalledWith('model-launch'),
+    );
   });
 });

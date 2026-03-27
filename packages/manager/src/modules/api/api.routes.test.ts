@@ -64,8 +64,11 @@ function makeRes() {
     }),
     getStatus: () => status,
     getBody: () => {
-      try { return JSON.parse(chunks.join('')); }
-      catch { return chunks.join(''); }
+      try {
+        return JSON.parse(chunks.join(''));
+      } catch {
+        return chunks.join('');
+      }
     },
     getHeader: (key: string) => headers[key],
   } as unknown as ServerResponse & {
@@ -103,15 +106,25 @@ describe('handleRequest()', () => {
       apiServer: { enabled: false, port: 3333 },
     } as ReturnType<typeof configService.get>);
 
-    mockGetState.mockReturnValue(BASE_STATE as ReturnType<typeof serverManager.getState>);
+    mockGetState.mockReturnValue(
+      BASE_STATE as ReturnType<typeof serverManager.getState>,
+    );
 
     mockGetEffective.mockReturnValue({
       modelPath: '/models/model.gguf',
       alias: 'TestModel',
-      temp: 0.6, topP: 0.95, topK: 20, minP: 0,
-      port: 8001, ctxSize: 131072,
-      kvUnified: true, cacheTypeK: 'q8_0', cacheTypeV: 'q8_0',
-      flashAttn: 'on', fit: 'on', extraFlags: '',
+      temp: 0.6,
+      topP: 0.95,
+      topK: 20,
+      minP: 0,
+      port: 8001,
+      ctxSize: 131072,
+      kvUnified: true,
+      cacheTypeK: 'q8_0',
+      cacheTypeV: 'q8_0',
+      flashAttn: 'on',
+      fit: 'on',
+      extraFlags: '',
     });
   });
 
@@ -120,9 +133,12 @@ describe('handleRequest()', () => {
     const req = makeReq('OPTIONS', '/api/models');
     const res = makeRes();
     await handleRequest(req, res);
-    expect(res.writeHead).toHaveBeenCalledWith(204, expect.objectContaining({
-      'Access-Control-Allow-Origin': '*',
-    }));
+    expect(res.writeHead).toHaveBeenCalledWith(
+      204,
+      expect.objectContaining({
+        'Access-Control-Allow-Origin': '*',
+      }),
+    );
   });
 
   // ── GET /api/models ───────────────────────────────────────────────────────
@@ -133,14 +149,18 @@ describe('handleRequest()', () => {
     expect(res.getStatus()).toBe(200);
     const body = res.getBody() as { models: unknown[] };
     expect(body.models).toHaveLength(1);
-    expect((body.models[0] as { filename: string }).filename).toBe('model.gguf');
+    expect((body.models[0] as { filename: string }).filename).toBe(
+      'model.gguf',
+    );
   });
 
   it('GET /api/models includes alias in config entries', async () => {
     const req = makeReq('GET', '/api/models');
     const res = makeRes();
     await handleRequest(req, res);
-    const body = res.getBody() as { models: Array<{ configs: Array<{ alias?: string }> }> };
+    const body = res.getBody() as {
+      models: Array<{ configs: Array<{ alias?: string }> }>;
+    };
     expect(body.models[0].configs[0].alias).toBe('TestModel');
   });
 
@@ -176,9 +196,18 @@ describe('handleRequest()', () => {
   // ── POST /api/models/:identifier/start ───────────────────────────────────
   it('POST start resolves by filename and starts server', async () => {
     mockResolve.mockReturnValueOnce({ filename: 'model.gguf' });
-    mockGetState.mockReturnValueOnce({ ...BASE_STATE, running: true, pid: 1234, port: 8001 } as ReturnType<typeof serverManager.getState>);
+    mockGetState.mockReturnValueOnce({
+      ...BASE_STATE,
+      running: true,
+      pid: 1234,
+      port: 8001,
+    } as ReturnType<typeof serverManager.getState>);
 
-    const req = makeReq('POST', '/api/models/model.gguf/start', '{"config":"default"}');
+    const req = makeReq(
+      'POST',
+      '/api/models/model.gguf/start',
+      '{"config":"default"}',
+    );
     const res = makeRes();
     await handleRequest(req, res);
 
@@ -193,21 +222,33 @@ describe('handleRequest()', () => {
     const res = makeRes();
     await handleRequest(req, res);
     expect(res.getStatus()).toBe(404);
-    expect((res.getBody() as { error: string }).error).toContain('No configuration found');
+    expect((res.getBody() as { error: string }).error).toContain(
+      'No configuration found',
+    );
   });
 
   it('POST start returns 400 on invalid JSON body', async () => {
     mockResolve.mockReturnValueOnce({ filename: 'model.gguf' });
-    const req = makeReq('POST', '/api/models/model.gguf/start', '{invalid json}');
+    const req = makeReq(
+      'POST',
+      '/api/models/model.gguf/start',
+      '{invalid json}',
+    );
     const res = makeRes();
     await handleRequest(req, res);
     expect(res.getStatus()).toBe(400);
-    expect((res.getBody() as { error: string }).error).toContain('Invalid JSON');
+    expect((res.getBody() as { error: string }).error).toContain(
+      'Invalid JSON',
+    );
   });
 
   it('POST start returns 404 for unknown config name', async () => {
     mockResolve.mockReturnValueOnce({ filename: 'model.gguf' });
-    const req = makeReq('POST', '/api/models/model.gguf/start', '{"config":"nonexistent"}');
+    const req = makeReq(
+      'POST',
+      '/api/models/model.gguf/start',
+      '{"config":"nonexistent"}',
+    );
     const res = makeRes();
     await handleRequest(req, res);
     expect(res.getStatus()).toBe(404);

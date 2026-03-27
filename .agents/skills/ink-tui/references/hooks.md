@@ -5,7 +5,7 @@
 Handle keyboard input. Called for each character typed, or once for pasted text.
 
 ```tsx
-import {useInput} from 'ink';
+import { useInput } from 'ink';
 
 const MyComponent = () => {
   useInput((input, key) => {
@@ -33,37 +33,42 @@ const MyComponent = () => {
 
 ### Key Object Properties
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `key.leftArrow` | `boolean` | Left arrow pressed |
-| `key.rightArrow` | `boolean` | Right arrow pressed |
-| `key.upArrow` | `boolean` | Up arrow pressed |
-| `key.downArrow` | `boolean` | Down arrow pressed |
-| `key.return` | `boolean` | Enter/Return pressed |
-| `key.escape` | `boolean` | Escape pressed |
-| `key.ctrl` | `boolean` | Ctrl modifier |
-| `key.shift` | `boolean` | Shift modifier |
-| `key.meta` | `boolean` | Meta key pressed |
-| `key.tab` | `boolean` | Tab pressed |
-| `key.backspace` | `boolean` | Backspace pressed |
-| `key.delete` | `boolean` | Delete pressed |
-| `key.pageUp` | `boolean` | Page Up pressed |
-| `key.pageDown` | `boolean` | Page Down pressed |
-| `key.home` | `boolean` | Home pressed |
-| `key.end` | `boolean` | End pressed |
-| `key.super` | `boolean` | Cmd/Win (kitty protocol) |
-| `key.hyper` | `boolean` | Hyper key (kitty protocol) |
-| `key.eventType` | `string \| undefined` | `'press'`, `'repeat'`, `'release'` (kitty protocol) |
+| Property         | Type                  | Description                                         |
+| ---------------- | --------------------- | --------------------------------------------------- |
+| `key.leftArrow`  | `boolean`             | Left arrow pressed                                  |
+| `key.rightArrow` | `boolean`             | Right arrow pressed                                 |
+| `key.upArrow`    | `boolean`             | Up arrow pressed                                    |
+| `key.downArrow`  | `boolean`             | Down arrow pressed                                  |
+| `key.return`     | `boolean`             | Enter/Return pressed                                |
+| `key.escape`     | `boolean`             | Escape pressed                                      |
+| `key.ctrl`       | `boolean`             | Ctrl modifier                                       |
+| `key.shift`      | `boolean`             | Shift modifier                                      |
+| `key.meta`       | `boolean`             | Meta key pressed                                    |
+| `key.tab`        | `boolean`             | Tab pressed                                         |
+| `key.backspace`  | `boolean`             | Backspace pressed                                   |
+| `key.delete`     | `boolean`             | Delete pressed                                      |
+| `key.pageUp`     | `boolean`             | Page Up pressed                                     |
+| `key.pageDown`   | `boolean`             | Page Down pressed                                   |
+| `key.home`       | `boolean`             | Home pressed                                        |
+| `key.end`        | `boolean`             | End pressed                                         |
+| `key.super`      | `boolean`             | Cmd/Win (kitty protocol)                            |
+| `key.hyper`      | `boolean`             | Hyper key (kitty protocol)                          |
+| `key.eventType`  | `string \| undefined` | `'press'`, `'repeat'`, `'release'` (kitty protocol) |
 
 ### Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `isActive` | `boolean` | `true` | Enable/disable input capture |
+| Option     | Type      | Default | Description                  |
+| ---------- | --------- | ------- | ---------------------------- |
+| `isActive` | `boolean` | `true`  | Enable/disable input capture |
 
 ```tsx
 // Conditionally active input handler
-useInput((input, key) => { /* ... */ }, {isActive: isFocused});
+useInput(
+  (input, key) => {
+    /* ... */
+  },
+  { isActive: isFocused },
+);
 ```
 
 ---
@@ -73,12 +78,14 @@ useInput((input, key) => { /* ... */ }, {isActive: isFocused});
 Handle pasted text separately from typed input. Enables bracketed paste mode automatically.
 
 ```tsx
-import {useInput, usePaste} from 'ink';
+import { useInput, usePaste } from 'ink';
 
 const Editor = () => {
   useInput((input, key) => {
     // Only receives typed characters, NOT pasted text
-    if (key.return) { /* submit */ }
+    if (key.return) {
+      /* submit */
+    }
   });
 
   usePaste((text) => {
@@ -90,9 +97,9 @@ const Editor = () => {
 };
 ```
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `isActive` | `boolean` | `true` | Enable/disable paste handler |
+| Option     | Type      | Default | Description                  |
+| ---------- | --------- | ------- | ---------------------------- |
+| `isActive` | `boolean` | `true`  | Enable/disable paste handler |
 
 ---
 
@@ -101,10 +108,10 @@ const Editor = () => {
 Access app lifecycle methods.
 
 ```tsx
-import {useApp} from 'ink';
+import { useApp } from 'ink';
 
 const MyComponent = () => {
-  const {exit, waitUntilRenderFlush} = useApp();
+  const { exit, waitUntilRenderFlush } = useApp();
 
   // Exit after timeout
   useEffect(() => {
@@ -134,10 +141,10 @@ const MyComponent = () => {
 Access stdin stream and raw mode utilities.
 
 ```tsx
-import {useStdin} from 'ink';
+import { useStdin } from 'ink';
 
 const MyComponent = () => {
-  const {stdin, isRawModeSupported, setRawMode} = useStdin();
+  const { stdin, isRawModeSupported, setRawMode } = useStdin();
 
   // Check raw mode support before using it
   if (!isRawModeSupported) {
@@ -161,10 +168,10 @@ const MyComponent = () => {
 Access stdout stream and write outside Ink's render output.
 
 ```tsx
-import {useStdout} from 'ink';
+import { useStdout } from 'ink';
 
 const MyComponent = () => {
-  const {stdout, write} = useStdout();
+  const { stdout, write } = useStdout();
 
   useEffect(() => {
     // Write above Ink's output, like <Static> but for strings
@@ -180,10 +187,10 @@ const MyComponent = () => {
 Same as `useStdout()` but for stderr.
 
 ```tsx
-import {useStderr} from 'ink';
+import { useStderr } from 'ink';
 
 const MyComponent = () => {
-  const {write} = useStderr();
+  const { write } = useStderr();
 
   useEffect(() => {
     write('Error message to stderr\n');
@@ -198,12 +205,12 @@ const MyComponent = () => {
 Get layout metrics for a `<Box>` element. Updates on layout changes and terminal resize.
 
 ```tsx
-import {useRef} from 'react';
-import {Box, Text, useBoxMetrics} from 'ink';
+import { useRef } from 'react';
+import { Box, Text, useBoxMetrics } from 'ink';
 
 const MeasuredBox = () => {
   const ref = useRef(null);
-  const {width, height, left, top, hasMeasured} = useBoxMetrics(ref);
+  const { width, height, left, top, hasMeasured } = useBoxMetrics(ref);
 
   return (
     <Box ref={ref}>
@@ -224,14 +231,16 @@ Returns `{width: 0, height: 0, left: 0, top: 0}` until first layout pass.
 Get terminal dimensions. Re-renders on resize.
 
 ```tsx
-import {useWindowSize, Text} from 'ink';
+import { useWindowSize, Text } from 'ink';
 
 const ResponsiveLayout = () => {
-  const {columns, rows} = useWindowSize();
+  const { columns, rows } = useWindowSize();
 
   return (
     <Box flexDirection={columns < 80 ? 'column' : 'row'}>
-      <Text>{columns}x{rows}</Text>
+      <Text>
+        {columns}x{rows}
+      </Text>
     </Box>
   );
 };
@@ -244,10 +253,10 @@ const ResponsiveLayout = () => {
 Make a component focusable. User navigates with **Tab** / **Shift+Tab**.
 
 ```tsx
-import {useFocus, Box, Text} from 'ink';
+import { useFocus, Box, Text } from 'ink';
 
-const FocusableItem = ({label}) => {
-  const {isFocused} = useFocus();
+const FocusableItem = ({ label }) => {
+  const { isFocused } = useFocus();
 
   return (
     <Box>
@@ -261,11 +270,11 @@ const FocusableItem = ({label}) => {
 
 ### Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `autoFocus` | `boolean` | `false` | Auto-focus if no component is focused |
-| `isActive` | `boolean` | `true` | Enable/disable focus (keeps position in focus list) |
-| `id` | `string` | — | ID for programmatic focus via `useFocusManager` |
+| Option      | Type      | Default | Description                                         |
+| ----------- | --------- | ------- | --------------------------------------------------- |
+| `autoFocus` | `boolean` | `false` | Auto-focus if no component is focused               |
+| `isActive`  | `boolean` | `true`  | Enable/disable focus (keeps position in focus list) |
+| `id`        | `string`  | —       | ID for programmatic focus via `useFocusManager`     |
 
 ---
 
@@ -274,10 +283,17 @@ const FocusableItem = ({label}) => {
 Programmatically manage focus across components.
 
 ```tsx
-import {useFocusManager, useInput} from 'ink';
+import { useFocusManager, useInput } from 'ink';
 
 const FocusController = () => {
-  const {focus, focusNext, focusPrevious, enableFocus, disableFocus, activeId} = useFocusManager();
+  const {
+    focus,
+    focusNext,
+    focusPrevious,
+    enableFocus,
+    disableFocus,
+    activeId,
+  } = useFocusManager();
 
   useInput((input, key) => {
     if (input === 'j') focusNext();
@@ -289,14 +305,14 @@ const FocusController = () => {
 };
 ```
 
-| Method/Property | Description |
-|---------|-------------|
-| `focusNext()` | Focus next component (same as Tab) |
-| `focusPrevious()` | Focus previous component (same as Shift+Tab) |
-| `focus(id)` | Focus component by its focus ID |
-| `enableFocus()` | Re-enable focus management |
-| `disableFocus()` | Disable focus for all components |
-| `activeId` | ID of currently focused component or `undefined` |
+| Method/Property   | Description                                      |
+| ----------------- | ------------------------------------------------ |
+| `focusNext()`     | Focus next component (same as Tab)               |
+| `focusPrevious()` | Focus previous component (same as Shift+Tab)     |
+| `focus(id)`       | Focus component by its focus ID                  |
+| `enableFocus()`   | Re-enable focus management                       |
+| `disableFocus()`  | Disable focus for all components                 |
+| `activeId`        | ID of currently focused component or `undefined` |
 
 ---
 
@@ -305,21 +321,24 @@ const FocusController = () => {
 Control terminal cursor position. Essential for IME support and text input.
 
 ```tsx
-import {useState} from 'react';
-import {Box, Text, useCursor} from 'ink';
+import { useState } from 'react';
+import { Box, Text, useCursor } from 'ink';
 import stringWidth from 'string-width';
 
 const TextInput = () => {
   const [text, setText] = useState('');
-  const {setCursorPosition} = useCursor();
+  const { setCursorPosition } = useCursor();
 
   const prompt = '> ';
-  setCursorPosition({x: stringWidth(prompt + text), y: 1});
+  setCursorPosition({ x: stringWidth(prompt + text), y: 1 });
 
   return (
     <Box flexDirection="column">
       <Text>Type here:</Text>
-      <Text>{prompt}{text}</Text>
+      <Text>
+        {prompt}
+        {text}
+      </Text>
     </Box>
   );
 };
@@ -334,14 +353,16 @@ Pass `undefined` to `setCursorPosition` to hide the cursor. Use `string-width` f
 Detect if screen reader mode is active for accessible rendering.
 
 ```tsx
-import {useIsScreenReaderEnabled, Text} from 'ink';
+import { useIsScreenReaderEnabled, Text } from 'ink';
 
-const StatusIndicator = ({progress}) => {
+const StatusIndicator = ({ progress }) => {
   const isScreenReaderEnabled = useIsScreenReaderEnabled();
 
-  return isScreenReaderEnabled
-    ? <Text>Progress: {progress}%</Text>
-    : <ProgressBar value={progress} />;
+  return isScreenReaderEnabled ? (
+    <Text>Progress: {progress}%</Text>
+  ) : (
+    <ProgressBar value={progress} />
+  );
 };
 ```
 
@@ -355,27 +376,34 @@ Mount and render the app. Returns an `Instance` object.
 
 ```tsx
 const instance = render(<App />, {
-  exitOnCtrlC: true,        // default: true
-  patchConsole: true,       // default: true — patches console.* to avoid mixing
-  maxFps: 30,               // default: 30
+  exitOnCtrlC: true, // default: true
+  patchConsole: true, // default: true — patches console.* to avoid mixing
+  maxFps: 30, // default: 30
   incrementalRendering: false, // only update changed lines
-  concurrent: false,        // enable React Concurrent mode
-  alternateScreen: false,   // use alternate screen buffer (like vim)
-  debug: false,             // render each update separately
+  concurrent: false, // enable React Concurrent mode
+  alternateScreen: false, // use alternate screen buffer (like vim)
+  debug: false, // render each update separately
 });
 ```
 
 ### Instance Methods
 
 ```tsx
-const {rerender, unmount, waitUntilExit, waitUntilRenderFlush, clear, cleanup} = render(<App />);
+const {
+  rerender,
+  unmount,
+  waitUntilExit,
+  waitUntilRenderFlush,
+  clear,
+  cleanup,
+} = render(<App />);
 
-rerender(<App count={2} />);     // Update root component
-unmount();                        // Unmount the app
-await waitUntilExit();            // Wait for app exit
-await waitUntilRenderFlush();     // Wait for render flush to stdout
-clear();                          // Clear output
-cleanup();                        // Unmount + delete internal instance
+rerender(<App count={2} />); // Update root component
+unmount(); // Unmount the app
+await waitUntilExit(); // Wait for app exit
+await waitUntilRenderFlush(); // Wait for render flush to stdout
+clear(); // Clear output
+cleanup(); // Unmount + delete internal instance
 ```
 
 ### renderToString(tree, options?)
@@ -383,13 +411,13 @@ cleanup();                        // Unmount + delete internal instance
 Synchronous string rendering (no terminal, no event listeners). For testing/documentation.
 
 ```tsx
-import {renderToString, Text, Box} from 'ink';
+import { renderToString, Text, Box } from 'ink';
 
 const output = renderToString(
   <Box padding={1}>
     <Text color="green">Hello</Text>
   </Box>,
-  {columns: 80}
+  { columns: 80 },
 );
 ```
 
@@ -401,8 +429,12 @@ Measure a `<Box>` element's dimensions. Call from `useEffect`/`useLayoutEffect`,
 const ref = useRef();
 
 useEffect(() => {
-  const {width, height} = measureElement(ref.current);
+  const { width, height } = measureElement(ref.current);
 }, []);
 
-return <Box ref={ref}><Text>Content</Text></Box>;
+return (
+  <Box ref={ref}>
+    <Text>Content</Text>
+  </Box>
+);
 ```

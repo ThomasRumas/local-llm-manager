@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import { Box, Text, useInput, useFocus } from 'ink';
 
 interface TextInputFieldProps {
@@ -8,7 +7,12 @@ interface TextInputFieldProps {
   placeholder?: string;
 }
 
-export function TextInputField({ label, value, onChange, placeholder }: TextInputFieldProps) {
+export function TextInputField({
+  label,
+  value,
+  onChange,
+  placeholder,
+}: TextInputFieldProps) {
   const { isFocused } = useFocus();
 
   useInput((input, key) => {
@@ -16,7 +20,15 @@ export function TextInputField({ label, value, onChange, placeholder }: TextInpu
 
     if (key.backspace || key.delete) {
       onChange(value.slice(0, -1));
-    } else if (!key.ctrl && !key.meta && !key.upArrow && !key.downArrow && !key.return && !key.tab && !key.escape) {
+    } else if (
+      !key.ctrl &&
+      !key.meta &&
+      !key.upArrow &&
+      !key.downArrow &&
+      !key.return &&
+      !key.tab &&
+      !key.escape
+    ) {
       onChange(value + input);
     }
   });

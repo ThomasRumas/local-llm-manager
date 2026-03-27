@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, Text } from 'ink';
 
 interface HeaderProps {
@@ -14,9 +13,7 @@ export function Header({ title = 'Local LLM Manager', subtitle }: HeaderProps) {
           {title}
         </Text>
       </Box>
-      {subtitle && (
-        <Text color="gray">{subtitle}</Text>
-      )}
+      {subtitle && <Text color="gray">{subtitle}</Text>}
       <Text color="gray">{'─'.repeat(40)}</Text>
     </Box>
   );

@@ -19,7 +19,9 @@ class SystemStatsService {
   private async detectVramLabel(): Promise<string> {
     try {
       if (platform() === 'darwin') {
-        const { stdout: archOut } = await execAsync('uname -m', { timeout: 1000 });
+        const { stdout: archOut } = await execAsync('uname -m', {
+          timeout: 1000,
+        });
         if (archOut.trim() === 'arm64') {
           const gb = Math.round(totalmem() / 1_073_741_824);
           return `Unified ${gb}GB`;
@@ -78,10 +80,15 @@ class SystemStatsService {
     return { used: total - free, total };
   }
 
-  async getProcessStats(pid: number): Promise<{ cpuPercent: number; ramBytes: number } | null> {
+  async getProcessStats(
+    pid: number,
+  ): Promise<{ cpuPercent: number; ramBytes: number } | null> {
     // pid comes from Node's child_process, always a positive integer — safe to interpolate
     try {
-      const { stdout } = await execAsync(`ps -p ${pid} -o %cpu,rss 2>/dev/null`, { timeout: 1000 });
+      const { stdout } = await execAsync(
+        `ps -p ${pid} -o %cpu,rss 2>/dev/null`,
+        { timeout: 1000 },
+      );
       const line = stdout.trim().split('\n')[1]?.trim();
       if (!line) return null;
       const [cpuStr, rssStr] = line.split(/\s+/);

@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import React from 'react';
 import { render } from 'ink-testing-library';
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
@@ -42,13 +41,19 @@ describe('ModelLaunch', () => {
     vi.mocked(useServer).mockReturnValue(SERVER_RUNNING as any);
     vi.mocked(configService.getModelsDirectory).mockReturnValue('/models');
     vi.mocked(configService.getEffective).mockReturnValue({} as any);
-    vi.mocked(configService.getModelDisplayName).mockImplementation((f) => f.replace(/\.gguf$/, ''));
+    vi.mocked(configService.getModelDisplayName).mockImplementation((f) =>
+      f.replace(/\.gguf$/, ''),
+    );
     vi.mocked(useSystemStats).mockReturnValue(null);
   });
 
   it('renders server running state', () => {
     const { lastFrame } = render(
-      <ModelLaunch modelFile="model-a.gguf" configName="default" onBack={vi.fn()} />,
+      <ModelLaunch
+        modelFile="model-a.gguf"
+        configName="default"
+        onBack={vi.fn()}
+      />,
     );
     expect(lastFrame()).toContain('Running');
     expect(lastFrame()).toContain(':8001');
@@ -70,7 +75,11 @@ describe('ModelLaunch', () => {
 
   it('displays log lines', () => {
     const { lastFrame } = render(
-      <ModelLaunch modelFile="model-a.gguf" configName="default" onBack={vi.fn()} />,
+      <ModelLaunch
+        modelFile="model-a.gguf"
+        configName="default"
+        onBack={vi.fn()}
+      />,
     );
     expect(lastFrame()).toContain('Server listening');
   });
@@ -78,7 +87,11 @@ describe('ModelLaunch', () => {
   it('calls onBack when Escape is pressed', async () => {
     const onBack = vi.fn();
     const instance = render(
-      <ModelLaunch modelFile="model-a.gguf" configName="default" onBack={onBack} />,
+      <ModelLaunch
+        modelFile="model-a.gguf"
+        configName="default"
+        onBack={onBack}
+      />,
     );
     instance.stdin.write('\x1B'); // ESC
     await vi.waitFor(() => expect(onBack).toHaveBeenCalled());
@@ -91,7 +104,11 @@ describe('ModelLaunch', () => {
       stop: stopMock,
     } as any);
     const instance = render(
-      <ModelLaunch modelFile="model-a.gguf" configName="default" onBack={vi.fn()} />,
+      <ModelLaunch
+        modelFile="model-a.gguf"
+        configName="default"
+        onBack={vi.fn()}
+      />,
     );
     instance.stdin.write('s');
     await vi.waitFor(() => expect(stopMock).toHaveBeenCalled());
@@ -114,7 +131,11 @@ describe('ModelLaunch', () => {
       uptimeSeconds: 90, // 1m 30s
     } as any);
     const { lastFrame } = render(
-      <ModelLaunch modelFile="model-a.gguf" configName="default" onBack={vi.fn()} />,
+      <ModelLaunch
+        modelFile="model-a.gguf"
+        configName="default"
+        onBack={vi.fn()}
+      />,
     );
     expect(lastFrame()).toContain('1m');
   });
@@ -125,7 +146,11 @@ describe('ModelLaunch', () => {
       uptimeSeconds: 3700, // 1h 1m
     } as any);
     const { lastFrame } = render(
-      <ModelLaunch modelFile="model-a.gguf" configName="default" onBack={vi.fn()} />,
+      <ModelLaunch
+        modelFile="model-a.gguf"
+        configName="default"
+        onBack={vi.fn()}
+      />,
     );
     expect(lastFrame()).toContain('1h');
   });
@@ -140,7 +165,11 @@ describe('ModelLaunch', () => {
       processRamBytes: 2_000_000_000,
     });
     const { lastFrame } = render(
-      <ModelLaunch modelFile="model-a.gguf" configName="default" onBack={vi.fn()} />,
+      <ModelLaunch
+        modelFile="model-a.gguf"
+        configName="default"
+        onBack={vi.fn()}
+      />,
     );
     expect(lastFrame()).toContain('35%');
     expect(lastFrame()).toContain('GB');

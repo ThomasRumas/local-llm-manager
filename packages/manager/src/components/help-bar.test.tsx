@@ -1,5 +1,4 @@
 import { describe, it, expect } from 'vitest';
-import React from 'react';
 import { render } from 'ink-testing-library';
 import { HelpBar } from './help-bar.js';
 
@@ -17,7 +16,9 @@ describe('HelpBar', () => {
   });
 
   it('renders with a single item', () => {
-    const { lastFrame } = render(<HelpBar items={[{ key: 'esc', label: 'back' }]} />);
+    const { lastFrame } = render(
+      <HelpBar items={[{ key: 'esc', label: 'back' }]} />,
+    );
     expect(lastFrame()).toContain('esc');
     expect(lastFrame()).toContain('back');
   });

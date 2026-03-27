@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Text } from 'ink';
 import { useScreen } from './hooks/use-screen.js';
 import { configService } from './modules/config/config.service.js';
@@ -14,13 +14,44 @@ import { ModelLaunch } from './screens/model-launch.js';
 import { Settings } from './screens/settings.js';
 
 const HELP: Record<string, Array<{ key: string; label: string }>> = {
-  dashboard:      [{ key: '↑↓', label: 'navigate' }, { key: 'Enter', label: 'select' }, { key: '1-4', label: 'shortcut' }, { key: 'q', label: 'quit' }],
-  install:        [{ key: 'r', label: 'refresh' }, { key: 'i', label: 'install' }, { key: 'Esc', label: 'back' }],
-  search:         [{ key: 'Enter', label: 'search/select' }, { key: 'Esc', label: 'back' }],
-  'my-models':    [{ key: '↑↓', label: 'navigate' }, { key: 'Enter', label: 'select' }, { key: 'Esc', label: 'back' }],
-  'model-config': [{ key: '↑↓', label: 'fields' }, { key: '←→', label: 'adjust' }, { key: 'Ctrl+S', label: 'save' }, { key: 'Ctrl+L', label: 'launch' }, { key: 'Esc', label: 'back' }],
-  'model-launch': [{ key: '↑↓', label: 'scroll' }, { key: 's', label: 'stop server' }, { key: 'Esc', label: 'back' }],
-  settings:       [{ key: '↑↓', label: 'fields' }, { key: '←→', label: 'adjust' }, { key: 'Ctrl+S', label: 'save' }, { key: 'Esc', label: 'back' }],
+  dashboard: [
+    { key: '↑↓', label: 'navigate' },
+    { key: 'Enter', label: 'select' },
+    { key: '1-4', label: 'shortcut' },
+    { key: 'q', label: 'quit' },
+  ],
+  install: [
+    { key: 'r', label: 'refresh' },
+    { key: 'i', label: 'install' },
+    { key: 'Esc', label: 'back' },
+  ],
+  search: [
+    { key: 'Enter', label: 'search/select' },
+    { key: 'Esc', label: 'back' },
+  ],
+  'my-models': [
+    { key: '↑↓', label: 'navigate' },
+    { key: 'Enter', label: 'select' },
+    { key: 'Esc', label: 'back' },
+  ],
+  'model-config': [
+    { key: '↑↓', label: 'fields' },
+    { key: '←→', label: 'adjust' },
+    { key: 'Ctrl+S', label: 'save' },
+    { key: 'Ctrl+L', label: 'launch' },
+    { key: 'Esc', label: 'back' },
+  ],
+  'model-launch': [
+    { key: '↑↓', label: 'scroll' },
+    { key: 's', label: 'stop server' },
+    { key: 'Esc', label: 'back' },
+  ],
+  settings: [
+    { key: '↑↓', label: 'fields' },
+    { key: '←→', label: 'adjust' },
+    { key: 'Ctrl+S', label: 'save' },
+    { key: 'Esc', label: 'back' },
+  ],
 };
 
 function AppShell() {
@@ -29,14 +60,17 @@ function AppShell() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    configService.load()
+    configService
+      .load()
       .then((config) => {
         setReady(true);
         if (config.apiServer.enabled) {
           return apiServer.start(config.apiServer.port);
         }
       })
-      .catch((err) => setError(err instanceof Error ? err.message : String(err)));
+      .catch((err) =>
+        setError(err instanceof Error ? err.message : String(err)),
+      );
 
     return () => {
       apiServer.stop();
@@ -44,11 +78,19 @@ function AppShell() {
   }, []);
 
   if (error) {
-    return <Box><Text color="red">Failed to load config: {error}</Text></Box>;
+    return (
+      <Box>
+        <Text color="red">Failed to load config: {error}</Text>
+      </Box>
+    );
   }
 
   if (!ready) {
-    return <Box><Text color="cyan">Loading...</Text></Box>;
+    return (
+      <Box>
+        <Text color="cyan">Loading...</Text>
+      </Box>
+    );
   }
 
   const helpItems = HELP[screen] ?? HELP['dashboard'];

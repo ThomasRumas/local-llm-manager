@@ -1,5 +1,4 @@
 import { describe, it, expect, vi } from 'vitest';
-import React from 'react';
 import { render } from 'ink-testing-library';
 import { Text } from 'ink';
 import { useAsync } from './use-async.js';
@@ -15,7 +14,10 @@ function UseAsyncWrapper({ fn }: Readonly<{ fn: () => Promise<string> }>) {
 describe('useAsync()', () => {
   it('starts in loading state', async () => {
     let resolve!: (v: string) => void;
-    const fn = () => new Promise<string>((r) => { resolve = r; });
+    const fn = () =>
+      new Promise<string>((r) => {
+        resolve = r;
+      });
 
     const { lastFrame } = render(<UseAsyncWrapper fn={fn} />);
     expect(lastFrame()).toContain('loading');

@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { Box, Text } from 'ink';
 import { useWindowSize } from '../hooks/use-window-size.js';
 import { useServer } from '../contexts/server-context.js';
@@ -31,7 +31,11 @@ function formatUptime(seconds: number): string {
   return `${h}h ${m % 60}m`;
 }
 
-export function FullScreen({ screen, helpItems, children }: Readonly<FullScreenProps>) {
+export function FullScreen({
+  screen,
+  helpItems,
+  children,
+}: Readonly<FullScreenProps>) {
   const { columns, rows } = useWindowSize();
   const server = useServer();
   const apiStatus = useApiServer();
@@ -41,7 +45,10 @@ export function FullScreen({ screen, helpItems, children }: Readonly<FullScreenP
   const serverDot = server.running ? '●' : '○';
   const serverColor = server.running ? 'green' : 'gray';
   const serverDisplayName = server.modelFile
-    ? configService.getModelDisplayName(server.modelFile, server.configName ?? 'default')
+    ? configService.getModelDisplayName(
+        server.modelFile,
+        server.configName ?? 'default',
+      )
     : null;
   const serverInfo = server.running
     ? `${serverDisplayName}  :${server.port}  ${formatUptime(server.uptimeSeconds)}`
@@ -63,7 +70,9 @@ export function FullScreen({ screen, helpItems, children }: Readonly<FullScreenP
         paddingX={1}
         justifyContent="space-between"
       >
-        <Text bold color="cyan">{headerLeft}</Text>
+        <Text bold color="cyan">
+          {headerLeft}
+        </Text>
         <Box gap={2}>
           <Box gap={1}>
             <Text color={apiColor}>{apiDot}</Text>
@@ -73,7 +82,9 @@ export function FullScreen({ screen, helpItems, children }: Readonly<FullScreenP
           <Text color="gray">│</Text>
           <Box gap={1}>
             <Text color={serverColor}>{serverDot}</Text>
-            <Text color="gray" wrap="truncate">{serverInfo}</Text>
+            <Text color="gray" wrap="truncate">
+              {serverInfo}
+            </Text>
           </Box>
         </Box>
       </Box>
@@ -95,7 +106,9 @@ export function FullScreen({ screen, helpItems, children }: Readonly<FullScreenP
       >
         {helpItems.map((item) => (
           <Box key={item.key} gap={1}>
-            <Text bold color="yellow">{item.key}</Text>
+            <Text bold color="yellow">
+              {item.key}
+            </Text>
             <Text color="gray">{item.label}</Text>
           </Box>
         ))}

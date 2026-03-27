@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import React from 'react';
+import type React from 'react';
 import { render } from 'ink-testing-library';
 import { Text } from 'ink';
 import { useScreen } from './use-screen.js';
@@ -12,7 +12,11 @@ function UseScreenWrapper({
 }>) {
   const api = useScreen();
   apiRef.current = api;
-  return <Text>{api.screen}:{JSON.stringify(api.params)}</Text>;
+  return (
+    <Text>
+      {api.screen}:{JSON.stringify(api.params)}
+    </Text>
+  );
 }
 
 describe('useScreen()', () => {

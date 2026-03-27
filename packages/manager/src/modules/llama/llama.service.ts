@@ -1,6 +1,10 @@
-import { execFile, spawn, type ChildProcess } from 'node:child_process';
+import { execFile, spawn } from 'node:child_process';
 import { promisify } from 'node:util';
-import type { LlamaStatus, LaunchOptions, LaunchResult } from './llama.types.js';
+import type {
+  LlamaStatus,
+  LaunchOptions,
+  LaunchResult,
+} from './llama.types.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -28,7 +32,9 @@ export class LlamaService {
     }
   }
 
-  install(onData: (data: string) => void): Promise<{ success: boolean; error?: string }> {
+  install(
+    onData: (data: string) => void,
+  ): Promise<{ success: boolean; error?: string }> {
     return new Promise((resolve) => {
       const proc = spawn('brew', ['install', 'llama.cpp'], {
         stdio: ['ignore', 'pipe', 'pipe'],
@@ -62,16 +68,26 @@ export class LlamaService {
 
   private buildArgs(options: LaunchOptions): string[] {
     const args: string[] = [
-      '--model', options.modelPath,
-      '--alias', options.alias || options.modelPath,
-      '--temp', String(options.temp),
-      '--top-p', String(options.topP),
-      '--top-k', String(options.topK),
-      '--min-p', String(options.minP),
-      '--port', String(options.port),
-      '--ctx-size', String(options.ctxSize),
-      '--cache-type-k', options.cacheTypeK,
-      '--cache-type-v', options.cacheTypeV,
+      '--model',
+      options.modelPath,
+      '--alias',
+      options.alias || options.modelPath,
+      '--temp',
+      String(options.temp),
+      '--top-p',
+      String(options.topP),
+      '--top-k',
+      String(options.topK),
+      '--min-p',
+      String(options.minP),
+      '--port',
+      String(options.port),
+      '--ctx-size',
+      String(options.ctxSize),
+      '--cache-type-k',
+      options.cacheTypeK,
+      '--cache-type-v',
+      options.cacheTypeV,
     ];
 
     if (options.kvUnified) {

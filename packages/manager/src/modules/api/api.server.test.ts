@@ -32,16 +32,24 @@ describe('ApiServer', () => {
   // ── start() ───────────────────────────────────────────────────────────────
   describe('start()', () => {
     it('creates an HTTP server and listens on port', async () => {
-      mockListen.mockImplementation((_port: number, _host: string, cb: () => void) => cb());
+      mockListen.mockImplementation(
+        (_port: number, _host: string, cb: () => void) => cb(),
+      );
       mockServerOn.mockImplementation(() => ({}));
 
       await server.start(3333);
       expect(mockCreateServer).toHaveBeenCalled();
-      expect(mockListen).toHaveBeenCalledWith(3333, '0.0.0.0', expect.any(Function));
+      expect(mockListen).toHaveBeenCalledWith(
+        3333,
+        '0.0.0.0',
+        expect.any(Function),
+      );
     });
 
     it('emits change after listening', async () => {
-      mockListen.mockImplementation((_port: number, _host: string, cb: () => void) => cb());
+      mockListen.mockImplementation(
+        (_port: number, _host: string, cb: () => void) => cb(),
+      );
       mockServerOn.mockImplementation(() => ({}));
 
       const onChange = vi.fn();
@@ -51,7 +59,9 @@ describe('ApiServer', () => {
     });
 
     it('sets isRunning=true and port after listen', async () => {
-      mockListen.mockImplementation((_port: number, _host: string, cb: () => void) => cb());
+      mockListen.mockImplementation(
+        (_port: number, _host: string, cb: () => void) => cb(),
+      );
       mockServerOn.mockImplementation(() => ({}));
 
       await server.start(3333);
@@ -60,7 +70,9 @@ describe('ApiServer', () => {
     });
 
     it('resolves immediately if already running (idempotent)', async () => {
-      mockListen.mockImplementation((_port: number, _host: string, cb: () => void) => cb());
+      mockListen.mockImplementation(
+        (_port: number, _host: string, cb: () => void) => cb(),
+      );
       mockServerOn.mockImplementation(() => ({}));
 
       await server.start(3333);
@@ -69,11 +81,13 @@ describe('ApiServer', () => {
     });
 
     it('rejects on server error', async () => {
-      mockServerOn.mockImplementation((event: string, handler: (err: Error) => void) => {
-        if (event === 'error') {
-          setImmediate(() => handler(new Error('EADDRINUSE')));
-        }
-      });
+      mockServerOn.mockImplementation(
+        (event: string, handler: (err: Error) => void) => {
+          if (event === 'error') {
+            setImmediate(() => handler(new Error('EADDRINUSE')));
+          }
+        },
+      );
       mockListen.mockImplementation(() => {});
 
       await expect(server.start(3333)).rejects.toThrow('EADDRINUSE');
@@ -87,7 +101,9 @@ describe('ApiServer', () => {
     });
 
     it('emits change after close', async () => {
-      mockListen.mockImplementation((_port: number, _host: string, cb: () => void) => cb());
+      mockListen.mockImplementation(
+        (_port: number, _host: string, cb: () => void) => cb(),
+      );
       mockServerOn.mockImplementation(() => ({}));
       mockClose.mockImplementation((cb: () => void) => cb());
 
@@ -99,7 +115,9 @@ describe('ApiServer', () => {
     });
 
     it('sets isRunning=false after stop', async () => {
-      mockListen.mockImplementation((_port: number, _host: string, cb: () => void) => cb());
+      mockListen.mockImplementation(
+        (_port: number, _host: string, cb: () => void) => cb(),
+      );
       mockServerOn.mockImplementation(() => ({}));
       mockClose.mockImplementation((cb: () => void) => cb());
 

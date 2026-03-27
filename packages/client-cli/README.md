@@ -49,10 +49,10 @@ llm-client config show
 llm-client config set <key> <value>
 ```
 
-| Key | Description |
-|-----|-------------|
-| `remote-url` | Base URL of the manager API (e.g. `http://192.168.1.5:3333`) |
-| `default-model` | Model name to use when none is specified on `start` |
+| Key              | Description                                                          |
+| ---------------- | -------------------------------------------------------------------- |
+| `remote-url`     | Base URL of the manager API (e.g. `http://192.168.1.5:3333`)         |
+| `default-model`  | Model name to use when none is specified on `start`                  |
 | `default-config` | Config name to use when `--config` is omitted (default: `"default"`) |
 
 Client config is stored at `~/.local-llm-client/config.json`.

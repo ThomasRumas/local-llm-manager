@@ -1,5 +1,4 @@
 import { describe, it, expect, vi } from 'vitest';
-import React from 'react';
 import { render } from 'ink-testing-library';
 
 // ── Mock llamaService ─────────────────────────────────────────────────────────
@@ -47,7 +46,11 @@ describe('InstallCheck', () => {
   });
 
   it('calls onBack when Escape is pressed', async () => {
-    mockDetect.mockResolvedValueOnce({ installed: true, path: '/bin/llama-server', version: '1.0' });
+    mockDetect.mockResolvedValueOnce({
+      installed: true,
+      path: '/bin/llama-server',
+      version: '1.0',
+    });
     const onBack = vi.fn();
     const instance = render(<InstallCheck onBack={onBack} />);
     // Wait for detect to complete so component is fully rendered and useInput registered
@@ -69,7 +72,7 @@ describe('InstallCheck', () => {
     await vi.waitFor(() => {
       expect(
         instance.lastFrame()!.includes('Installing') ||
-        instance.lastFrame()!.includes('Installation complete'),
+          instance.lastFrame()!.includes('Installation complete'),
       ).toBe(true);
     });
   });

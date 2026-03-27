@@ -3,7 +3,11 @@ import { createWriteStream } from 'node:fs';
 import { pipeline } from 'node:stream/promises';
 import { Readable } from 'node:stream';
 import { join } from 'node:path';
-import type { SearchResult, GGUFFile, DownloadProgress } from './huggingface.types.js';
+import type {
+  SearchResult,
+  GGUFFile,
+  DownloadProgress,
+} from './huggingface.types.js';
 import { configService } from '../config/config.service.js';
 
 /** Converts raw HF 401 / "Invalid username or password" errors into a readable message. */
@@ -16,15 +20,18 @@ function rewriteHfAuthError(err: unknown): never {
   ) {
     throw new Error(
       'Hugging Face authentication failed.\n' +
-      'A token is required to access this repository.\n' +
-      'Go to Settings (press 4) and set your Hugging Face token (hf_...).',
+        'A token is required to access this repository.\n' +
+        'Go to Settings (press 4) and set your Hugging Face token (hf_...).',
     );
   }
   throw err;
 }
 
 export class HuggingFaceService {
-  async searchModels(query: string, limit: number = 20): Promise<SearchResult[]> {
+  async searchModels(
+    query: string,
+    limit: number = 20,
+  ): Promise<SearchResult[]> {
     const results: SearchResult[] = [];
 
     const token = configService.getHfToken();
@@ -64,7 +71,10 @@ export class HuggingFaceService {
     const token = configService.getHfToken();
 
     try {
-      for await (const file of listFiles({ repo: repoId, ...(token ? { accessToken: token } : {}) })) {
+      for await (const file of listFiles({
+        repo: repoId,
+        ...(token ? { accessToken: token } : {}),
+      })) {
         if (file.path.endsWith('.gguf')) {
           files.push({
             filename: file.path,
@@ -96,11 +106,13 @@ export class HuggingFaceService {
       if (response.status === 401 || response.status === 403) {
         throw new Error(
           'Hugging Face authentication failed.\n' +
-          'A token is required to download this file.\n' +
-          'Go to Settings (press 4) and set your Hugging Face token (hf_...).',
+            'A token is required to download this file.\n' +
+            'Go to Settings (press 4) and set your Hugging Face token (hf_...).',
         );
       }
-      throw new Error(`Download failed: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Download failed: ${response.status} ${response.statusText}`,
+      );
     }
 
     const totalBytes = Number(response.headers.get('content-length') ?? 0);

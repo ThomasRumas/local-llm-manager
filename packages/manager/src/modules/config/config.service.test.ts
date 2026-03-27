@@ -48,7 +48,9 @@ describe('ConfigService.load()', () => {
   });
 
   it('falls back to DEFAULT_CONFIG when file is missing (ENOENT)', async () => {
-    mockReadFile.mockRejectedValueOnce(Object.assign(new Error('ENOENT'), { code: 'ENOENT' }));
+    mockReadFile.mockRejectedValueOnce(
+      Object.assign(new Error('ENOENT'), { code: 'ENOENT' }),
+    );
     const svc = makeService();
     const config = await svc.load();
 
@@ -65,7 +67,9 @@ describe('ConfigService.load()', () => {
   });
 
   it('merges apiServer with DEFAULT_API_SERVER if fields are missing', async () => {
-    mockReadFile.mockResolvedValueOnce(JSON.stringify({ apiServer: { enabled: true } }));
+    mockReadFile.mockResolvedValueOnce(
+      JSON.stringify({ apiServer: { enabled: true } }),
+    );
     const svc = makeService();
     const config = await svc.load();
 
@@ -111,7 +115,7 @@ describe('ConfigService.save()', () => {
       expect.stringMatching(/^\{/), // valid JSON
       'utf-8',
     );
-    const written = JSON.parse((mockWriteFile.mock.calls[0]![1] as string));
+    const written = JSON.parse(mockWriteFile.mock.calls[0]![1] as string);
     expect(written.modelsDirectory).toBe('/custom/models');
   });
 });
@@ -142,7 +146,11 @@ describe('ConfigService.getEffective()', () => {
     mockReadFile.mockResolvedValueOnce(VALID_CONFIG);
     const svc = makeService();
     await svc.load();
-    const effective = svc.getEffective('mymodel.gguf', '/models/mymodel.gguf', 'default');
+    const effective = svc.getEffective(
+      'mymodel.gguf',
+      '/models/mymodel.gguf',
+      'default',
+    );
 
     expect(effective.alias).toBe('MyAlias');
     expect(effective.temp).toBe(0.7); // from model config
@@ -194,21 +202,27 @@ describe('ConfigService.resolveModelIdentifier()', () => {
     mockReadFile.mockResolvedValueOnce(VALID_CONFIG);
     const svc = makeService();
     await svc.load();
-    expect(svc.resolveModelIdentifier('mymodel.gguf')).toEqual({ filename: 'mymodel.gguf' });
+    expect(svc.resolveModelIdentifier('mymodel.gguf')).toEqual({
+      filename: 'mymodel.gguf',
+    });
   });
 
   it('resolves name without .gguf extension', async () => {
     mockReadFile.mockResolvedValueOnce(VALID_CONFIG);
     const svc = makeService();
     await svc.load();
-    expect(svc.resolveModelIdentifier('mymodel')).toEqual({ filename: 'mymodel.gguf' });
+    expect(svc.resolveModelIdentifier('mymodel')).toEqual({
+      filename: 'mymodel.gguf',
+    });
   });
 
   it('resolves by alias', async () => {
     mockReadFile.mockResolvedValueOnce(VALID_CONFIG);
     const svc = makeService();
     await svc.load();
-    expect(svc.resolveModelIdentifier('MyAlias')).toEqual({ filename: 'mymodel.gguf' });
+    expect(svc.resolveModelIdentifier('MyAlias')).toEqual({
+      filename: 'mymodel.gguf',
+    });
   });
 
   it('returns undefined for unknown identifier', async () => {

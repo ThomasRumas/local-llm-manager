@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import React from 'react';
 import { render } from 'ink-testing-library';
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
@@ -40,18 +39,32 @@ const DEFAULT_RESOLVED = {
 describe('ModelConfig', () => {
   beforeEach(() => {
     vi.mocked(configService.getModelsDirectory).mockReturnValue('/models');
-    vi.mocked(configService.getEffective).mockReturnValue(DEFAULT_RESOLVED as any);
+    vi.mocked(configService.getEffective).mockReturnValue(
+      DEFAULT_RESOLVED as any,
+    );
     vi.mocked(configService.getModelConfigNames).mockReturnValue([]);
     vi.mocked(configService.saveModelConfig).mockResolvedValue(undefined);
     vi.mocked(useServer).mockReturnValue({
-      running: false, modelFile: null, configName: null, port: null, pid: null,
-      uptimeSeconds: 0, logs: [], error: null, start: vi.fn(), stop: vi.fn(),
+      running: false,
+      modelFile: null,
+      configName: null,
+      port: null,
+      pid: null,
+      uptimeSeconds: 0,
+      logs: [],
+      error: null,
+      start: vi.fn(),
+      stop: vi.fn(),
     } as any);
   });
 
   it('renders config form with all fields', () => {
     const { lastFrame } = render(
-      <ModelConfig modelFile="my-model.gguf" onBack={vi.fn()} onNavigate={vi.fn()} />,
+      <ModelConfig
+        modelFile="my-model.gguf"
+        onBack={vi.fn()}
+        onNavigate={vi.fn()}
+      />,
     );
     expect(lastFrame()).toContain('Alias');
     expect(lastFrame()).toContain('Temperature');
@@ -62,7 +75,11 @@ describe('ModelConfig', () => {
 
   it('shows config name selector', () => {
     const { lastFrame } = render(
-      <ModelConfig modelFile="my-model.gguf" onBack={vi.fn()} onNavigate={vi.fn()} />,
+      <ModelConfig
+        modelFile="my-model.gguf"
+        onBack={vi.fn()}
+        onNavigate={vi.fn()}
+      />,
     );
     expect(lastFrame()).toContain('Config');
     expect(lastFrame()).toContain('default');
@@ -71,7 +88,11 @@ describe('ModelConfig', () => {
   it('calls onBack when Escape is pressed', async () => {
     const onBack = vi.fn();
     const instance = render(
-      <ModelConfig modelFile="my-model.gguf" onBack={onBack} onNavigate={vi.fn()} />,
+      <ModelConfig
+        modelFile="my-model.gguf"
+        onBack={onBack}
+        onNavigate={vi.fn()}
+      />,
     );
     instance.stdin.write('\x1B'); // ESC
     await vi.waitFor(() => expect(onBack).toHaveBeenCalled());
@@ -79,7 +100,11 @@ describe('ModelConfig', () => {
 
   it('saves config on Ctrl+S', async () => {
     const instance = render(
-      <ModelConfig modelFile="my-model.gguf" onBack={vi.fn()} onNavigate={vi.fn()} />,
+      <ModelConfig
+        modelFile="my-model.gguf"
+        onBack={vi.fn()}
+        onNavigate={vi.fn()}
+      />,
     );
     instance.stdin.write('\x13'); // Ctrl+S
     await vi.waitFor(() => {
@@ -93,7 +118,11 @@ describe('ModelConfig', () => {
 
   it('shows save & launch button', () => {
     const { lastFrame } = render(
-      <ModelConfig modelFile="my-model.gguf" onBack={vi.fn()} onNavigate={vi.fn()} />,
+      <ModelConfig
+        modelFile="my-model.gguf"
+        onBack={vi.fn()}
+        onNavigate={vi.fn()}
+      />,
     );
     expect(lastFrame()).toContain('[S] Save');
     expect(lastFrame()).toContain('[L] Save & Launch');
@@ -101,7 +130,11 @@ describe('ModelConfig', () => {
 
   it('navigates field with arrow keys', async () => {
     const instance = render(
-      <ModelConfig modelFile="my-model.gguf" onBack={vi.fn()} onNavigate={vi.fn()} />,
+      <ModelConfig
+        modelFile="my-model.gguf"
+        onBack={vi.fn()}
+        onNavigate={vi.fn()}
+      />,
     );
     // Press down to move focus to Alias field (index 1)
     instance.stdin.write('\x1B[B'); // Down arrow
@@ -112,7 +145,11 @@ describe('ModelConfig', () => {
 
   it('edits alias field with typing', async () => {
     const instance = render(
-      <ModelConfig modelFile="my-model.gguf" onBack={vi.fn()} onNavigate={vi.fn()} />,
+      <ModelConfig
+        modelFile="my-model.gguf"
+        onBack={vi.fn()}
+        onNavigate={vi.fn()}
+      />,
     );
     // Navigate down past alias (focusIndex=1) to temp (focusIndex=2, shows ±0.1)
     // then further down to each field to exercise FieldEditor branches
@@ -130,7 +167,11 @@ describe('ModelConfig', () => {
 
   it('changes temperature with left/right arrows', async () => {
     const instance = render(
-      <ModelConfig modelFile="my-model.gguf" onBack={vi.fn()} onNavigate={vi.fn()} />,
+      <ModelConfig
+        modelFile="my-model.gguf"
+        onBack={vi.fn()}
+        onNavigate={vi.fn()}
+      />,
     );
     // Navigate to Temperature field (focusIndex=2 → press down twice)
     instance.stdin.write('\x1B[B'); // → focusIndex=1 (Alias)
@@ -147,17 +188,28 @@ describe('ModelConfig', () => {
     const onNavigate = vi.fn();
     vi.mocked(configService.saveModelConfig).mockResolvedValue(undefined);
     const instance = render(
-      <ModelConfig modelFile="my-model.gguf" onBack={vi.fn()} onNavigate={onNavigate} />,
+      <ModelConfig
+        modelFile="my-model.gguf"
+        onBack={vi.fn()}
+        onNavigate={onNavigate}
+      />,
     );
     instance.stdin.write('\x0C'); // Ctrl+L
     await vi.waitFor(() => {
-      expect(onNavigate).toHaveBeenCalledWith('model-launch', expect.any(Object));
+      expect(onNavigate).toHaveBeenCalledWith(
+        'model-launch',
+        expect.any(Object),
+      );
     });
   });
 
   it('adjusts port and ctxSize fields with left/right arrows', async () => {
     const instance = render(
-      <ModelConfig modelFile="my-model.gguf" onBack={vi.fn()} onNavigate={vi.fn()} />,
+      <ModelConfig
+        modelFile="my-model.gguf"
+        onBack={vi.fn()}
+        onNavigate={vi.fn()}
+      />,
     );
     // Navigate to Port field (focusIndex=6 = FIELDS[5]='port' → fieldIdx=5)
     for (let i = 0; i < 6; i++) {
@@ -172,7 +224,11 @@ describe('ModelConfig', () => {
 
   it('adjusts topP, topK, minP fields', async () => {
     const instance = render(
-      <ModelConfig modelFile="my-model.gguf" onBack={vi.fn()} onNavigate={vi.fn()} />,
+      <ModelConfig
+        modelFile="my-model.gguf"
+        onBack={vi.fn()}
+        onNavigate={vi.fn()}
+      />,
     );
     // Navigate to topP (focusIndex=3, shows ±0.05)
     for (let i = 0; i < 3; i++) {
@@ -199,7 +255,11 @@ describe('ModelConfig', () => {
 
   it('adjusts cache type field with left/right arrows', async () => {
     const instance = render(
-      <ModelConfig modelFile="my-model.gguf" onBack={vi.fn()} onNavigate={vi.fn()} />,
+      <ModelConfig
+        modelFile="my-model.gguf"
+        onBack={vi.fn()}
+        onNavigate={vi.fn()}
+      />,
     );
     // Navigate to Cache Type K field (focusIndex=8)
     for (let i = 0; i < 8; i++) {

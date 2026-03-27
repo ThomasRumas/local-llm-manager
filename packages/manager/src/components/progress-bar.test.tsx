@@ -1,5 +1,4 @@
 import { describe, it, expect } from 'vitest';
-import React from 'react';
 import { render } from 'ink-testing-library';
 import { ProgressBar } from './progress-bar.js';
 
@@ -24,7 +23,9 @@ describe('ProgressBar', () => {
   });
 
   it('renders optional label', () => {
-    const { lastFrame } = render(<ProgressBar percent={25} label="Downloading" />);
+    const { lastFrame } = render(
+      <ProgressBar percent={25} label="Downloading" />,
+    );
     expect(lastFrame()).toContain('Downloading');
   });
 

@@ -1,4 +1,5 @@
-import React, { useState, useCallback } from 'react';
+import type React from 'react';
+import { useState, useCallback } from 'react';
 import { Box, Text, useInput, type Key } from 'ink';
 import { StatusBadge } from '../components/status-badge.js';
 import { configService } from '../modules/config/config.service.js';
@@ -8,8 +9,21 @@ interface SettingsProps {
   onBack: () => void;
 }
 
-type SettingsField = 'modelsDir' | 'port' | 'ctxSize' | 'hfToken' | 'apiEnabled' | 'apiPort';
-const SETTINGS_FIELDS: SettingsField[] = ['modelsDir', 'port', 'ctxSize', 'hfToken', 'apiEnabled', 'apiPort'];
+type SettingsField =
+  | 'modelsDir'
+  | 'port'
+  | 'ctxSize'
+  | 'hfToken'
+  | 'apiEnabled'
+  | 'apiPort';
+const SETTINGS_FIELDS: SettingsField[] = [
+  'modelsDir',
+  'port',
+  'ctxSize',
+  'hfToken',
+  'apiEnabled',
+  'apiPort',
+];
 
 type TextSetter = React.Dispatch<React.SetStateAction<string>>;
 type BoolSetter = React.Dispatch<React.SetStateAction<boolean>>;
@@ -25,23 +39,54 @@ interface FieldSetters {
   setSaved: SavedSetter;
 }
 
-function editText(setter: TextSetter, input: string, key: Key, isTextKey: boolean, digitOnly = false): boolean {
-  if (key.backspace || key.delete) { setter((p) => p.slice(0, -1)); return true; }
-  if (isTextKey && (!digitOnly || /^\d$/.test(input))) { setter((p) => p + input); return true; }
+function editText(
+  setter: TextSetter,
+  input: string,
+  key: Key,
+  isTextKey: boolean,
+  digitOnly = false,
+): boolean {
+  if (key.backspace || key.delete) {
+    setter((p) => p.slice(0, -1));
+    return true;
+  }
+  if (isTextKey && (!digitOnly || /^\d$/.test(input))) {
+    setter((p) => p + input);
+    return true;
+  }
   return false;
 }
 
-function handleFieldKey(field: SettingsField, input: string, key: Key, isTextKey: boolean, s: FieldSetters): void {
+function handleFieldKey(
+  field: SettingsField,
+  input: string,
+  key: Key,
+  isTextKey: boolean,
+  s: FieldSetters,
+): void {
   let changed = false;
   switch (field) {
-    case 'modelsDir': changed = editText(s.setModelsDir, input, key, isTextKey); break;
-    case 'port': changed = editText(s.setPortStr, input, key, isTextKey, true); break;
-    case 'ctxSize': changed = editText(s.setCtxSizeStr, input, key, isTextKey, true); break;
-    case 'hfToken': changed = editText(s.setHfToken, input, key, isTextKey); break;
-    case 'apiEnabled':
-      if (key.leftArrow || key.rightArrow) { s.setApiEnabled((p) => !p); changed = true; }
+    case 'modelsDir':
+      changed = editText(s.setModelsDir, input, key, isTextKey);
       break;
-    case 'apiPort': changed = editText(s.setApiPortStr, input, key, isTextKey, true); break;
+    case 'port':
+      changed = editText(s.setPortStr, input, key, isTextKey, true);
+      break;
+    case 'ctxSize':
+      changed = editText(s.setCtxSizeStr, input, key, isTextKey, true);
+      break;
+    case 'hfToken':
+      changed = editText(s.setHfToken, input, key, isTextKey);
+      break;
+    case 'apiEnabled':
+      if (key.leftArrow || key.rightArrow) {
+        s.setApiEnabled((p) => !p);
+        changed = true;
+      }
+      break;
+    case 'apiPort':
+      changed = editText(s.setApiPortStr, input, key, isTextKey, true);
+      break;
   }
   if (changed) s.setSaved(false);
 }
@@ -79,7 +124,10 @@ async function applySave(
     await configService.setModelsDirectory(p.modelsDir);
     await configService.setDefaults({ port: portNum, ctxSize: ctxSizeNum });
     await configService.setHfToken(p.hfToken.trim());
-    await configService.setApiServerConfig({ enabled: p.apiEnabled, port: apiPortNum });
+    await configService.setApiServerConfig({
+      enabled: p.apiEnabled,
+      port: apiPortNum,
+    });
     if (p.apiEnabled && !apiServer.isRunning) {
       await apiServer.start(apiPortNum);
     } else if (!p.apiEnabled && apiServer.isRunning) {
@@ -96,17 +144,22 @@ export function Settings({ onBack }: Readonly<SettingsProps>) {
   const appConfig = configService.get();
   const [modelsDir, setModelsDir] = useState(appConfig.modelsDirectory);
   const [portStr, setPortStr] = useState(String(appConfig.defaults.port));
-  const [ctxSizeStr, setCtxSizeStr] = useState(String(appConfig.defaults.ctxSize));
+  const [ctxSizeStr, setCtxSizeStr] = useState(
+    String(appConfig.defaults.ctxSize),
+  );
   const [hfToken, setHfToken] = useState(appConfig.hfToken ?? '');
   const [apiEnabled, setApiEnabled] = useState(appConfig.apiServer.enabled);
-  const [apiPortStr, setApiPortStr] = useState(String(appConfig.apiServer.port));
+  const [apiPortStr, setApiPortStr] = useState(
+    String(appConfig.apiServer.port),
+  );
   const [focusIndex, setFocusIndex] = useState(0);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const hfTokenMasked = hfToken.length > 0
-    ? `hf_${'*'.repeat(Math.max(0, hfToken.length - 3))}${hfToken.slice(-3)}`
-    : '(not set)';
+  const hfTokenMasked =
+    hfToken.length > 0
+      ? `hf_${'*'.repeat(Math.max(0, hfToken.length - 3))}${hfToken.slice(-3)}`
+      : '(not set)';
 
   const handleSave = useCallback(() => {
     applySave(
@@ -117,7 +170,10 @@ export function Settings({ onBack }: Readonly<SettingsProps>) {
   }, [modelsDir, portStr, ctxSizeStr, hfToken, apiEnabled, apiPortStr]);
 
   useInput((input, key) => {
-    if (key.escape) { onBack(); return; }
+    if (key.escape) {
+      onBack();
+      return;
+    }
 
     if (key.upArrow) {
       setFocusIndex((prev) => (prev > 0 ? prev - 1 : SETTINGS_FIELDS.length));
@@ -125,36 +181,63 @@ export function Settings({ onBack }: Readonly<SettingsProps>) {
       setFocusIndex((prev) => (prev < SETTINGS_FIELDS.length ? prev + 1 : 0));
     }
 
-    const isTextKey = !key.ctrl && !key.meta && !key.upArrow && !key.downArrow && !key.return && !key.tab && !key.escape;
+    const isTextKey =
+      !key.ctrl &&
+      !key.meta &&
+      !key.upArrow &&
+      !key.downArrow &&
+      !key.return &&
+      !key.tab &&
+      !key.escape;
     const field = SETTINGS_FIELDS[focusIndex];
     if (field) {
-      handleFieldKey(field, input, key, isTextKey, { setModelsDir, setPortStr, setCtxSizeStr, setHfToken, setApiEnabled, setApiPortStr, setSaved });
+      handleFieldKey(field, input, key, isTextKey, {
+        setModelsDir,
+        setPortStr,
+        setCtxSizeStr,
+        setHfToken,
+        setApiEnabled,
+        setApiPortStr,
+        setSaved,
+      });
     }
 
-    if (focusIndex === SETTINGS_FIELDS.length && key.return) { handleSave(); }
-    if (key.ctrl && input === 's') { handleSave(); }
+    if (focusIndex === SETTINGS_FIELDS.length && key.return) {
+      handleSave();
+    }
+    if (key.ctrl && input === 's') {
+      handleSave();
+    }
   });
 
   return (
     <Box flexDirection="column">
       <Box flexDirection="column">
         <Box>
-          <Text color={focusIndex === 0 ? 'cyan' : 'white'}>Models Directory: </Text>
+          <Text color={focusIndex === 0 ? 'cyan' : 'white'}>
+            Models Directory:{' '}
+          </Text>
           <Text color={focusIndex === 0 ? 'white' : 'gray'}>{modelsDir}</Text>
           {focusIndex === 0 && <Text color="cyan">▎</Text>}
         </Box>
         <Box>
-          <Text color={focusIndex === 1 ? 'cyan' : 'white'}>Default Port: </Text>
+          <Text color={focusIndex === 1 ? 'cyan' : 'white'}>
+            Default Port:{' '}
+          </Text>
           <Text color={focusIndex === 1 ? 'white' : 'gray'}>{portStr}</Text>
           {focusIndex === 1 && <Text color="cyan">▎</Text>}
         </Box>
         <Box>
-          <Text color={focusIndex === 2 ? 'cyan' : 'white'}>Default Context Size: </Text>
+          <Text color={focusIndex === 2 ? 'cyan' : 'white'}>
+            Default Context Size:{' '}
+          </Text>
           <Text color={focusIndex === 2 ? 'white' : 'gray'}>{ctxSizeStr}</Text>
           {focusIndex === 2 && <Text color="cyan">▎</Text>}
         </Box>
         <Box>
-          <Text color={focusIndex === 3 ? 'cyan' : 'white'}>Hugging Face Token: </Text>
+          <Text color={focusIndex === 3 ? 'cyan' : 'white'}>
+            Hugging Face Token:{' '}
+          </Text>
           {focusIndex === 3 ? (
             <Text color="white">{hfToken}</Text>
           ) : (
@@ -165,10 +248,14 @@ export function Settings({ onBack }: Readonly<SettingsProps>) {
       </Box>
 
       <Box marginTop={1} flexDirection="column">
-        <Text color="gray" dimColor>── API Server ─────────────────────</Text>
+        <Text color="gray" dimColor>
+          ── API Server ─────────────────────
+        </Text>
         <Box>
           <Text color={focusIndex === 4 ? 'cyan' : 'white'}>API Server: </Text>
-          <Text color={apiEnabled ? 'green' : 'gray'}>{apiEnabled ? 'enabled' : 'disabled'}</Text>
+          <Text color={apiEnabled ? 'green' : 'gray'}>
+            {apiEnabled ? 'enabled' : 'disabled'}
+          </Text>
           {focusIndex === 4 && <Text color="cyan"> ← →</Text>}
           {apiServer.isRunning && <Text color="green"> ● running</Text>}
         </Box>

@@ -5,16 +5,16 @@
 Print current DOM state:
 
 ```ts
-import { screen } from "@testing-library/react";
+import { screen } from '@testing-library/react';
 
 // Print entire document
 screen.debug();
 
 // Print specific element
-screen.debug(screen.getByRole("button"));
+screen.debug(screen.getByRole('button'));
 
 // Print multiple elements
-screen.debug(screen.getAllByRole("listitem"));
+screen.debug(screen.getAllByRole('listitem'));
 
 // With max length
 screen.debug(undefined, 20000);
@@ -30,10 +30,10 @@ screen.debug(undefined, 10000, { highlight: false });
 Convert DOM to string:
 
 ```ts
-import { prettyDOM } from "@testing-library/react";
+import { prettyDOM } from '@testing-library/react';
 
-const div = document.createElement("div");
-div.innerHTML = "<h1>Hello</h1>";
+const div = document.createElement('div');
+div.innerHTML = '<h1>Hello</h1>';
 
 console.log(prettyDOM(div));
 // <div>
@@ -46,7 +46,7 @@ prettyDOM(element, 5000);
 // With options
 prettyDOM(element, undefined, {
   highlight: false,
-  filterNode: (node) => node.tagName !== "SCRIPT",
+  filterNode: (node) => node.tagName !== 'SCRIPT',
 });
 ```
 
@@ -140,7 +140,7 @@ COLORS=false npm test
 
 ```ts
 screen.debug();
-expect(screen.getByText("Hello")).toBeInTheDocument();
+expect(screen.getByText('Hello')).toBeInTheDocument();
 ```
 
 ### 2. Use logRoles for Role Queries
@@ -154,7 +154,7 @@ logRoles(container);
 ### 3. Check Element Properties
 
 ```ts
-const button = screen.getByRole("button");
+const button = screen.getByRole('button');
 console.log({
   text: button.textContent,
   disabled: button.disabled,
@@ -182,11 +182,13 @@ await waitFor(() => {
 
 ```ts
 // See what's found
-console.log(screen.queryAllByRole("button"));
+console.log(screen.queryAllByRole('button'));
 
 // Check accessible name
-const buttons = screen.getAllByRole("button");
-buttons.forEach((b) => console.log(b.textContent, b.getAttribute("aria-label")));
+const buttons = screen.getAllByRole('button');
+buttons.forEach((b) =>
+  console.log(b.textContent, b.getAttribute('aria-label')),
+);
 ```
 
 ---
@@ -203,19 +205,19 @@ screen.debug();
 logRoles(container);
 
 // 3. Try different queries
-screen.queryByText("...");
-screen.queryByRole("...");
-screen.queryByTestId("...");
+screen.queryByText('...');
+screen.queryByRole('...');
+screen.queryByTestId('...');
 ```
 
 ### Element Not Visible
 
 ```ts
 // Include hidden elements
-screen.getByRole("button", { hidden: true });
+screen.getByRole('button', { hidden: true });
 
 // Check visibility
-const el = screen.getByText("Hidden");
+const el = screen.getByText('Hidden');
 console.log(window.getComputedStyle(el).display);
 console.log(window.getComputedStyle(el).visibility);
 ```
@@ -229,7 +231,7 @@ await waitFor(
     screen.debug();
     expect(element).toBeInTheDocument();
   },
-  { timeout: 5000 }
+  { timeout: 5000 },
 );
 ```
 
@@ -237,10 +239,10 @@ await waitFor(
 
 ```ts
 // See all matching elements
-screen.debug(screen.getAllByRole("button"));
+screen.debug(screen.getAllByRole('button'));
 
 // Be more specific
-screen.getByRole("button", { name: /submit/i });
+screen.getByRole('button', { name: /submit/i });
 ```
 
 ---

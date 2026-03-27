@@ -1,9 +1,9 @@
 ---
 name: unit-testing-test-generate
-description: "Generate comprehensive, maintainable unit tests across languages with strong coverage and edge case focus."
+description: 'Generate comprehensive, maintainable unit tests across languages with strong coverage and edge case focus.'
 risk: unknown
 source: community
-date_added: "2026-02-27"
+date_added: '2026-02-27'
 ---
 
 # Automated Unit Test Generation
@@ -167,18 +167,21 @@ class JestTestGenerator {
       {
         name: `${functionName} returns expected result with valid input`,
         execution: `const result = ${functionName}(${this.generateMockParams(params)})`,
-        assertions: ['expect(result).toBeDefined()', 'expect(result).not.toBeNull()']
+        assertions: [
+          'expect(result).toBeDefined()',
+          'expect(result).not.toBeNull()',
+        ],
       },
       {
         name: `${functionName} handles null input gracefully`,
         execution: `const result = ${functionName}(null)`,
-        assertions: ['expect(result).toBeDefined()']
+        assertions: ['expect(result).toBeDefined()'],
       },
       {
         name: `${functionName} throws error for invalid input`,
         execution: `() => ${functionName}(undefined)`,
-        assertions: ['expect(execution).toThrow()']
-      }
+        assertions: ['expect(execution).toThrow()'],
+      },
     ];
 
     return this.formatJestSuite(functionName, tests);
@@ -204,7 +207,9 @@ class JestTestGenerator {
   }
 
   generateMockParams(params: string[]): string {
-    return params.map(p => `mock${p.charAt(0).toUpperCase() + p.slice(1)}`).join(', ');
+    return params
+      .map((p) => `mock${p.charAt(0).toUpperCase() + p.slice(1)}`)
+      .join(', ');
   }
 }
 ```

@@ -1,5 +1,4 @@
 import { describe, it, expect } from 'vitest';
-import React from 'react';
 import { render } from 'ink-testing-library';
 import { StatusBadge } from './status-badge.js';
 
@@ -17,7 +16,9 @@ describe('StatusBadge', () => {
   });
 
   it('renders warning with ⚠ icon', () => {
-    const { lastFrame } = render(<StatusBadge status="warning" label="Watch out" />);
+    const { lastFrame } = render(
+      <StatusBadge status="warning" label="Watch out" />,
+    );
     expect(lastFrame()).toContain('⚠');
   });
 
@@ -27,7 +28,9 @@ describe('StatusBadge', () => {
   });
 
   it('renders loading with ⟳ icon', () => {
-    const { lastFrame } = render(<StatusBadge status="loading" label="Working…" />);
+    const { lastFrame } = render(
+      <StatusBadge status="loading" label="Working…" />,
+    );
     expect(lastFrame()).toContain('⟳');
     expect(lastFrame()).toContain('Working…');
   });

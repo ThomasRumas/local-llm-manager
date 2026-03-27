@@ -18,10 +18,10 @@ Always use `await` with async utilities!
 
 ```ts
 // Wait for element to appear
-const button = await screen.findByRole("button", { name: /submit/i });
+const button = await screen.findByRole('button', { name: /submit/i });
 
 // With timeout
-const element = await screen.findByText("Loaded", {}, { timeout: 5000 });
+const element = await screen.findByText('Loaded', {}, { timeout: 5000 });
 ```
 
 ### Options
@@ -46,11 +46,11 @@ await screen.findByText(
 Retry callback until it succeeds or times out:
 
 ```ts
-import { waitFor, screen } from "@testing-library/react";
+import { waitFor, screen } from '@testing-library/react';
 
 // Wait for assertion
 await waitFor(() => {
-  expect(screen.getByText("Loaded")).toBeInTheDocument();
+  expect(screen.getByText('Loaded')).toBeInTheDocument();
 });
 
 // Wait for mock to be called
@@ -59,7 +59,10 @@ await waitFor(() => {
 });
 
 // Wait with custom timeout
-await waitFor(() => expect(element).toBeVisible(), { timeout: 5000, interval: 100 });
+await waitFor(() => expect(element).toBeVisible(), {
+  timeout: 5000,
+  interval: 100,
+});
 ```
 
 ### Options
@@ -77,7 +80,7 @@ await waitFor(() => expect(element).toBeVisible(), { timeout: 5000, interval: 10
 ```ts
 // Wait for loading to finish
 await waitFor(() => {
-  expect(screen.queryByText("Loading...")).not.toBeInTheDocument();
+  expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
 });
 
 // Wait for API call
@@ -87,7 +90,7 @@ await waitFor(() => {
 
 // Wait for DOM change
 await waitFor(() => {
-  expect(screen.getByRole("list").children).toHaveLength(5);
+  expect(screen.getByRole('list').children).toHaveLength(5);
 });
 ```
 
@@ -95,16 +98,16 @@ await waitFor(() => {
 
 ```ts
 // ❌ Don't use waitFor with findBy (findBy already waits)
-await waitFor(() => screen.findByText("Hello"));
+await waitFor(() => screen.findByText('Hello'));
 
 // ✅ Just use findBy
-const element = await screen.findByText("Hello");
+const element = await screen.findByText('Hello');
 
 // ❌ Don't wrap getBy in waitFor if element exists
-await waitFor(() => screen.getByText("Static"));
+await waitFor(() => screen.getByText('Static'));
 
 // ✅ Use getBy directly
-const element = screen.getByText("Static");
+const element = screen.getByText('Static');
 
 // ❌ Empty waitFor callback
 await waitFor(() => {});
@@ -120,28 +123,30 @@ await waitFor(() => expect(something).toBe(true));
 Wait for element to be removed from DOM:
 
 ```ts
-import { waitForElementToBeRemoved, screen } from "@testing-library/react";
+import { waitForElementToBeRemoved, screen } from '@testing-library/react';
 
 // Pass element directly
-const loader = screen.getByText("Loading...");
+const loader = screen.getByText('Loading...');
 await waitForElementToBeRemoved(loader);
 
 // Pass callback
-await waitForElementToBeRemoved(() => screen.queryByText("Loading..."));
+await waitForElementToBeRemoved(() => screen.queryByText('Loading...'));
 
 // With timeout
-await waitForElementToBeRemoved(() => screen.queryByText("Loading..."), { timeout: 5000 });
+await waitForElementToBeRemoved(() => screen.queryByText('Loading...'), {
+  timeout: 5000,
+});
 ```
 
 ### Important Notes
 
 ```ts
 // ❌ Element must exist when calling
-await waitForElementToBeRemoved(screen.queryByText("Not there"));
+await waitForElementToBeRemoved(screen.queryByText('Not there'));
 // Error: Element not found
 
 // ✅ Element must exist initially
-const element = screen.getByText("Loading...");
+const element = screen.getByText('Loading...');
 await waitForElementToBeRemoved(element);
 ```
 
@@ -152,71 +157,73 @@ await waitForElementToBeRemoved(element);
 ### Loading State
 
 ```tsx
-test("shows loading then data", async () => {
+test('shows loading then data', async () => {
   render(<DataFetcher />);
 
   // Loading appears
-  expect(screen.getByText("Loading...")).toBeInTheDocument();
+  expect(screen.getByText('Loading...')).toBeInTheDocument();
 
   // Wait for data to load
-  await waitForElementToBeRemoved(() => screen.queryByText("Loading..."));
+  await waitForElementToBeRemoved(() => screen.queryByText('Loading...'));
 
   // Data appears
-  expect(screen.getByText("Data loaded")).toBeInTheDocument();
+  expect(screen.getByText('Data loaded')).toBeInTheDocument();
 });
 ```
 
 ### Form Submission
 
 ```tsx
-test("submits form and shows success", async () => {
+test('submits form and shows success', async () => {
   const user = userEvent.setup();
   render(<ContactForm />);
 
-  await user.type(screen.getByLabelText("Email"), "test@example.com");
-  await user.click(screen.getByRole("button", { name: "Submit" }));
+  await user.type(screen.getByLabelText('Email'), 'test@example.com');
+  await user.click(screen.getByRole('button', { name: 'Submit' }));
 
   // Wait for success message
-  expect(await screen.findByText("Thank you!")).toBeInTheDocument();
+  expect(await screen.findByText('Thank you!')).toBeInTheDocument();
 });
 ```
 
 ### Multiple Async Operations
 
 ```tsx
-test("loads and updates data", async () => {
+test('loads and updates data', async () => {
   render(<Dashboard />);
 
   // Wait for initial load
-  await screen.findByText("Dashboard");
+  await screen.findByText('Dashboard');
 
   // Trigger refresh
-  await userEvent.click(screen.getByRole("button", { name: "Refresh" }));
+  await userEvent.click(screen.getByRole('button', { name: 'Refresh' }));
 
   // Wait for loading indicator to appear and disappear
   await waitFor(() => {
-    expect(screen.queryByText("Refreshing...")).not.toBeInTheDocument();
+    expect(screen.queryByText('Refreshing...')).not.toBeInTheDocument();
   });
 
   // Verify updated content
-  expect(screen.getByText("Updated")).toBeInTheDocument();
+  expect(screen.getByText('Updated')).toBeInTheDocument();
 });
 ```
 
 ### Testing Error States
 
 ```tsx
-test("shows error on failure", async () => {
+test('shows error on failure', async () => {
   server.use(
-    rest.get("/api/data", (req, res, ctx) => {
+    rest.get('/api/data', (req, res, ctx) => {
       return res(ctx.status(500));
-    })
+    }),
   );
 
   render(<DataComponent />);
 
   // Wait for error
-  expect(await screen.findByRole("alert")).toHaveTextContent("Error loading data");
+  expect(await screen.findByRole('alert')).toHaveTextContent(
+    'Error loading data',
+  );
 });
 ```
 
@@ -227,7 +234,7 @@ test("shows error on failure", async () => {
 ### Global Default
 
 ```ts
-import { configure } from "@testing-library/react";
+import { configure } from '@testing-library/react';
 
 configure({
   asyncUtilTimeout: 5000, // 5 seconds
@@ -237,7 +244,7 @@ configure({
 ### Per-Query
 
 ```ts
-await screen.findByText("Slow content", {}, { timeout: 10000 });
+await screen.findByText('Slow content', {}, { timeout: 10000 });
 
 await waitFor(() => expect(element).toBeVisible(), { timeout: 10000 });
 ```
@@ -249,7 +256,7 @@ await waitFor(() => expect(element).toBeVisible(), { timeout: 10000 });
 1. **Use findBy for async elements**
 
    ```ts
-   const element = await screen.findByText("Loaded");
+   const element = await screen.findByText('Loaded');
    ```
 
 2. **Use waitFor for assertions**
@@ -262,25 +269,25 @@ await waitFor(() => expect(element).toBeVisible(), { timeout: 10000 });
 
    ```ts
    // ❌ Bad
-   await waitFor(() => screen.findByText("x"));
+   await waitFor(() => screen.findByText('x'));
 
    // ✅ Good
-   await screen.findByText("x");
+   await screen.findByText('x');
    ```
 
 4. **Always await async operations**
 
    ```ts
    // ❌ Missing await
-   screen.findByText("Hello");
+   screen.findByText('Hello');
 
    // ✅ Correct
-   await screen.findByText("Hello");
+   await screen.findByText('Hello');
    ```
 
 5. **Use queryBy for disappearance checks**
    ```ts
    await waitFor(() => {
-     expect(screen.queryByText("Loading")).not.toBeInTheDocument();
+     expect(screen.queryByText('Loading')).not.toBeInTheDocument();
    });
    ```

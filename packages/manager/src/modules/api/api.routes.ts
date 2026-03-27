@@ -11,9 +11,18 @@ import type {
   ApiErrorResponse,
 } from './api.types.js';
 
-type JsonResponse = ApiModelsResponse | ApiStartResponse | ApiStatusResponse | ApiStopResponse | ApiErrorResponse;
+type JsonResponse =
+  | ApiModelsResponse
+  | ApiStartResponse
+  | ApiStatusResponse
+  | ApiStopResponse
+  | ApiErrorResponse;
 
-function sendJson(res: ServerResponse, status: number, body: JsonResponse): void {
+function sendJson(
+  res: ServerResponse,
+  status: number,
+  body: JsonResponse,
+): void {
   const payload = JSON.stringify(body);
   res.writeHead(status, {
     'Content-Type': 'application/json',
@@ -36,7 +45,11 @@ async function readBody(req: IncomingMessage): Promise<string> {
 
 const START_ROUTE = /^\/api\/models\/([^/]+)\/start$/;
 
-async function handleStartModel(req: IncomingMessage, res: ServerResponse, pathname: string): Promise<void> {
+async function handleStartModel(
+  req: IncomingMessage,
+  res: ServerResponse,
+  pathname: string,
+): Promise<void> {
   const match = START_ROUTE.exec(pathname);
   if (!match) {
     sendJson(res, 404, { error: 'Not found' } satisfies ApiErrorResponse);
@@ -46,7 +59,9 @@ async function handleStartModel(req: IncomingMessage, res: ServerResponse, pathn
 
   const resolved = configService.resolveModelIdentifier(identifier);
   if (!resolved) {
-    sendJson(res, 404, { error: `No configuration found for model: ${identifier}` } satisfies ApiErrorResponse);
+    sendJson(res, 404, {
+      error: `No configuration found for model: ${identifier}`,
+    } satisfies ApiErrorResponse);
     return;
   }
   const { filename } = resolved;
@@ -59,20 +74,31 @@ async function handleStartModel(req: IncomingMessage, res: ServerResponse, pathn
       body = JSON.parse(raw) as ApiStartBody;
     }
   } catch {
-    sendJson(res, 400, { error: 'Invalid JSON body' } satisfies ApiErrorResponse);
+    sendJson(res, 400, {
+      error: 'Invalid JSON body',
+    } satisfies ApiErrorResponse);
     return;
   }
 
-  const configName = (typeof body.config === 'string' && body.config.trim()) ? body.config.trim() : 'default';
+  const configName =
+    typeof body.config === 'string' && body.config.trim()
+      ? body.config.trim()
+      : 'default';
 
   if (!Object.hasOwn(configurations[filename] ?? {}, configName)) {
-    sendJson(res, 404, { error: `No configuration named "${configName}" for model: ${filename}` } satisfies ApiErrorResponse);
+    sendJson(res, 404, {
+      error: `No configuration named "${configName}" for model: ${filename}`,
+    } satisfies ApiErrorResponse);
     return;
   }
 
   const modelsDir = configService.getModelsDirectory();
   const modelPath = `${modelsDir}/${filename}`;
-  const launchConfig = configService.getEffective(filename, modelPath, configName);
+  const launchConfig = configService.getEffective(
+    filename,
+    modelPath,
+    configName,
+  );
 
   serverManager.start(launchConfig, filename, configName);
 
@@ -84,7 +110,10 @@ async function handleStartModel(req: IncomingMessage, res: ServerResponse, pathn
   } satisfies ApiStartResponse);
 }
 
-export async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
+export async function handleRequest(
+  req: IncomingMessage,
+  res: ServerResponse,
+): Promise<void> {
   const { method, url } = req;
 
   // Handle CORS preflight
@@ -103,11 +132,15 @@ export async function handleRequest(req: IncomingMessage, res: ServerResponse): 
   // GET /api/models
   if (method === 'GET' && pathname === '/api/models') {
     const configurations = configService.get().configurations;
-    const models: ApiModelsResponse['models'] = Object.entries(configurations).map(([filename, configs]) => {
-      const configEntries: ApiModelConfig[] = Object.entries(configs).map(([name, cfg]) => ({
-        name,
-        ...(cfg.alias ? { alias: cfg.alias } : {}),
-      }));
+    const models: ApiModelsResponse['models'] = Object.entries(
+      configurations,
+    ).map(([filename, configs]) => {
+      const configEntries: ApiModelConfig[] = Object.entries(configs).map(
+        ([name, cfg]) => ({
+          name,
+          ...(cfg.alias ? { alias: cfg.alias } : {}),
+        }),
+      );
       return { filename, configs: configEntries };
     });
     sendJson(res, 200, { models } satisfies ApiModelsResponse);

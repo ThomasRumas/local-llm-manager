@@ -25,7 +25,10 @@ describe('Client Config', () => {
   describe('loadConfig()', () => {
     it('reads and merges config from disk', async () => {
       mockReadFile.mockResolvedValueOnce(
-        JSON.stringify({ remoteUrl: 'http://192.168.1.5:3333', defaultModel: 'MyModel' }),
+        JSON.stringify({
+          remoteUrl: 'http://192.168.1.5:3333',
+          defaultModel: 'MyModel',
+        }),
       );
       const config = await loadConfig();
       expect(config.remoteUrl).toBe('http://192.168.1.5:3333');
@@ -86,7 +89,7 @@ describe('Client Config', () => {
         JSON.stringify({ remoteUrl: 'http://old.com' }),
       );
       await setConfigValue('remoteUrl', 'http://new.com');
-      const written = JSON.parse((mockWriteFile.mock.calls.at(-1)![1] as string));
+      const written = JSON.parse(mockWriteFile.mock.calls.at(-1)![1] as string);
       expect(written.remoteUrl).toBe('http://new.com');
     });
   });

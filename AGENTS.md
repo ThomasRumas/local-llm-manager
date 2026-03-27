@@ -8,13 +8,13 @@ Provide a single interactive CLI to install llama.cpp, discover and download mod
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Runtime | Node.js 22+ (ESM) |
-| UI Framework | Ink 6 + React 19 |
-| Language | TypeScript |
-| LLM Backend | llama.cpp (`llama-server`) installed via Homebrew |
-| Model Registry | Hugging Face Hub (via `@huggingface/hub`) |
+| Layer          | Technology                                                        |
+| -------------- | ----------------------------------------------------------------- |
+| Runtime        | Node.js 22+ (ESM)                                                 |
+| UI Framework   | Ink 6 + React 19                                                  |
+| Language       | TypeScript                                                        |
+| LLM Backend    | llama.cpp (`llama-server`) installed via Homebrew                 |
+| Model Registry | Hugging Face Hub (via `@huggingface/hub`)                         |
 | Config Storage | JSON file on disk (`~/.local-llm-manager/config.json` by default) |
 
 ## Features
@@ -44,20 +44,20 @@ Provide a single interactive CLI to install llama.cpp, discover and download mod
 
 When launching a model, allow the user to configure `llama-server` flags through a form UI:
 
-| Parameter | Flag | Default | Description |
-|-----------|------|---------|-------------|
-| Alias | `--alias` | model name | Display name for the model |
-| Temperature | `--temp` | `0.6` | Sampling temperature |
-| Top-P | `--top-p` | `0.95` | Nucleus sampling threshold |
-| Top-K | `--top-k` | `20` | Top-K sampling |
-| Min-P | `--min-p` | `0.0` | Minimum probability threshold |
-| Port | `--port` | global default | HTTP server port (global default, overridable per model) |
-| Context Size | `--ctx-size` | global default | Context window size in tokens (global default, overridable per model) |
-| KV Unified | `--kv-unified` | `true` | Unified KV cache |
-| Cache Type K | `--cache-type-k` | `q8_0` | Key cache quantization |
-| Cache Type V | `--cache-type-v` | `q8_0` | Value cache quantization |
-| Flash Attention | `--flash-attn` | `on` | Enable flash attention |
-| FIT | `--fit` | `on` | Enable FIT |
+| Parameter       | Flag             | Default        | Description                                                           |
+| --------------- | ---------------- | -------------- | --------------------------------------------------------------------- |
+| Alias           | `--alias`        | model name     | Display name for the model                                            |
+| Temperature     | `--temp`         | `0.6`          | Sampling temperature                                                  |
+| Top-P           | `--top-p`        | `0.95`         | Nucleus sampling threshold                                            |
+| Top-K           | `--top-k`        | `20`           | Top-K sampling                                                        |
+| Min-P           | `--min-p`        | `0.0`          | Minimum probability threshold                                         |
+| Port            | `--port`         | global default | HTTP server port (global default, overridable per model)              |
+| Context Size    | `--ctx-size`     | global default | Context window size in tokens (global default, overridable per model) |
+| KV Unified      | `--kv-unified`   | `true`         | Unified KV cache                                                      |
+| Cache Type K    | `--cache-type-k` | `q8_0`         | Key cache quantization                                                |
+| Cache Type V    | `--cache-type-v` | `q8_0`         | Value cache quantization                                              |
+| Flash Attention | `--flash-attn`   | `on`           | Enable flash attention                                                |
+| FIT             | `--fit`          | `on`           | Enable FIT                                                            |
 
 The form should also support adding arbitrary extra flags as raw text for advanced users.
 
@@ -83,7 +83,7 @@ The form should also support adding arbitrary extra flags as raw text for advanc
   "modelsDirectory": "~/.local-llm-manager/models",
   "defaults": {
     "port": 8001,
-    "ctxSize": 131072
+    "ctxSize": 131072,
   },
   "configurations": {
     "Qwen3.5-35B-A3B-UD-Q4_K_XL.gguf": {
@@ -102,10 +102,10 @@ The form should also support adding arbitrary extra flags as raw text for advanc
         "cacheTypeV": "q8_0",
         "flashAttn": "on",
         "fit": "on",
-        "extraFlags": ""
-      }
-    }
-  }
+        "extraFlags": "",
+      },
+    },
+  },
 }
 ```
 

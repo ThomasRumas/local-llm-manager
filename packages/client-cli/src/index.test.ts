@@ -14,7 +14,11 @@ const mockStartModel = vi.mocked(startModel);
 const mockGetStatus = vi.mocked(getStatus);
 const mockStopModel = vi.mocked(stopModel);
 
-const DEFAULT_CONFIG = { remoteUrl: 'http://localhost:3333', defaultModel: undefined, defaultConfig: undefined };
+const DEFAULT_CONFIG = {
+  remoteUrl: 'http://localhost:3333',
+  defaultModel: undefined,
+  defaultConfig: undefined,
+};
 
 // ── Helper to run index.ts main() once with given argv ────────────────────────
 // Run index.ts main() with the given argv and capture output + exit code.
@@ -57,7 +61,9 @@ describe('CLI index.ts', () => {
   beforeEach(() => {
     mockLoadConfig.mockResolvedValue({ ...DEFAULT_CONFIG });
     mockSetConfigValue.mockResolvedValue(undefined);
-    vi.mocked(loadConfig as any)['saveConfig'] = vi.fn().mockResolvedValue(undefined);
+    vi.mocked(loadConfig as any)['saveConfig'] = vi
+      .fn()
+      .mockResolvedValue(undefined);
   });
 
   // ── help ──────────────────────────────────────────────────────────────────
@@ -81,7 +87,10 @@ describe('CLI index.ts', () => {
   // ── config show ───────────────────────────────────────────────────────────
   describe('config show', () => {
     it('displays current configuration', async () => {
-      mockLoadConfig.mockResolvedValue({ remoteUrl: 'http://my-server:4444', defaultModel: 'Qwen' } as any);
+      mockLoadConfig.mockResolvedValue({
+        remoteUrl: 'http://my-server:4444',
+        defaultModel: 'Qwen',
+      } as any);
       const { logs } = await runCli(['config', 'show']);
       expect(logs.join('\n')).toContain('http://my-server:4444');
       expect(logs.join('\n')).toContain('Qwen');
@@ -91,9 +100,17 @@ describe('CLI index.ts', () => {
   // ── config set ────────────────────────────────────────────────────────────
   describe('config set', () => {
     it('sets a valid config key', async () => {
-      const { errors } = await runCli(['config', 'set', 'remote-url', 'http://10.0.0.1:3333']);
+      const { errors } = await runCli([
+        'config',
+        'set',
+        'remote-url',
+        'http://10.0.0.1:3333',
+      ]);
       expect(errors.join('\n')).not.toContain('Unknown config key');
-      expect(mockSetConfigValue).toHaveBeenCalledWith('remoteUrl', 'http://10.0.0.1:3333');
+      expect(mockSetConfigValue).toHaveBeenCalledWith(
+        'remoteUrl',
+        'http://10.0.0.1:3333',
+      );
     });
 
     it('exits 1 on unknown key', async () => {
@@ -111,10 +128,12 @@ describe('CLI index.ts', () => {
   describe('list command', () => {
     it('displays configured models', async () => {
       mockListModels.mockResolvedValue({
-        models: [{
-          filename: 'mymodel.gguf',
-          configs: [{ name: 'default', alias: 'MyAlias' }],
-        }],
+        models: [
+          {
+            filename: 'mymodel.gguf',
+            configs: [{ name: 'default', alias: 'MyAlias' }],
+          },
+        ],
       } as any);
       const { logs } = await runCli(['list']);
       expect(logs.join('\n')).toContain('MyAlias');
@@ -136,19 +155,29 @@ describe('CLI index.ts', () => {
   // ── start ─────────────────────────────────────────────────────────────────
   describe('start command', () => {
     it('starts model by name', async () => {
-      mockStartModel.mockResolvedValue({ success: true, port: 8001, pid: 1234 } as any);
+      mockStartModel.mockResolvedValue({
+        success: true,
+        port: 8001,
+        pid: 1234,
+      } as any);
       const { logs } = await runCli(['start', 'mymodel']);
       expect(logs.join('\n')).toContain('started');
     });
 
     it('exits 1 when no model specified and no default', async () => {
-      mockLoadConfig.mockResolvedValue({ remoteUrl: 'http://localhost:3333' } as any);
+      mockLoadConfig.mockResolvedValue({
+        remoteUrl: 'http://localhost:3333',
+      } as any);
       const { exitCode } = await runCli(['start']);
       expect(exitCode).toBe(1);
     });
 
     it('passes --config flag to startModel', async () => {
-      mockStartModel.mockResolvedValue({ success: true, port: 8001, pid: 1 } as any);
+      mockStartModel.mockResolvedValue({
+        success: true,
+        port: 8001,
+        pid: 1,
+      } as any);
       await runCli(['start', 'mymodel', '--config', 'quality']);
       expect(mockStartModel).toHaveBeenCalledWith(
         expect.any(String),

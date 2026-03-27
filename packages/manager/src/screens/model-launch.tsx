@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Text, useInput } from 'ink';
 import { useServer } from '../contexts/server-context.js';
 import { configService } from '../modules/config/config.service.js';
@@ -23,7 +23,11 @@ function formatGb(bytes: number): string {
   return `${(bytes / 1_073_741_824).toFixed(1)} GB`;
 }
 
-export function ModelLaunch({ modelFile, configName = 'default', onBack }: Readonly<ModelLaunchProps>) {
+export function ModelLaunch({
+  modelFile,
+  configName = 'default',
+  onBack,
+}: Readonly<ModelLaunchProps>) {
   const server = useServer();
   const [scrollOffset, setScrollOffset] = useState(0);
   const stats = useSystemStats(server.pid);
@@ -36,9 +40,13 @@ export function ModelLaunch({ modelFile, configName = 'default', onBack }: Reado
     if (server.running && server.modelFile === modelFile) return;
     const modelsDir = configService.getModelsDirectory();
     const modelPath = `${modelsDir}/${modelFile}`;
-    const resolved = configService.getEffective(modelFile, modelPath, configName);
+    const resolved = configService.getEffective(
+      modelFile,
+      modelPath,
+      configName,
+    );
     server.start(resolved, modelFile, configName);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const VISIBLE_LINES = 20;
@@ -80,16 +88,36 @@ export function ModelLaunch({ modelFile, configName = 'default', onBack }: Reado
           {server.running ? '● Running' : '○ Stopped'}
         </Text>
         <Box flexDirection="column" marginTop={1} gap={0}>
-          <InfoRow label="Model"   value={server.modelFile ? configService.getModelDisplayName(server.modelFile, server.configName ?? 'default') : '—'} />
-          <InfoRow label="Config"  value={server.configName ?? '—'} />
-          <InfoRow label="Port"    value={server.port ? `:${server.port}` : '—'} color="cyan" />
-          <InfoRow label="Uptime"  value={formatUptime(server.uptimeSeconds)} color={server.running ? 'green' : 'gray'} />
+          <InfoRow
+            label="Model"
+            value={
+              server.modelFile
+                ? configService.getModelDisplayName(
+                    server.modelFile,
+                    server.configName ?? 'default',
+                  )
+                : '—'
+            }
+          />
+          <InfoRow label="Config" value={server.configName ?? '—'} />
+          <InfoRow
+            label="Port"
+            value={server.port ? `:${server.port}` : '—'}
+            color="cyan"
+          />
+          <InfoRow
+            label="Uptime"
+            value={formatUptime(server.uptimeSeconds)}
+            color={server.running ? 'green' : 'gray'}
+          />
           {server.pid && <InfoRow label="PID" value={String(server.pid)} />}
         </Box>
 
         {/* System resources */}
         <Box marginTop={1} flexDirection="column" gap={0}>
-          <Text bold dimColor>System</Text>
+          <Text bold dimColor>
+            System
+          </Text>
           {stats ? (
             <>
               <InfoRow
@@ -97,13 +125,24 @@ export function ModelLaunch({ modelFile, configName = 'default', onBack }: Reado
                 value={`${stats.cpuPercent}%`}
                 color={stats.cpuPercent > 80 ? 'red' : 'green'}
               />
-              <InfoRow label="RAM" value={`${formatGb(stats.ramUsedBytes)} / ${formatGb(stats.ramTotalBytes)}`} />
+              <InfoRow
+                label="RAM"
+                value={`${formatGb(stats.ramUsedBytes)} / ${formatGb(stats.ramTotalBytes)}`}
+              />
               <InfoRow label="VRAM" value={stats.vramLabel} color="gray" />
               {stats.processCpuPercent !== null && (
-                <InfoRow label="Proc CPU" value={`${stats.processCpuPercent.toFixed(1)}%`} color="cyan" />
+                <InfoRow
+                  label="Proc CPU"
+                  value={`${stats.processCpuPercent.toFixed(1)}%`}
+                  color="cyan"
+                />
               )}
               {stats.processRamBytes !== null && (
-                <InfoRow label="Proc RAM" value={formatGb(stats.processRamBytes)} color="cyan" />
+                <InfoRow
+                  label="Proc RAM"
+                  value={formatGb(stats.processRamBytes)}
+                  color="cyan"
+                />
               )}
             </>
           ) : (
@@ -112,12 +151,16 @@ export function ModelLaunch({ modelFile, configName = 'default', onBack }: Reado
         </Box>
         {server.running && (
           <Box marginTop={1}>
-            <Text color="cyan" dimColor>http://localhost:{server.port}</Text>
+            <Text color="cyan" dimColor>
+              http://localhost:{server.port}
+            </Text>
           </Box>
         )}
         {server.error && (
           <Box marginTop={1}>
-            <Text color="red" wrap="wrap">{server.error}</Text>
+            <Text color="red" wrap="wrap">
+              {server.error}
+            </Text>
           </Box>
         )}
       </Box>
@@ -132,12 +175,19 @@ export function ModelLaunch({ modelFile, configName = 'default', onBack }: Reado
         overflow="hidden"
       >
         <Box justifyContent="space-between">
-          <Text bold dimColor>Logs</Text>
-          <Text dimColor>{totalLogs} lines{scrollOffset > 0 ? `  ↑ +${scrollOffset}` : ''}</Text>
+          <Text bold dimColor>
+            Logs
+          </Text>
+          <Text dimColor>
+            {totalLogs} lines{scrollOffset > 0 ? `  ↑ +${scrollOffset}` : ''}
+          </Text>
         </Box>
         <Box flexDirection="column" flexGrow={1} overflow="hidden">
           {visibleLogs.map((line, i) => {
-            const isError = line.includes('[error]') || line.includes('ERROR') || line.includes('error');
+            const isError =
+              line.includes('[error]') ||
+              line.includes('ERROR') ||
+              line.includes('error');
             const isInfo = line.includes('[info]') || line.includes('INFO');
             let lineColor = 'gray';
             if (isError) lineColor = 'red';
@@ -158,11 +208,19 @@ export function ModelLaunch({ modelFile, configName = 'default', onBack }: Reado
   );
 }
 
-function InfoRow({ label, value, color }: Readonly<{ label: string; value: string; color?: string }>) {
+function InfoRow({
+  label,
+  value,
+  color,
+}: Readonly<{ label: string; value: string; color?: string }>) {
   return (
     <Box gap={1}>
-      <Box width={8}><Text dimColor>{label}</Text></Box>
-      <Text color={color ?? 'white'} wrap="truncate">{value}</Text>
+      <Box width={8}>
+        <Text dimColor>{label}</Text>
+      </Box>
+      <Text color={color ?? 'white'} wrap="truncate">
+        {value}
+      </Text>
     </Box>
   );
 }

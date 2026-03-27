@@ -21,17 +21,17 @@ import {Text} from 'ink';
 
 ### Text Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `color` | `string` | — | Text color (named, hex `#005cc5`, or `rgb()`) |
-| `backgroundColor` | `string` | — | Background color |
-| `dimColor` | `boolean` | `false` | Dim the color |
-| `bold` | `boolean` | `false` | Bold text |
-| `italic` | `boolean` | `false` | Italic text |
-| `underline` | `boolean` | `false` | Underlined text |
-| `strikethrough` | `boolean` | `false` | Strikethrough text |
-| `inverse` | `boolean` | `false` | Swap foreground and background |
-| `wrap` | `string` | `'wrap'` | `'wrap'`, `'truncate'`, `'truncate-start'`, `'truncate-middle'`, `'truncate-end'` |
+| Prop              | Type      | Default  | Description                                                                       |
+| ----------------- | --------- | -------- | --------------------------------------------------------------------------------- |
+| `color`           | `string`  | —        | Text color (named, hex `#005cc5`, or `rgb()`)                                     |
+| `backgroundColor` | `string`  | —        | Background color                                                                  |
+| `dimColor`        | `boolean` | `false`  | Dim the color                                                                     |
+| `bold`            | `boolean` | `false`  | Bold text                                                                         |
+| `italic`          | `boolean` | `false`  | Italic text                                                                       |
+| `underline`       | `boolean` | `false`  | Underlined text                                                                   |
+| `strikethrough`   | `boolean` | `false`  | Strikethrough text                                                                |
+| `inverse`         | `boolean` | `false`  | Swap foreground and background                                                    |
+| `wrap`            | `string`  | `'wrap'` | `'wrap'`, `'truncate'`, `'truncate-start'`, `'truncate-middle'`, `'truncate-end'` |
 
 ### Text Wrapping and Truncation
 
@@ -64,70 +64,70 @@ import {Text} from 'ink';
 Layout container — think `<div style="display: flex">`. Every `<Box>` is a Flexbox container.
 
 ```tsx
-import {Box, Text} from 'ink';
+import { Box, Text } from 'ink';
 
 <Box margin={2}>
   <Text>This is a box with margin</Text>
-</Box>
+</Box>;
 ```
 
 ### Dimensions
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `width` | `number \| string` | — | Width in spaces or percentage |
-| `height` | `number \| string` | — | Height in lines or percentage |
-| `minWidth` | `number` | — | Minimum width |
-| `minHeight` | `number \| string` | — | Minimum height |
-| `maxWidth` | `number` | — | Maximum width |
-| `maxHeight` | `number \| string` | — | Maximum height |
-| `aspectRatio` | `number` | — | Width/height ratio (use with a size constraint) |
+| Prop          | Type               | Default | Description                                     |
+| ------------- | ------------------ | ------- | ----------------------------------------------- |
+| `width`       | `number \| string` | —       | Width in spaces or percentage                   |
+| `height`      | `number \| string` | —       | Height in lines or percentage                   |
+| `minWidth`    | `number`           | —       | Minimum width                                   |
+| `minHeight`   | `number \| string` | —       | Minimum height                                  |
+| `maxWidth`    | `number`           | —       | Maximum width                                   |
+| `maxHeight`   | `number \| string` | —       | Maximum height                                  |
+| `aspectRatio` | `number`           | —       | Width/height ratio (use with a size constraint) |
 
 ### Padding
 
-| Prop | Type | Default |
-|------|------|---------|
-| `padding` | `number` | `0` |
-| `paddingX` | `number` | `0` |
-| `paddingY` | `number` | `0` |
-| `paddingTop` | `number` | `0` |
-| `paddingBottom` | `number` | `0` |
-| `paddingLeft` | `number` | `0` |
-| `paddingRight` | `number` | `0` |
+| Prop            | Type     | Default |
+| --------------- | -------- | ------- |
+| `padding`       | `number` | `0`     |
+| `paddingX`      | `number` | `0`     |
+| `paddingY`      | `number` | `0`     |
+| `paddingTop`    | `number` | `0`     |
+| `paddingBottom` | `number` | `0`     |
+| `paddingLeft`   | `number` | `0`     |
+| `paddingRight`  | `number` | `0`     |
 
 ### Margin
 
-| Prop | Type | Default |
-|------|------|---------|
-| `margin` | `number` | `0` |
-| `marginX` | `number` | `0` |
-| `marginY` | `number` | `0` |
-| `marginTop` | `number` | `0` |
-| `marginBottom` | `number` | `0` |
-| `marginLeft` | `number` | `0` |
-| `marginRight` | `number` | `0` |
+| Prop           | Type     | Default |
+| -------------- | -------- | ------- |
+| `margin`       | `number` | `0`     |
+| `marginX`      | `number` | `0`     |
+| `marginY`      | `number` | `0`     |
+| `marginTop`    | `number` | `0`     |
+| `marginBottom` | `number` | `0`     |
+| `marginLeft`   | `number` | `0`     |
+| `marginRight`  | `number` | `0`     |
 
 ### Gap
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `gap` | `number` | `0` | Shorthand for `columnGap` + `rowGap` |
-| `columnGap` | `number` | `0` | Space between columns |
-| `rowGap` | `number` | `0` | Space between rows |
+| Prop        | Type     | Default | Description                          |
+| ----------- | -------- | ------- | ------------------------------------ |
+| `gap`       | `number` | `0`     | Shorthand for `columnGap` + `rowGap` |
+| `columnGap` | `number` | `0`     | Space between columns                |
+| `rowGap`    | `number` | `0`     | Space between rows                   |
 
 ### Flex Layout
 
-| Prop | Type | Default | Values |
-|------|------|---------|--------|
-| `flexDirection` | `string` | `'row'` | `'row'`, `'row-reverse'`, `'column'`, `'column-reverse'` |
-| `flexWrap` | `string` | `'nowrap'` | `'nowrap'`, `'wrap'`, `'wrap-reverse'` |
-| `flexGrow` | `number` | `0` | How much the item grows |
-| `flexShrink` | `number` | `1` | How much the item shrinks |
-| `flexBasis` | `number \| string` | — | Initial size before flex |
-| `alignItems` | `string` | — | `'flex-start'`, `'center'`, `'flex-end'`, `'stretch'`, `'baseline'` |
-| `alignSelf` | `string` | `'auto'` | Same as alignItems + `'auto'` |
-| `alignContent` | `string` | `'flex-start'` | For multi-line flex containers |
-| `justifyContent` | `string` | — | `'flex-start'`, `'center'`, `'flex-end'`, `'space-between'`, `'space-around'`, `'space-evenly'` |
+| Prop             | Type               | Default        | Values                                                                                          |
+| ---------------- | ------------------ | -------------- | ----------------------------------------------------------------------------------------------- |
+| `flexDirection`  | `string`           | `'row'`        | `'row'`, `'row-reverse'`, `'column'`, `'column-reverse'`                                        |
+| `flexWrap`       | `string`           | `'nowrap'`     | `'nowrap'`, `'wrap'`, `'wrap-reverse'`                                                          |
+| `flexGrow`       | `number`           | `0`            | How much the item grows                                                                         |
+| `flexShrink`     | `number`           | `1`            | How much the item shrinks                                                                       |
+| `flexBasis`      | `number \| string` | —              | Initial size before flex                                                                        |
+| `alignItems`     | `string`           | —              | `'flex-start'`, `'center'`, `'flex-end'`, `'stretch'`, `'baseline'`                             |
+| `alignSelf`      | `string`           | `'auto'`       | Same as alignItems + `'auto'`                                                                   |
+| `alignContent`   | `string`           | `'flex-start'` | For multi-line flex containers                                                                  |
+| `justifyContent` | `string`           | —              | `'flex-start'`, `'center'`, `'flex-end'`, `'space-between'`, `'space-around'`, `'space-evenly'` |
 
 ```tsx
 // Horizontal layout with spacing
@@ -156,22 +156,22 @@ import {Box, Text} from 'ink';
 
 ### Position
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `position` | `string` | `'relative'` | `'relative'`, `'absolute'`, `'static'` |
-| `top` | `number \| string` | — | Top offset (percentage supported) |
-| `right` | `number \| string` | — | Right offset |
-| `bottom` | `number \| string` | — | Bottom offset |
-| `left` | `number \| string` | — | Left offset |
+| Prop       | Type               | Default      | Description                            |
+| ---------- | ------------------ | ------------ | -------------------------------------- |
+| `position` | `string`           | `'relative'` | `'relative'`, `'absolute'`, `'static'` |
+| `top`      | `number \| string` | —            | Top offset (percentage supported)      |
+| `right`    | `number \| string` | —            | Right offset                           |
+| `bottom`   | `number \| string` | —            | Bottom offset                          |
+| `left`     | `number \| string` | —            | Left offset                            |
 
 ### Visibility
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `display` | `string` | `'flex'` | `'flex'` or `'none'` to hide |
-| `overflow` | `string` | `'visible'` | `'visible'` or `'hidden'` |
-| `overflowX` | `string` | `'visible'` | Horizontal overflow |
-| `overflowY` | `string` | `'visible'` | Vertical overflow |
+| Prop        | Type     | Default     | Description                  |
+| ----------- | -------- | ----------- | ---------------------------- |
+| `display`   | `string` | `'flex'`    | `'flex'` or `'none'` to hide |
+| `overflow`  | `string` | `'visible'` | `'visible'` or `'hidden'`    |
+| `overflowX` | `string` | `'visible'` | Horizontal overflow          |
+| `overflowY` | `string` | `'visible'` | Vertical overflow            |
 
 ### Borders
 
@@ -198,13 +198,13 @@ import {Box, Text} from 'ink';
 </Box>
 ```
 
-| Prop | Type | Default |
-|------|------|---------|
-| `borderStyle` | `string \| BoxStyle` | — |
-| `borderColor` | `string` | — |
-| `borderTop/Right/Bottom/Left` | `boolean` | `true` |
-| `borderTopColor`, etc. | `string` | — |
-| `borderDimColor` | `boolean` | `false` |
+| Prop                          | Type                 | Default |
+| ----------------------------- | -------------------- | ------- |
+| `borderStyle`                 | `string \| BoxStyle` | —       |
+| `borderColor`                 | `string`             | —       |
+| `borderTop/Right/Bottom/Left` | `boolean`            | `true`  |
+| `borderTopColor`, etc.        | `string`             | —       |
+| `borderDimColor`              | `boolean`            | `false` |
 
 ### Background
 
@@ -259,10 +259,10 @@ Flexible space that expands along the main axis.
 
 Permanently renders output above everything else. Use for completed tasks, logs, or items that won't change after rendering.
 
-**Critical:** `<Static>` only renders *new* items. Changes to previously rendered items are ignored.
+**Critical:** `<Static>` only renders _new_ items. Changes to previously rendered items are ignored.
 
 ```tsx
-import {Static, Box, Text} from 'ink';
+import { Static, Box, Text } from 'ink';
 
 const App = () => {
   const [tests, setTests] = useState([]);
@@ -270,7 +270,7 @@ const App = () => {
   return (
     <>
       <Static items={tests}>
-        {test => (
+        {(test) => (
           <Box key={test.id}>
             <Text color="green">✔ {test.title}</Text>
           </Box>
@@ -285,10 +285,10 @@ const App = () => {
 };
 ```
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `items` | `Array` | Items to render |
-| `style` | `object` | Box styles for the container |
+| Prop       | Type                         | Description                                      |
+| ---------- | ---------------------------- | ------------------------------------------------ |
+| `items`    | `Array`                      | Items to render                                  |
+| `style`    | `object`                     | Box styles for the container                     |
 | `children` | `(item, index) => ReactNode` | Render function (must return element with `key`) |
 
 ---
@@ -298,6 +298,7 @@ const App = () => {
 Transforms the string output of child `<Text>` components before rendering.
 
 **Rules:**
+
 - Apply only to `<Text>` children
 - Must not change output dimensions (layout will break)
 - Styled text contains ANSI escape codes — use `slice-ansi` / `strip-ansi` for string operations

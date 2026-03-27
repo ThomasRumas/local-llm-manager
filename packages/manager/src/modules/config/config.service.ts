@@ -51,7 +51,11 @@ export class ConfigService {
       throw new Error('No config loaded');
     }
     await mkdir(this.configDir, { recursive: true });
-    await writeFile(this.configPath, JSON.stringify(this.config, null, 2), 'utf-8');
+    await writeFile(
+      this.configPath,
+      JSON.stringify(this.config, null, 2),
+      'utf-8',
+    );
   }
 
   get(): AppConfig {
@@ -78,7 +82,11 @@ export class ConfigService {
   }
 
   getHfToken(): string | undefined {
-    return this.get().hfToken || process.env['HF_TOKEN'] || process.env['HUGGING_FACE_HUB_TOKEN'];
+    return (
+      this.get().hfToken ||
+      process.env['HF_TOKEN'] ||
+      process.env['HUGGING_FACE_HUB_TOKEN']
+    );
   }
 
   async setHfToken(token: string): Promise<void> {
@@ -95,7 +103,10 @@ export class ConfigService {
     await this.save();
   }
 
-  getModelConfig(modelFile: string, configName: string = 'default'): ModelConfig | undefined {
+  getModelConfig(
+    modelFile: string,
+    configName: string = 'default',
+  ): ModelConfig | undefined {
     return this.get().configurations[modelFile]?.[configName];
   }
 
@@ -103,7 +114,9 @@ export class ConfigService {
    * Find a model+config pair by alias. Returns the first match.
    * Returns undefined if no config has a matching alias.
    */
-  findByAlias(alias: string): { filename: string; configName: string } | undefined {
+  findByAlias(
+    alias: string,
+  ): { filename: string; configName: string } | undefined {
     const configurations = this.get().configurations;
     for (const [filename, configs] of Object.entries(configurations)) {
       for (const [configName, modelConfig] of Object.entries(configs)) {
@@ -126,7 +139,9 @@ export class ConfigService {
       return { filename: identifier };
     }
     // 2. Filename + .gguf
-    const withExt = identifier.endsWith('.gguf') ? identifier : `${identifier}.gguf`;
+    const withExt = identifier.endsWith('.gguf')
+      ? identifier
+      : `${identifier}.gguf`;
     if (Object.hasOwn(configurations, withExt)) {
       return { filename: withExt };
     }
@@ -147,7 +162,10 @@ export class ConfigService {
    * Returns the alias for a given model + config, or the stripped filename
    * as a fallback so callers never have to deal with ".gguf" themselves.
    */
-  getModelDisplayName(modelFile: string, configName: string = 'default'): string {
+  getModelDisplayName(
+    modelFile: string,
+    configName: string = 'default',
+  ): string {
     const alias = this.getModelConfig(modelFile, configName)?.alias;
     if (alias?.trim()) return alias.trim();
     // Try any config if the requested one has no alias
@@ -160,7 +178,11 @@ export class ConfigService {
     return modelFile.replace(/\.gguf$/, '');
   }
 
-  async saveModelConfig(modelFile: string, configName: string, config: ModelConfig): Promise<void> {
+  async saveModelConfig(
+    modelFile: string,
+    configName: string,
+    config: ModelConfig,
+  ): Promise<void> {
     const appConfig = this.get();
     if (!appConfig.configurations[modelFile]) {
       appConfig.configurations[modelFile] = {};
@@ -169,11 +191,17 @@ export class ConfigService {
     await this.save();
   }
 
-  async deleteModelConfig(modelFile: string, configName?: string): Promise<void> {
+  async deleteModelConfig(
+    modelFile: string,
+    configName?: string,
+  ): Promise<void> {
     const appConfig = this.get();
     if (configName) {
       delete appConfig.configurations[modelFile]?.[configName];
-      if (appConfig.configurations[modelFile] && Object.keys(appConfig.configurations[modelFile]).length === 0) {
+      if (
+        appConfig.configurations[modelFile] &&
+        Object.keys(appConfig.configurations[modelFile]).length === 0
+      ) {
         delete appConfig.configurations[modelFile];
       }
     } else {
@@ -182,7 +210,11 @@ export class ConfigService {
     await this.save();
   }
 
-  getEffective(modelFile: string, modelPath: string, configName: string = 'default'): ResolvedConfig {
+  getEffective(
+    modelFile: string,
+    modelPath: string,
+    configName: string = 'default',
+  ): ResolvedConfig {
     const modelConfig = this.getModelConfig(modelFile, configName) ?? {};
     const defaults = this.get().defaults;
 
@@ -194,7 +226,8 @@ export class ConfigService {
       topK: modelConfig.topK ?? HARDCODED_DEFAULTS.topK,
       minP: modelConfig.minP ?? HARDCODED_DEFAULTS.minP,
       port: modelConfig.port ?? defaults.port ?? HARDCODED_DEFAULTS.port,
-      ctxSize: modelConfig.ctxSize ?? defaults.ctxSize ?? HARDCODED_DEFAULTS.ctxSize,
+      ctxSize:
+        modelConfig.ctxSize ?? defaults.ctxSize ?? HARDCODED_DEFAULTS.ctxSize,
       kvUnified: modelConfig.kvUnified ?? HARDCODED_DEFAULTS.kvUnified,
       cacheTypeK: modelConfig.cacheTypeK ?? HARDCODED_DEFAULTS.cacheTypeK,
       cacheTypeV: modelConfig.cacheTypeV ?? HARDCODED_DEFAULTS.cacheTypeV,

@@ -91,10 +91,10 @@ await user.tab({ shift: true }); // Shift+Tab
 ### type() — Input Text
 
 ```ts
-await user.type(input, "Hello World");
+await user.type(input, 'Hello World');
 
 // With options
-await user.type(input, "text", {
+await user.type(input, 'text', {
   skipClick: true, // don't click before typing
   skipAutoClose: true, // don't release keys at end
   initialSelectionStart: 0, // set cursor position
@@ -113,23 +113,23 @@ await user.clear(input);
 
 ```ts
 // Select by value
-await user.selectOptions(select, ["option1", "option2"]);
+await user.selectOptions(select, ['option1', 'option2']);
 
 // Select by text content
-await user.selectOptions(select, ["Apple", "Banana"]);
+await user.selectOptions(select, ['Apple', 'Banana']);
 
 // Select by element
-const option = screen.getByRole("option", { name: "Apple" });
+const option = screen.getByRole('option', { name: 'Apple' });
 await user.selectOptions(select, option);
 
 // Deselect (multi-select only)
-await user.deselectOptions(select, "option1");
+await user.deselectOptions(select, 'option1');
 ```
 
 ### upload() — File Upload
 
 ```ts
-const file = new File(["content"], "file.png", { type: "image/png" });
+const file = new File(['content'], 'file.png', { type: 'image/png' });
 const input = screen.getByLabelText(/upload/i);
 
 await user.upload(input, file);
@@ -138,7 +138,10 @@ expect(input.files[0]).toBe(file);
 expect(input.files).toHaveLength(1);
 
 // Multiple files
-const files = [new File(["a"], "a.png", { type: "image/png" }), new File(["b"], "b.png", { type: "image/png" })];
+const files = [
+  new File(['a'], 'a.png', { type: 'image/png' }),
+  new File(['b'], 'b.png', { type: 'image/png' }),
+];
 await user.upload(input, files);
 ```
 
@@ -150,58 +153,58 @@ await user.upload(input, files);
 
 ```ts
 // Press Enter
-await user.keyboard("{Enter}");
+await user.keyboard('{Enter}');
 
 // Press Tab
-await user.keyboard("{Tab}");
+await user.keyboard('{Tab}');
 
 // Press Escape
-await user.keyboard("{Escape}");
+await user.keyboard('{Escape}');
 
 // Press Backspace
-await user.keyboard("{Backspace}");
+await user.keyboard('{Backspace}');
 
 // Press Delete
-await user.keyboard("{Delete}");
+await user.keyboard('{Delete}');
 
 // Arrow keys
-await user.keyboard("{ArrowUp}");
-await user.keyboard("{ArrowDown}");
-await user.keyboard("{ArrowLeft}");
-await user.keyboard("{ArrowRight}");
+await user.keyboard('{ArrowUp}');
+await user.keyboard('{ArrowDown}');
+await user.keyboard('{ArrowLeft}');
+await user.keyboard('{ArrowRight}');
 ```
 
 ### Modifier Keys
 
 ```ts
 // Hold Shift (key down, no release)
-await user.keyboard("{Shift>}");
+await user.keyboard('{Shift>}');
 
 // Release Shift
-await user.keyboard("{/Shift}");
+await user.keyboard('{/Shift}');
 
 // Shift + A (hold, press a, release)
-await user.keyboard("{Shift>}A{/Shift}");
+await user.keyboard('{Shift>}A{/Shift}');
 
 // Ctrl + A (select all)
-await user.keyboard("{Control>}a{/Control}");
+await user.keyboard('{Control>}a{/Control}');
 
 // Ctrl + C (copy)
-await user.keyboard("{Control>}c{/Control}");
+await user.keyboard('{Control>}c{/Control}');
 
 // Ctrl + V (paste)
-await user.keyboard("{Control>}v{/Control}");
+await user.keyboard('{Control>}v{/Control}');
 ```
 
 ### Type Text
 
 ```ts
 // Type literal text
-await user.keyboard("Hello World");
+await user.keyboard('Hello World');
 
 // Special characters need escaping
-await user.keyboard("Hello {{World}}"); // types "Hello {World}"
-await user.keyboard("Hello [[World]]"); // types "Hello [World]"
+await user.keyboard('Hello {{World}}'); // types "Hello {World}"
+await user.keyboard('Hello [[World]]'); // types "Hello [World]"
 ```
 
 ---
@@ -212,13 +215,13 @@ await user.keyboard("Hello [[World]]"); // types "Hello [World]"
 
 ```ts
 // Click
-await user.pointer({ keys: "[MouseLeft]", target: element });
+await user.pointer({ keys: '[MouseLeft]', target: element });
 
 // Right-click
-await user.pointer({ keys: "[MouseRight]", target: element });
+await user.pointer({ keys: '[MouseRight]', target: element });
 
 // Double-click
-await user.pointer({ keys: "[MouseLeft][MouseLeft]", target: element });
+await user.pointer({ keys: '[MouseLeft][MouseLeft]', target: element });
 
 // Move to element
 await user.pointer({ target: element });
@@ -228,9 +231,9 @@ await user.pointer({ target: element });
 
 ```ts
 await user.pointer([
-  { keys: "[MouseLeft>]", target: source }, // Press down on source
+  { keys: '[MouseLeft>]', target: source }, // Press down on source
   { target: destination }, // Move to destination
-  { keys: "[/MouseLeft]" }, // Release
+  { keys: '[/MouseLeft]' }, // Release
 ]);
 ```
 
@@ -249,7 +252,7 @@ await user.cut();
 await user.paste();
 
 // Paste specific text
-await user.paste("pasted text");
+await user.paste('pasted text');
 ```
 
 ---
@@ -257,28 +260,28 @@ await user.paste("pasted text");
 ## Complete Example
 
 ```tsx
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
-test("form submission", async () => {
+test('form submission', async () => {
   const user = userEvent.setup();
   const handleSubmit = jest.fn();
 
   render(<LoginForm onSubmit={handleSubmit} />);
 
   // Fill form
-  await user.type(screen.getByLabelText(/username/i), "john");
-  await user.type(screen.getByLabelText(/password/i), "secret123");
+  await user.type(screen.getByLabelText(/username/i), 'john');
+  await user.type(screen.getByLabelText(/password/i), 'secret123');
 
   // Check remember me
-  await user.click(screen.getByRole("checkbox", { name: /remember/i }));
+  await user.click(screen.getByRole('checkbox', { name: /remember/i }));
 
   // Submit
-  await user.click(screen.getByRole("button", { name: /submit/i }));
+  await user.click(screen.getByRole('button', { name: /submit/i }));
 
   expect(handleSubmit).toHaveBeenCalledWith({
-    username: "john",
-    password: "secret123",
+    username: 'john',
+    password: 'secret123',
     remember: true,
   });
 });

@@ -25,7 +25,7 @@ export function useAsync<T>(fn: () => Promise<T>, deps: unknown[] = []) {
         error: err instanceof Error ? err.message : String(err),
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
   useEffect(() => {

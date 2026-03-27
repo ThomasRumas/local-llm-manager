@@ -5,8 +5,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 // Instead, create a minimal EventEmitter-like object using native Node.
 const mockApiServer = vi.hoisted(() => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const eventsModule = require('node:events') as { EventEmitter: typeof import('node:events').EventEmitter };
-  const emitter = Object.assign(new eventsModule.EventEmitter(), { isRunning: false, port: null as number | null });
+  const eventsModule = require('node:events') as {
+    EventEmitter: typeof import('node:events').EventEmitter;
+  };
+  const emitter = Object.assign(new eventsModule.EventEmitter(), {
+    isRunning: false,
+    port: null as number | null,
+  });
   return emitter;
 });
 
@@ -14,7 +19,6 @@ vi.mock('../modules/api/api.server.js', () => ({
   apiServer: mockApiServer,
 }));
 
-import React from 'react';
 import { render } from 'ink-testing-library';
 import { Text } from 'ink';
 import { useApiServer } from './use-api-server.js';

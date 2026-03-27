@@ -29,10 +29,14 @@ describe('ModelsService', () => {
     it('returns .gguf files sorted by mtime descending', async () => {
       const older = new Date('2024-01-01');
       const newer = new Date('2024-06-01');
-      mockReaddir.mockResolvedValueOnce(['old.gguf', 'readme.txt', 'new.gguf'] as unknown as Awaited<ReturnType<typeof readdir>>);
+      mockReaddir.mockResolvedValueOnce([
+        'old.gguf',
+        'readme.txt',
+        'new.gguf',
+      ] as unknown as Awaited<ReturnType<typeof readdir>>);
       mockStat
-        .mockResolvedValueOnce(makeStat(1000, older))  // old.gguf
-        .mockResolvedValueOnce(makeStat(2000, newer));  // new.gguf
+        .mockResolvedValueOnce(makeStat(1000, older)) // old.gguf
+        .mockResolvedValueOnce(makeStat(2000, newer)); // new.gguf
 
       const models = await svc.listLocal('/models');
       expect(models).toHaveLength(2);
@@ -41,7 +45,11 @@ describe('ModelsService', () => {
     });
 
     it('filters out non-.gguf files', async () => {
-      mockReaddir.mockResolvedValueOnce(['model.bin', 'notes.txt', 'model.gguf'] as unknown as Awaited<ReturnType<typeof readdir>>);
+      mockReaddir.mockResolvedValueOnce([
+        'model.bin',
+        'notes.txt',
+        'model.gguf',
+      ] as unknown as Awaited<ReturnType<typeof readdir>>);
       mockStat.mockResolvedValueOnce(makeStat(500, new Date()));
 
       const models = await svc.listLocal('/models');
@@ -50,20 +58,26 @@ describe('ModelsService', () => {
     });
 
     it('returns [] when directory does not exist (readdir error)', async () => {
-      mockReaddir.mockRejectedValueOnce(Object.assign(new Error('ENOENT'), { code: 'ENOENT' }));
+      mockReaddir.mockRejectedValueOnce(
+        Object.assign(new Error('ENOENT'), { code: 'ENOENT' }),
+      );
       const models = await svc.listLocal('/no/such/dir');
       expect(models).toEqual([]);
     });
 
     it('returns [] for empty directory', async () => {
-      mockReaddir.mockResolvedValueOnce([] as unknown as Awaited<ReturnType<typeof readdir>>);
+      mockReaddir.mockResolvedValueOnce(
+        [] as unknown as Awaited<ReturnType<typeof readdir>>,
+      );
       const models = await svc.listLocal('/empty');
       expect(models).toEqual([]);
     });
 
     it('populates all LocalModel fields', async () => {
       const mtime = new Date('2025-01-15');
-      mockReaddir.mockResolvedValueOnce(['m.gguf'] as unknown as Awaited<ReturnType<typeof readdir>>);
+      mockReaddir.mockResolvedValueOnce(['m.gguf'] as unknown as Awaited<
+        ReturnType<typeof readdir>
+      >);
       mockStat.mockResolvedValueOnce(makeStat(1_500_000, mtime));
 
       const [m] = await svc.listLocal('/models');
@@ -83,14 +97,18 @@ describe('ModelsService', () => {
 
     it('propagates errors from unlink', async () => {
       mockUnlink.mockRejectedValueOnce(new Error('Permission denied'));
-      await expect(svc.deleteModel('/models/locked.gguf')).rejects.toThrow('Permission denied');
+      await expect(svc.deleteModel('/models/locked.gguf')).rejects.toThrow(
+        'Permission denied',
+      );
     });
   });
 
   // ── getModelPath() ─────────────────────────────────────────────────────────
   describe('getModelPath()', () => {
     it('joins dir and filename', () => {
-      expect(svc.getModelPath('/models', 'test.gguf')).toBe('/models/test.gguf');
+      expect(svc.getModelPath('/models', 'test.gguf')).toBe(
+        '/models/test.gguf',
+      );
     });
   });
 });

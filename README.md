@@ -16,10 +16,10 @@ Local LLM Manager bridges that gap: it gives you a **terminal user interface** o
 
 This is a monorepo with two packages:
 
-| Package | npm | Description |
-|---------|-----|-------------|
-| [`@thomasrumas/llm-manager`](./packages/manager) | [![npm](https://img.shields.io/npm/v/@thomasrumas/llm-manager)](https://www.npmjs.com/package/@thomasrumas/llm-manager) | Interactive TUI — install llama.cpp, search & download models, configure and launch `llama-server`, monitor it in real time |
-| [`@thomasrumas/llm-client`](./packages/client-cli) | [![npm](https://img.shields.io/npm/v/@thomasrumas/llm-client)](https://www.npmjs.com/package/@thomasrumas/llm-client) | Thin CLI client — launch and control models running on a remote machine over your local network |
+| Package                                            | npm                                                                                                                     | Description                                                                                                                 |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| [`@thomasrumas/llm-manager`](./packages/manager)   | [![npm](https://img.shields.io/npm/v/@thomasrumas/llm-manager)](https://www.npmjs.com/package/@thomasrumas/llm-manager) | Interactive TUI — install llama.cpp, search & download models, configure and launch `llama-server`, monitor it in real time |
+| [`@thomasrumas/llm-client`](./packages/client-cli) | [![npm](https://img.shields.io/npm/v/@thomasrumas/llm-client)](https://www.npmjs.com/package/@thomasrumas/llm-client)   | Thin CLI client — launch and control models running on a remote machine over your local network                             |
 
 ---
 

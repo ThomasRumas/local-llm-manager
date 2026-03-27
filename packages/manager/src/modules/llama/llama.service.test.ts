@@ -40,8 +40,14 @@ describe('LlamaService', () => {
   describe('detect()', () => {
     it('returns installed=true when llama-server is on PATH', async () => {
       mockExecFile
-        .mockResolvedValueOnce({ stdout: '/usr/local/bin/llama-server\n', stderr: '' })
-        .mockResolvedValueOnce({ stdout: 'llama-server version 1.2.3\n', stderr: '' });
+        .mockResolvedValueOnce({
+          stdout: '/usr/local/bin/llama-server\n',
+          stderr: '',
+        })
+        .mockResolvedValueOnce({
+          stdout: 'llama-server version 1.2.3\n',
+          stderr: '',
+        });
 
       const result = await svc.detect();
       expect(result.installed).toBe(true);
@@ -63,7 +69,10 @@ describe('LlamaService', () => {
 
     it('returns version=undefined when --version fails', async () => {
       mockExecFile
-        .mockResolvedValueOnce({ stdout: '/usr/bin/llama-server\n', stderr: '' })
+        .mockResolvedValueOnce({
+          stdout: '/usr/bin/llama-server\n',
+          stderr: '',
+        })
         .mockRejectedValueOnce(new Error('version error'));
 
       const result = await svc.detect();
@@ -103,7 +112,10 @@ describe('LlamaService', () => {
       const received: string[] = [];
 
       const promise = svc.install((d) => received.push(d));
-      (proc as unknown as { stdout: EventEmitter }).stdout.emit('data', Buffer.from('installing...\n'));
+      (proc as unknown as { stdout: EventEmitter }).stdout.emit(
+        'data',
+        Buffer.from('installing...\n'),
+      );
       proc.emit('close', 0);
 
       await promise;

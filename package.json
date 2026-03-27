@@ -12,6 +12,19 @@
     "start:manager": "npm run start -w packages/manager",
     "dev:manager": "npm run dev -w packages/manager",
     "test": "npm run test -w packages/manager && npm run test -w packages/client-cli",
-    "test:coverage": "npm run test:coverage -w packages/manager && npm run test:coverage -w packages/client-cli"
+    "test:coverage": "npm run test:coverage -w packages/manager && npm run test:coverage -w packages/client-cli",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "eslint": "^9.39.4",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "prettier": "^3.8.1",
+    "typescript-eslint": "^8.57.2"
   }
 }

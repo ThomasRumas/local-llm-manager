@@ -1,9 +1,15 @@
 import { useState, useEffect } from 'react';
-import { systemStatsService, type SystemStats } from '../modules/system/system-stats.service.js';
+import {
+  systemStatsService,
+  type SystemStats,
+} from '../modules/system/system-stats.service.js';
 
 export { type SystemStats };
 
-export function useSystemStats(pid: number | null = null, intervalMs = 3000): SystemStats | null {
+export function useSystemStats(
+  pid: number | null = null,
+  intervalMs = 3000,
+): SystemStats | null {
   const [stats, setStats] = useState<SystemStats | null>(null);
 
   useEffect(() => {
@@ -12,7 +18,9 @@ export function useSystemStats(pid: number | null = null, intervalMs = 3000): Sy
     const poll = () => {
       systemStatsService
         .getSnapshot(pid)
-        .then((s) => { if (!cancelled) setStats(s); })
+        .then((s) => {
+          if (!cancelled) setStats(s);
+        })
         .catch(() => {});
     };
 

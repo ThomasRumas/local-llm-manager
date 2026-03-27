@@ -1,5 +1,4 @@
 import { describe, it, expect, vi } from 'vitest';
-import React from 'react';
 import { render } from 'ink-testing-library';
 import { SelectField } from './select-field.js';
 
@@ -8,7 +7,12 @@ describe('SelectField', () => {
 
   it('renders label and current value', () => {
     const { lastFrame } = render(
-      <SelectField label="Cache" options={options} value="q8_0" onChange={vi.fn()} />,
+      <SelectField
+        label="Cache"
+        options={options}
+        value="q8_0"
+        onChange={vi.fn()}
+      />,
     );
     expect(lastFrame()).toContain('Cache:');
     expect(lastFrame()).toContain('q8_0');
@@ -16,14 +20,26 @@ describe('SelectField', () => {
 
   it('renders all options accessible (no crash)', () => {
     expect(() =>
-      render(<SelectField label="Type" options={options} value="q4_0" onChange={vi.fn()} />),
+      render(
+        <SelectField
+          label="Type"
+          options={options}
+          value="q4_0"
+          onChange={vi.fn()}
+        />,
+      ),
     ).not.toThrow();
   });
 
   it('calls onChange when right arrow pressed (focused)', async () => {
     const onChange = vi.fn();
     const instance = render(
-      <SelectField label="Type" options={options} value="q4_0" onChange={onChange} />,
+      <SelectField
+        label="Type"
+        options={options}
+        value="q4_0"
+        onChange={onChange}
+      />,
     );
     instance.stdin.write('\x1B[C'); // Right arrow
     // If focused, onChange should be called; if not focused, no error
@@ -35,7 +51,12 @@ describe('SelectField', () => {
   it('does not crash on left arrow press', async () => {
     const onChange = vi.fn();
     const instance = render(
-      <SelectField label="Type" options={options} value="q8_0" onChange={onChange} />,
+      <SelectField
+        label="Type"
+        options={options}
+        value="q8_0"
+        onChange={onChange}
+      />,
     );
     instance.stdin.write('\x1B[D'); // Left arrow
     await new Promise((r) => setTimeout(r, 10));
