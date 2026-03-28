@@ -25,7 +25,7 @@ import { Settings } from './settings.js';
 
 const DEFAULT_CONFIG = {
   modelsDirectory: '/models',
-  defaults: { port: 8001, ctxSize: 131072 },
+  defaults: { port: 8001, ctxSize: 131072, host: '0.0.0.0' },
   hfToken: '',
   apiServer: { enabled: false, port: 3000 },
   configurations: {},
@@ -104,8 +104,8 @@ describe('Settings', () => {
 
   it('toggles API enabled with left/right arrow', async () => {
     const instance = render(<Settings onBack={vi.fn()} />);
-    // API Server is at focusIndex=4 — navigate there via 4 down presses
-    for (let i = 0; i < 4; i++) {
+    // API Server is at focusIndex=5 — navigate there via 5 down presses
+    for (let i = 0; i < 5; i++) {
       instance.stdin.write('\x1B[B'); // Down
       await vi.waitFor(
         () => {
@@ -149,8 +149,8 @@ describe('Settings', () => {
 
   it('edits hfToken field with typing', async () => {
     const instance = render(<Settings onBack={vi.fn()} />);
-    // Navigate to hfToken (focusIndex=3)
-    for (let i = 0; i < 3; i++) {
+    // Navigate to hfToken (focusIndex=4)
+    for (let i = 0; i < 4; i++) {
       instance.stdin.write('\x1B[B'); // Down
       await new Promise((r) => setTimeout(r, 10));
     }
@@ -166,8 +166,8 @@ describe('Settings', () => {
 
   it('edits apiPort field with typing', async () => {
     const instance = render(<Settings onBack={vi.fn()} />);
-    // Navigate to apiPort (focusIndex=5)
-    for (let i = 0; i < 5; i++) {
+    // Navigate to apiPort (focusIndex=6)
+    for (let i = 0; i < 6; i++) {
       instance.stdin.write('\x1B[B'); // Down
       await new Promise((r) => setTimeout(r, 10));
     }
