@@ -13,6 +13,7 @@ type SettingsField =
   | 'modelsDir'
   | 'port'
   | 'ctxSize'
+  | 'host'
   | 'hfToken'
   | 'apiEnabled'
   | 'apiPort';
@@ -20,6 +21,7 @@ const SETTINGS_FIELDS: SettingsField[] = [
   'modelsDir',
   'port',
   'ctxSize',
+  'host',
   'hfToken',
   'apiEnabled',
   'apiPort',
@@ -33,6 +35,7 @@ interface FieldSetters {
   setModelsDir: TextSetter;
   setPortStr: TextSetter;
   setCtxSizeStr: TextSetter;
+  setHost: TextSetter;
   setHfToken: TextSetter;
   setApiEnabled: BoolSetter;
   setApiPortStr: TextSetter;
@@ -75,6 +78,9 @@ function handleFieldKey(
     case 'ctxSize':
       changed = editText(s.setCtxSizeStr, input, key, isTextKey, true);
       break;
+    case 'host':
+      changed = editText(s.setHost, input, key, isTextKey);
+      break;
     case 'hfToken':
       changed = editText(s.setHfToken, input, key, isTextKey);
       break;
@@ -95,6 +101,7 @@ interface SaveParams {
   modelsDir: string;
   portStr: string;
   ctxSizeStr: string;
+  host: string;
   hfToken: string;
   apiEnabled: boolean;
   apiPortStr: string;
@@ -116,13 +123,21 @@ async function applySave(
     setError('Context size must be a number ≥ 512');
     return;
   }
+  if (!p.host.trim()) {
+    setError('Host must not be empty');
+    return;
+  }
   if (Number.isNaN(apiPortNum) || apiPortNum < 1 || apiPortNum > 65535) {
     setError('API port must be a number between 1 and 65535');
     return;
   }
   try {
     await configService.setModelsDirectory(p.modelsDir);
-    await configService.setDefaults({ port: portNum, ctxSize: ctxSizeNum });
+    await configService.setDefaults({
+      port: portNum,
+      ctxSize: ctxSizeNum,
+      host: p.host.trim(),
+    });
     await configService.setHfToken(p.hfToken.trim());
     await configService.setApiServerConfig({
       enabled: p.apiEnabled,
@@ -147,6 +162,7 @@ export function Settings({ onBack }: Readonly<SettingsProps>) {
   const [ctxSizeStr, setCtxSizeStr] = useState(
     String(appConfig.defaults.ctxSize),
   );
+  const [host, setHost] = useState(appConfig.defaults.host ?? '0.0.0.0');
   const [hfToken, setHfToken] = useState(appConfig.hfToken ?? '');
   const [apiEnabled, setApiEnabled] = useState(appConfig.apiServer.enabled);
   const [apiPortStr, setApiPortStr] = useState(
@@ -163,11 +179,11 @@ export function Settings({ onBack }: Readonly<SettingsProps>) {
 
   const handleSave = useCallback(() => {
     applySave(
-      { modelsDir, portStr, ctxSizeStr, hfToken, apiEnabled, apiPortStr },
+      { modelsDir, portStr, ctxSizeStr, host, hfToken, apiEnabled, apiPortStr },
       setError,
       setSaved,
     );
-  }, [modelsDir, portStr, ctxSizeStr, hfToken, apiEnabled, apiPortStr]);
+  }, [modelsDir, portStr, ctxSizeStr, host, hfToken, apiEnabled, apiPortStr]);
 
   useInput((input, key) => {
     if (key.escape) {
@@ -195,6 +211,7 @@ export function Settings({ onBack }: Readonly<SettingsProps>) {
         setModelsDir,
         setPortStr,
         setCtxSizeStr,
+        setHost,
         setHfToken,
         setApiEnabled,
         setApiPortStr,
@@ -236,14 +253,21 @@ export function Settings({ onBack }: Readonly<SettingsProps>) {
         </Box>
         <Box>
           <Text color={focusIndex === 3 ? 'cyan' : 'white'}>
+            Default Host:{' '}
+          </Text>
+          <Text color={focusIndex === 3 ? 'white' : 'gray'}>{host}</Text>
+          {focusIndex === 3 && <Text color="cyan">▎</Text>}
+        </Box>
+        <Box>
+          <Text color={focusIndex === 4 ? 'cyan' : 'white'}>
             Hugging Face Token:{' '}
           </Text>
-          {focusIndex === 3 ? (
+          {focusIndex === 4 ? (
             <Text color="white">{hfToken}</Text>
           ) : (
             <Text color="gray">{hfTokenMasked}</Text>
           )}
-          {focusIndex === 3 && <Text color="cyan">▎</Text>}
+          {focusIndex === 4 && <Text color="cyan">▎</Text>}
         </Box>
       </Box>
 
@@ -252,17 +276,17 @@ export function Settings({ onBack }: Readonly<SettingsProps>) {
           ── API Server ─────────────────────
         </Text>
         <Box>
-          <Text color={focusIndex === 4 ? 'cyan' : 'white'}>API Server: </Text>
+          <Text color={focusIndex === 5 ? 'cyan' : 'white'}>API Server: </Text>
           <Text color={apiEnabled ? 'green' : 'gray'}>
             {apiEnabled ? 'enabled' : 'disabled'}
           </Text>
-          {focusIndex === 4 && <Text color="cyan"> ← →</Text>}
+          {focusIndex === 5 && <Text color="cyan"> ← →</Text>}
           {apiServer.isRunning && <Text color="green"> ● running</Text>}
         </Box>
         <Box>
-          <Text color={focusIndex === 5 ? 'cyan' : 'white'}>API Port: </Text>
-          <Text color={focusIndex === 5 ? 'white' : 'gray'}>{apiPortStr}</Text>
-          {focusIndex === 5 && <Text color="cyan">▎</Text>}
+          <Text color={focusIndex === 6 ? 'cyan' : 'white'}>API Port: </Text>
+          <Text color={focusIndex === 6 ? 'white' : 'gray'}>{apiPortStr}</Text>
+          {focusIndex === 6 && <Text color="cyan">▎</Text>}
         </Box>
       </Box>
 

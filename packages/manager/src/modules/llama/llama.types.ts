@@ -16,6 +16,7 @@ export interface LaunchOptions {
   minP: number;
   port: number;
   ctxSize: number;
+  host: string;
   kvUnified: boolean;
   cacheTypeK: CacheType;
   cacheTypeV: CacheType;

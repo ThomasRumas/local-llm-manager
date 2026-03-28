@@ -1,7 +1,6 @@
 import { listModels, listFiles } from '@huggingface/hub';
-import { createWriteStream } from 'node:fs';
-import { pipeline } from 'node:stream/promises';
-import { Readable } from 'node:stream';
+import { spawn } from 'node:child_process';
+import { stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import type {
   SearchResult,
@@ -96,58 +95,89 @@ export class HuggingFaceService {
     destDir: string,
     onProgress?: (progress: DownloadProgress) => void,
   ): Promise<string> {
-    const url = `https://huggingface.co/${repoId}/resolve/main/${filename}`;
-    const token = configService.getHfToken();
-    const headers: Record<string, string> = {};
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-    const response = await fetch(url, { headers });
-
-    if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
-        throw new Error(
-          'Hugging Face authentication failed.\n' +
-            'A token is required to download this file.\n' +
-            'Go to Settings (press 4) and set your Hugging Face token (hf_...).',
-        );
-      }
-      throw new Error(
-        `Download failed: ${response.status} ${response.statusText}`,
-      );
-    }
-
-    const totalBytes = Number(response.headers.get('content-length') ?? 0);
+    const url = `https://huggingface.co/${repoId}/resolve/main/${encodeURIComponent(filename)}`;
     const destPath = join(destDir, filename.split('/').pop()!);
+    const token = configService.getHfToken();
 
-    let downloadedBytes = 0;
-    const body = response.body;
-
-    if (!body) {
-      throw new Error('Response body is null');
+    const args = [
+      '-L', // follow redirects
+      '-o',
+      destPath,
+      '--progress-bar', // show progress on stderr
+      '-f', // fail on HTTP errors
+      '-#', // progress meter
+    ];
+    if (token) {
+      args.push('-H', `Authorization: Bearer ${token}`);
     }
+    args.push(url);
 
-    const reader = body.getReader();
-    const nodeStream = new Readable({
-      async read() {
-        const { done, value } = await reader.read();
-        if (done) {
-          this.push(null);
+    return new Promise<string>((resolve, reject) => {
+      const proc = spawn('curl', args, { stdio: ['ignore', 'ignore', 'pipe'] });
+
+      let stderrBuf = '';
+
+      proc.stderr.on('data', (chunk: Buffer) => {
+        stderrBuf += chunk.toString();
+        // curl progress bar outputs lines like "###                           10.5%"
+        const percentMatch = stderrBuf.match(/([\d.]+)\s*%/);
+        if (percentMatch) {
+          const percent = parseFloat(percentMatch[1]);
+          onProgress?.({
+            filename,
+            downloadedBytes: 0,
+            totalBytes: 0,
+            percent,
+          });
+          stderrBuf = '';
+        }
+      });
+
+      proc.on('error', (err) => {
+        reject(new Error(`Failed to start curl: ${err.message}`));
+      });
+
+      proc.on('close', async (code) => {
+        if (code === 22) {
+          // curl -f returns 22 for HTTP errors (4xx/5xx)
+          reject(
+            new Error(
+              'Hugging Face authentication failed.\n' +
+                'A token is required to download this file.\n' +
+                'Go to Settings (press 4) and set your Hugging Face token (hf_...).',
+            ),
+          );
           return;
         }
-        downloadedBytes += value.byteLength;
-        onProgress?.({
-          filename,
-          downloadedBytes,
-          totalBytes,
-          percent: totalBytes > 0 ? (downloadedBytes / totalBytes) * 100 : 0,
-        });
-        this.push(Buffer.from(value));
-      },
+        if (code !== 0) {
+          reject(
+            new Error(`curl exited with code ${code}: ${stderrBuf.trim()}`),
+          );
+          return;
+        }
+
+        // Read final file size for the last progress report
+        try {
+          const fileStat = await stat(destPath);
+          onProgress?.({
+            filename,
+            downloadedBytes: fileStat.size,
+            totalBytes: fileStat.size,
+            percent: 100,
+          });
+        } catch {
+          // stat failed — still report completion
+          onProgress?.({
+            filename,
+            downloadedBytes: 0,
+            totalBytes: 0,
+            percent: 100,
+          });
+        }
+
+        resolve(destPath);
+      });
     });
-
-    const writeStream = createWriteStream(destPath);
-    await pipeline(nodeStream, writeStream);
-
-    return destPath;
   }
 }
 

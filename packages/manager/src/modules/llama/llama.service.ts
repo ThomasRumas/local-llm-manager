@@ -69,6 +69,14 @@ export class LlamaService {
       detached: true,
     });
 
+    // Wait for the 'spawn' event (process started) or 'error' event (failed
+    // to start, e.g. ENOENT) so callers can trust proc.pid and report
+    // accurate success/failure.
+    await new Promise<void>((resolve, reject) => {
+      proc.on('spawn', () => resolve());
+      proc.on('error', (err) => reject(err));
+    });
+
     return { process: proc, port: options.port };
   }
 
@@ -117,6 +125,8 @@ export class LlamaService {
       String(options.minP),
       '--port',
       String(options.port),
+      '--host',
+      options.host,
       '--ctx-size',
       String(options.ctxSize),
       '--cache-type-k',

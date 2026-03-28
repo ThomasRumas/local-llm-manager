@@ -156,6 +156,7 @@ describe('ConfigService.getEffective()', () => {
     expect(effective.temp).toBe(0.7); // from model config
     expect(effective.port).toBe(9000); // from global defaults
     expect(effective.ctxSize).toBe(65536); // from global defaults
+    expect(effective.host).toBe(HARDCODED_DEFAULTS.host); // from hardcoded defaults
   });
 
   it('falls back to HARDCODED_DEFAULTS when nothing is set', async () => {
@@ -167,6 +168,19 @@ describe('ConfigService.getEffective()', () => {
     expect(effective.temp).toBe(HARDCODED_DEFAULTS.temp);
     expect(effective.port).toBe(HARDCODED_DEFAULTS.port);
     expect(effective.kvUnified).toBe(HARDCODED_DEFAULTS.kvUnified);
+    expect(effective.host).toBe(HARDCODED_DEFAULTS.host);
+  });
+
+  it('uses host from global defaults when set', async () => {
+    mockReadFile.mockResolvedValueOnce(
+      JSON.stringify({
+        defaults: { port: 9000, ctxSize: 65536, host: '127.0.0.1' },
+      }),
+    );
+    const svc = makeService();
+    await svc.load();
+    const effective = svc.getEffective('unknown.gguf', '/models/unknown.gguf');
+    expect(effective.host).toBe('127.0.0.1');
   });
 });
 

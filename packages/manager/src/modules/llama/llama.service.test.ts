@@ -22,6 +22,7 @@ vi.mock('node:fs/promises', () => ({
 }));
 
 import { LlamaService } from './llama.service.js';
+import type { LaunchOptions } from './llama.types.js';
 
 function makeProc(pid = 1234) {
   const stdout = new EventEmitter();
@@ -32,6 +33,8 @@ function makeProc(pid = 1234) {
     stderr,
     kill: vi.fn(),
   }) as unknown as ChildProcess;
+  // Emit 'spawn' on the next tick so launch()'s await resolves.
+  process.nextTick(() => proc.emit('spawn'));
   return proc;
 }
 
@@ -152,13 +155,14 @@ describe('LlamaService', () => {
       minP: 0,
       port: 8001,
       ctxSize: 131072,
+      host: '0.0.0.0',
       kvUnified: true,
       cacheTypeK: 'q8_0',
       cacheTypeV: 'q8_0',
       flashAttn: 'on',
       fit: 'on',
       extraFlags: '',
-    };
+    } satisfies LaunchOptions;
 
     beforeEach(() => {
       // Default: which resolves the binary path
@@ -285,6 +289,16 @@ describe('LlamaService', () => {
       const args: string[] = mockSpawn.mock.calls[0][1];
       const aliasIdx = args.indexOf('--alias');
       expect(args[aliasIdx + 1]).toBe('CoolModel');
+    });
+
+    it('passes --host to args', async () => {
+      const proc = makeProc();
+      mockSpawn.mockReturnValueOnce(proc);
+      await svc.launch({ ...baseOptions, host: '127.0.0.1' });
+      const args: string[] = mockSpawn.mock.calls[0][1];
+      const hostIdx = args.indexOf('--host');
+      expect(hostIdx).toBeGreaterThan(-1);
+      expect(args[hostIdx + 1]).toBe('127.0.0.1');
     });
   });
 });

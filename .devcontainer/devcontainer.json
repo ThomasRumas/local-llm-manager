@@ -1,0 +1,29 @@
+{
+  "name": "Local LLM Manager",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "features": {
+    "ghcr.io/meaningful-ooo/devcontainer-features/homebrew:2": {},
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts",
+      "nodeGypDependencies": true
+    }
+  },
+  "overrideCommand": false,
+  "postStartCommand": "./.devcontainer/scripts/setup.sh",
+  "postCreateCommand": "./.devcontainer/scripts/start.sh",
+  "containerEnv": {
+    "XDG_RUNTIME_DIR": "/run/user/1000"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
+    }
+  },
+  "runArgs": ["--privileged", "--cgroupns=host"],
+  "mounts": [
+    "type=tmpfs,destination=/run,tmpfs-mode=0755",
+    "type=tmpfs,destination=/run/lock"
+  ]
+}

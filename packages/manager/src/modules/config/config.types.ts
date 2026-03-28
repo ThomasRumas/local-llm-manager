@@ -11,6 +11,7 @@ export type OnOffSetting = 'on' | 'off';
 export interface Defaults {
   port: number;
   ctxSize: number;
+  host: string;
 }
 
 export interface ModelConfig {
@@ -21,6 +22,7 @@ export interface ModelConfig {
   minP?: number;
   port?: number;
   ctxSize?: number;
+  host?: string;
   kvUnified?: boolean;
   cacheTypeK?: CacheType;
   cacheTypeV?: CacheType;
@@ -51,6 +53,7 @@ export interface ResolvedConfig {
   minP: number;
   port: number;
   ctxSize: number;
+  host: string;
   kvUnified: boolean;
   cacheTypeK: CacheType;
   cacheTypeV: CacheType;
@@ -60,9 +63,9 @@ export interface ResolvedConfig {
 }
 
 export const HARDCODED_DEFAULTS: Required<
-  Omit<ModelConfig, 'port' | 'ctxSize'>
+  Omit<ModelConfig, 'port' | 'ctxSize' | 'host'>
 > &
-  Pick<Defaults, 'port' | 'ctxSize'> = {
+  Pick<Defaults, 'port' | 'ctxSize' | 'host'> = {
   alias: '',
   temp: 0.6,
   topP: 0.95,
@@ -70,6 +73,7 @@ export const HARDCODED_DEFAULTS: Required<
   minP: 0,
   port: 8001,
   ctxSize: 131072,
+  host: '0.0.0.0',
   kvUnified: true,
   cacheTypeK: 'q8_0',
   cacheTypeV: 'q8_0',
@@ -88,6 +92,7 @@ export const DEFAULT_CONFIG: AppConfig = {
   defaults: {
     port: HARDCODED_DEFAULTS.port,
     ctxSize: HARDCODED_DEFAULTS.ctxSize,
+    host: HARDCODED_DEFAULTS.host,
   },
   apiServer: { ...DEFAULT_API_SERVER },
   configurations: {},
