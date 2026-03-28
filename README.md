@@ -39,6 +39,10 @@ npm install -g @thomasrumas/llm-manager
 
 # Launch the TUI
 llm-manager
+
+# (Optional) Install as a background service so the API is always available
+llm-manager service install
+llm-manager service start
 ```
 
 ```bash

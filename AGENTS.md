@@ -75,6 +75,32 @@ The form should also support adding arbitrary extra flags as raw text for advanc
 - Persist this setting in the config file
 - Create the directory if it doesn't exist
 
+### 7. Daemon / Background Service
+
+- Run the REST API server as a persistent background service with no terminal window required
+- Platform support: **launchd** on macOS (`~/Library/LaunchAgents/com.local-llm-manager.daemon.plist`), **systemd** (user-level) on Linux
+- No `sudo` required — both service managers operate at user level
+- Service commands available both from the CLI (`llm-manager service <subcommand>`) and from the **Service** screen in the TUI
+- Subcommands: `install`, `uninstall`, `start`, `stop`, `status`, `logs`
+- Double-start prevention via a PID file (`~/.local-llm-manager/manager.pid`)
+- The daemon runs only the API server — it does **not** auto-launch a model
+- The TUI detects a running daemon on startup (`EADDRINUSE`) and continues normally without trying to start a second API server
+- The TUI header bar shows live service status: `not installed` / `stopped` / `running` (with PID), polled every 5 s
+- The service status is shared via `ServiceStatusProvider` context so both the header and the Service screen share a single polling instance
+
+**Daemon entry point** (`src/daemon.ts` → `dist/daemon.js`, binary `llm-manager-daemon`):
+1. `checkExistingDaemon()` — exits if PID file is alive
+2. `configService.load()`
+3. `writePid(process.pid)`
+4. `apiServer.start(config.apiServer.port)`
+5. SIGTERM/SIGINT → `apiServer.stop()` + `removePid()`
+
+**Module layout** (`src/modules/daemon/`):
+- `pid-file.ts` — write / read / remove PID file, stale-file cleanup
+- `service.ts` — OS service templates, install/uninstall/start/stop/status/logs, `runServiceCli()` command handler
+
+**launchd plist extras**: `EnvironmentVariables.PATH` includes `/opt/homebrew/bin` so `llama-server` resolves correctly in the minimal launchd environment.
+
 ## Config File Structure
 
 ```jsonc
@@ -84,6 +110,10 @@ The form should also support adding arbitrary extra flags as raw text for advanc
   "defaults": {
     "port": 8001,
     "ctxSize": 131072,
+  },
+  "apiServer": {
+    "enabled": false,
+    "port": 3333,
   },
   "configurations": {
     "Qwen3.5-35B-A3B-UD-Q4_K_XL.gguf": {
@@ -122,6 +152,7 @@ Resolution order: **model configuration → global defaults → hardcoded fallba
 │  [2] Search Models (Hugging Face)       │
 │  [3] My Models (downloaded)             │
 │  [4] Settings                           │
+│  [5] Service                            │
 │  [q] Quit                               │
 │                                         │
 └─────────────────────────────────────────┘
@@ -131,6 +162,7 @@ Resolution order: **model configuration → global defaults → hardcoded fallba
 - **Search Models**: Text input to search HF → results list → download action
 - **My Models**: List of local `.gguf` files → select to launch/configure/delete
 - **Settings**: Configure models directory, global defaults (port, context size), and other preferences
+- **Service**: Show OS service status (not installed / stopped / running + PID); install, start, stop, uninstall
 
 ## Conventions
 
@@ -143,4 +175,7 @@ Resolution order: **model configuration → global defaults → hardcoded fallba
 - Use `child_process.spawn` to run `llama-server` and stream its output
 - ESM-only (`"type": "module"` in package.json)
 - Strict TypeScript
-- Typescript backend will be inspired of NestJS modular system.
+- TypeScript backend follows a NestJS-inspired modular system
+- Use `ServiceStatusProvider` context at the `App` level so service status is polled once and shared across the header bar and the Service screen — never call `useServiceStatus()` directly inside components; use `useServiceStatusContext()` instead
+- Prefer explicit `null` checks over `&&` for `string | null` values in JSX to avoid falsy-render bugs (`rendering-conditional-render`)
+- Mk `setState` calls inside `useEffect` bodies async-only (no synchronous setState directly in the effect body) to satisfy `react-hooks/set-state-in-effect`

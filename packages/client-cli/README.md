@@ -5,7 +5,9 @@
 ## Requirements
 
 - Node.js 22+
-- A machine on your LAN running `@local-llm-manager/manager` with the **API server enabled** in Settings
+- A machine on your LAN running `@thomasrumas/llm-manager` with the API server available — either:
+  - **Daemon (recommended):** `llm-manager service install && llm-manager service start` on the remote machine
+  - **Embedded:** API server enabled in the TUI **Settings** (runs while the TUI is open)
 
 ## Install
 
@@ -102,6 +104,19 @@ llm-client help
 ```
 
 ## How the manager API must be enabled
+
+### Option A — Daemon (recommended for always-on access)
+
+On the remote machine:
+
+```bash
+llm-manager service install   # registers with launchd / systemd, starts at login
+llm-manager service start     # starts now
+```
+
+The daemon runs the API server headlessly with no terminal window required. The TUI can still be used alongside it.
+
+### Option B — Embedded API inside the TUI
 
 On the machine running the manager TUI:
 

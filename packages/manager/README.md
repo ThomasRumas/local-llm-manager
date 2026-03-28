@@ -96,6 +96,34 @@ Binds to `0.0.0.0` so it is reachable on your LAN. Disabled by default.
 - Hugging Face token
 - API server toggle + port
 
+### Daemon / Background Service
+
+Run the API server as a persistent background service (no terminal window needed) using the OS-native service manager — **launchd** on macOS, **systemd** on Linux.
+
+```bash
+# From the TUI: navigate to Service (5 from the dashboard)
+# Or directly from the command line:
+llm-manager service install    # write the service file and enable at login
+llm-manager service start      # start it now
+llm-manager service stop       # stop it
+llm-manager service status     # show running state and PID
+llm-manager service uninstall  # remove the service file
+llm-manager service logs       # tail the daemon log
+```
+
+The **Service** screen in the TUI shows the live status in the header bar and provides the same install / start / stop / uninstall actions with a single keypress.
+
+The daemon only runs the API server — it does **not** auto-launch a model. Models are still started through the TUI or via `llm-client start`.
+
+**Files created by the service:**
+
+| Platform | Service file | Log directory |
+| -------- | ------------ | ------------- |
+| macOS | `~/Library/LaunchAgents/com.local-llm-manager.daemon.plist` | `~/.local-llm-manager/logs/` |
+| Linux | `~/.config/systemd/user/local-llm-manager.service` | via `journalctl --user` |
+
+No `sudo` required — both service managers run at user level.
+
 ## Configuration file
 
 Stored at `~/.local-llm-manager/config.json`:
@@ -123,7 +151,7 @@ Stored at `~/.local-llm-manager/config.json`:
 | `Esc`    | Back                  |
 | `Ctrl+S` | Save                  |
 | `Ctrl+L` | Save & Launch         |
-| `1`–`4`  | Dashboard shortcuts   |
+| `1`–`5`  | Dashboard shortcuts   |
 | `q`      | Quit                  |
 
 ## License
