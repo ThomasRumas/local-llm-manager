@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/ThomasRumas/local-llm-manager/compare/manager-v1.1.0...manager-v1.1.1) (2026-03-28)
+
+
+### Bug Fixes
+
+* **daemon:** upgrade help message ([e975bb0](https://github.com/ThomasRumas/local-llm-manager/commit/e975bb057f3506854850d3e8a4fd6394b809e17d))
+
 ## [1.1.0](https://github.com/ThomasRumas/local-llm-manager/compare/manager-v1.0.1...manager-v1.1.0) (2026-03-28)
 
 
