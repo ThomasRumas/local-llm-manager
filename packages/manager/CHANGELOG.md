@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.3](https://github.com/ThomasRumas/local-llm-manager/compare/manager-v1.1.2...manager-v1.1.3) (2026-03-28)
+
+
+### Bug Fixes
+
+* **llama-server:** spawn two process when launched by TUI, also detect if an instance is running from Service ([e48aa84](https://github.com/ThomasRumas/local-llm-manager/commit/e48aa84fc260157cf52e9ef14a31c0ba2cb0e827))
+
 ## [1.1.2](https://github.com/ThomasRumas/local-llm-manager/compare/manager-v1.1.1...manager-v1.1.2) (2026-03-28)
 
 
