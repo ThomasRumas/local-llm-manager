@@ -1,5 +1,6 @@
 import { execFile, spawn } from 'node:child_process';
 import { promisify } from 'node:util';
+import { access } from 'node:fs/promises';
 import type {
   LlamaStatus,
   LaunchOptions,
@@ -57,13 +58,43 @@ export class LlamaService {
     });
   }
 
-  launch(options: LaunchOptions): LaunchResult {
+  async launch(options: LaunchOptions): Promise<LaunchResult> {
+    const binaryPath = await this.resolveBinaryPath();
     const args = this.buildArgs(options);
-    const proc = spawn('llama-server', args, {
+    const proc = spawn(binaryPath, args, {
       stdio: ['ignore', 'pipe', 'pipe'],
     });
 
     return { process: proc, port: options.port };
+  }
+
+  /**
+   * Resolve the full path to `llama-server`.
+   * Tries `which` first (works when PATH is set), then falls back to common
+   * Homebrew locations so the daemon works in restricted environments such as
+   * launchd on macOS where PATH is minimal.
+   */
+  private async resolveBinaryPath(): Promise<string> {
+    try {
+      const { stdout } = await execFileAsync('which', ['llama-server']);
+      const path = stdout.trim();
+      if (path) return path;
+    } catch {
+      // PATH doesn't have llama-server — try known installation locations
+    }
+    const candidates = [
+      '/opt/homebrew/bin/llama-server', // Apple Silicon Mac
+      '/usr/local/bin/llama-server', // Intel Mac
+    ];
+    for (const candidate of candidates) {
+      try {
+        await access(candidate);
+        return candidate;
+      } catch {
+        // not at this location
+      }
+    }
+    return 'llama-server'; // last resort: let the OS resolve
   }
 
   private buildArgs(options: LaunchOptions): string[] {

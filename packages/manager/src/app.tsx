@@ -4,6 +4,7 @@ import { useScreen } from './hooks/use-screen.js';
 import { configService } from './modules/config/config.service.js';
 import { apiServer } from './modules/api/api.server.js';
 import { ServerProvider } from './contexts/server-context.js';
+import { ServiceStatusProvider } from './contexts/service-status-context.js';
 import { FullScreen } from './components/full-screen.js';
 import { Dashboard } from './screens/dashboard.js';
 import { InstallCheck } from './screens/install-check.js';
@@ -12,6 +13,7 @@ import { MyModels } from './screens/my-models.js';
 import { ModelConfig } from './screens/model-config.js';
 import { ModelLaunch } from './screens/model-launch.js';
 import { Settings } from './screens/settings.js';
+import { ServiceManager } from './screens/service-manager.js';
 
 const HELP: Record<string, Array<{ key: string; label: string }>> = {
   dashboard: [
@@ -52,6 +54,13 @@ const HELP: Record<string, Array<{ key: string; label: string }>> = {
     { key: 'Ctrl+S', label: 'save' },
     { key: 'Esc', label: 'back' },
   ],
+  service: [
+    { key: 'i', label: 'install' },
+    { key: 'u', label: 'uninstall' },
+    { key: 's', label: 'start/stop' },
+    { key: 'r', label: 'refresh' },
+    { key: 'Esc', label: 'back' },
+  ],
 };
 
 function AppShell() {
@@ -68,9 +77,17 @@ function AppShell() {
           return apiServer.start(config.apiServer.port);
         }
       })
-      .catch((err) =>
-        setError(err instanceof Error ? err.message : String(err)),
-      );
+      .catch((err: unknown) => {
+        // EADDRINUSE means the daemon is already running on this port — the
+        // TUI does not need its own API server in that case, so just continue.
+        if (
+          err instanceof Error &&
+          (err as NodeJS.ErrnoException).code === 'EADDRINUSE'
+        ) {
+          return;
+        }
+        setError(err instanceof Error ? err.message : String(err));
+      });
 
     return () => {
       apiServer.stop();
@@ -124,6 +141,8 @@ function AppShell() {
         );
       case 'settings':
         return <Settings onBack={goBack} />;
+      case 'service':
+        return <ServiceManager onBack={goBack} />;
       default:
         return <Dashboard onNavigate={navigate} />;
     }
@@ -139,7 +158,9 @@ function AppShell() {
 export function App() {
   return (
     <ServerProvider>
-      <AppShell />
+      <ServiceStatusProvider>
+        <AppShell />
+      </ServiceStatusProvider>
     </ServerProvider>
   );
 }

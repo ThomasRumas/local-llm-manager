@@ -49,7 +49,7 @@ describe('ServerManager', () => {
   beforeEach(() => {
     manager = new ServerManager();
     proc = makeProc();
-    mockLaunch.mockReturnValue({ process: proc, port: 8001 });
+    mockLaunch.mockResolvedValue({ process: proc, port: 8001 });
     vi.useFakeTimers();
   });
 
@@ -68,13 +68,13 @@ describe('ServerManager', () => {
 
   // ── start() ────────────────────────────────────────────────────────────────
   describe('start()', () => {
-    it('calls llamaService.launch with config', () => {
-      manager.start(BASE_CONFIG, 'm.gguf', 'default');
+    it('calls llamaService.launch with config', async () => {
+      await manager.start(BASE_CONFIG, 'm.gguf', 'default');
       expect(mockLaunch).toHaveBeenCalledWith(BASE_CONFIG);
     });
 
-    it('sets running state after start', () => {
-      manager.start(BASE_CONFIG, 'm.gguf', 'default');
+    it('sets running state after start', async () => {
+      await manager.start(BASE_CONFIG, 'm.gguf', 'default');
       const s = manager.getState();
       expect(s.running).toBe(true);
       expect(s.pid).toBe(12345);
@@ -83,33 +83,33 @@ describe('ServerManager', () => {
       expect(s.port).toBe(8001);
     });
 
-    it('emits state-changed event', () => {
+    it('emits state-changed event', async () => {
       const listener = vi.fn();
       manager.on('state-changed', listener);
-      manager.start(BASE_CONFIG, 'm.gguf', 'default');
+      await manager.start(BASE_CONFIG, 'm.gguf', 'default');
       expect(listener).toHaveBeenCalled();
     });
 
-    it('resets uptimeSeconds to 0 on new start', () => {
-      manager.start(BASE_CONFIG, 'm.gguf', 'default');
+    it('resets uptimeSeconds to 0 on new start', async () => {
+      await manager.start(BASE_CONFIG, 'm.gguf', 'default');
       vi.advanceTimersByTime(5000);
       // start again with new process
       const proc2 = makeProc(99999);
-      mockLaunch.mockReturnValueOnce({ process: proc2, port: 8001 });
-      manager.start(BASE_CONFIG, 'm.gguf', 'default');
+      mockLaunch.mockResolvedValueOnce({ process: proc2, port: 8001 });
+      await manager.start(BASE_CONFIG, 'm.gguf', 'default');
       expect(manager.getState().uptimeSeconds).toBe(0);
     });
 
-    it('adds initial log line on start', () => {
-      manager.start(BASE_CONFIG, 'm.gguf', 'default');
+    it('adds initial log line on start', async () => {
+      await manager.start(BASE_CONFIG, 'm.gguf', 'default');
       expect(manager.getState().logs[0]).toContain('Starting llama-server');
     });
   });
 
   // ── uptime ─────────────────────────────────────────────────────────────────
   describe('uptime timer', () => {
-    it('increments uptimeSeconds every second', () => {
-      manager.start(BASE_CONFIG, 'm.gguf', 'default');
+    it('increments uptimeSeconds every second', async () => {
+      await manager.start(BASE_CONFIG, 'm.gguf', 'default');
       vi.advanceTimersByTime(3000);
       expect(manager.getState().uptimeSeconds).toBe(3);
     });
@@ -117,22 +117,22 @@ describe('ServerManager', () => {
 
   // ── log streaming ──────────────────────────────────────────────────────────
   describe('log streaming', () => {
-    it('appends stdout lines to logs', () => {
-      manager.start(BASE_CONFIG, 'm.gguf', 'default');
+    it('appends stdout lines to logs', async () => {
+      await manager.start(BASE_CONFIG, 'm.gguf', 'default');
       const stdout = (proc as unknown as { stdout: EventEmitter }).stdout;
       stdout.emit('data', Buffer.from('hello from stdout\n'));
       expect(manager.getState().logs).toContain('hello from stdout');
     });
 
-    it('appends stderr lines to logs', () => {
-      manager.start(BASE_CONFIG, 'm.gguf', 'default');
+    it('appends stderr lines to logs', async () => {
+      await manager.start(BASE_CONFIG, 'm.gguf', 'default');
       const stderr = (proc as unknown as { stderr: EventEmitter }).stderr;
       stderr.emit('data', Buffer.from('error line\n'));
       expect(manager.getState().logs).toContain('error line');
     });
 
-    it('caps logs at MAX_LOGS (500)', () => {
-      manager.start(BASE_CONFIG, 'm.gguf', 'default');
+    it('caps logs at MAX_LOGS (500)', async () => {
+      await manager.start(BASE_CONFIG, 'm.gguf', 'default');
       const stdout = (proc as unknown as { stdout: EventEmitter }).stdout;
       for (let i = 0; i < 510; i++) {
         stdout.emit('data', Buffer.from(`line ${i}\n`));
@@ -143,25 +143,25 @@ describe('ServerManager', () => {
 
   // ── process close ──────────────────────────────────────────────────────────
   describe('process close event', () => {
-    it('sets running=false when process exits', () => {
-      manager.start(BASE_CONFIG, 'm.gguf', 'default');
+    it('sets running=false when process exits', async () => {
+      await manager.start(BASE_CONFIG, 'm.gguf', 'default');
       proc.emit('close', 0);
       expect(manager.getState().running).toBe(false);
       expect(manager.getState().pid).toBeNull();
     });
 
-    it('appends exit log line', () => {
-      manager.start(BASE_CONFIG, 'm.gguf', 'default');
+    it('appends exit log line', async () => {
+      await manager.start(BASE_CONFIG, 'm.gguf', 'default');
       proc.emit('close', 1);
       const logs = manager.getState().logs;
       expect(logs.at(-1)).toContain('exited with code 1');
     });
 
-    it('ignores close from stale process (race guard)', () => {
-      manager.start(BASE_CONFIG, 'm.gguf', 'default');
+    it('ignores close from stale process (race guard)', async () => {
+      await manager.start(BASE_CONFIG, 'm.gguf', 'default');
       const proc2 = makeProc(99999);
-      mockLaunch.mockReturnValueOnce({ process: proc2, port: 8001 });
-      manager.start(BASE_CONFIG, 'm.gguf', 'default'); // replaces proc with proc2
+      mockLaunch.mockResolvedValueOnce({ process: proc2, port: 8001 });
+      await manager.start(BASE_CONFIG, 'm.gguf', 'default'); // replaces proc with proc2
       proc.emit('close', 0); // stale proc fires close
       expect(manager.getState().running).toBe(true); // should still be running
     });
@@ -169,8 +169,8 @@ describe('ServerManager', () => {
 
   // ── process error ──────────────────────────────────────────────────────────
   describe('process error event', () => {
-    it('sets error and running=false', () => {
-      manager.start(BASE_CONFIG, 'm.gguf', 'default');
+    it('sets error and running=false', async () => {
+      await manager.start(BASE_CONFIG, 'm.gguf', 'default');
       proc.emit('error', new Error('spawn ENOENT'));
       const s = manager.getState();
       expect(s.running).toBe(false);
@@ -180,16 +180,16 @@ describe('ServerManager', () => {
 
   // ── stop() ────────────────────────────────────────────────────────────────
   describe('stop()', () => {
-    it('kills the process and sets running=false', () => {
-      manager.start(BASE_CONFIG, 'm.gguf', 'default');
+    it('kills the process and sets running=false', async () => {
+      await manager.start(BASE_CONFIG, 'm.gguf', 'default');
       const kill = (proc as unknown as { kill: ReturnType<typeof vi.fn> }).kill;
       manager.stop();
       expect(kill).toHaveBeenCalledWith('SIGTERM');
       expect(manager.getState().running).toBe(false);
     });
 
-    it('clears uptime timer', () => {
-      manager.start(BASE_CONFIG, 'm.gguf', 'default');
+    it('clears uptime timer', async () => {
+      await manager.start(BASE_CONFIG, 'm.gguf', 'default');
       vi.advanceTimersByTime(2000);
       manager.stop();
       vi.advanceTimersByTime(3000);

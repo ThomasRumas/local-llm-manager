@@ -100,7 +100,7 @@ async function handleStartModel(
     configName,
   );
 
-  serverManager.start(launchConfig, filename, configName);
+  await serverManager.start(launchConfig, filename, configName);
 
   const state = serverManager.getState();
   sendJson(res, 200, {

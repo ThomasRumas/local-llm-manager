@@ -15,6 +15,12 @@ vi.mock('node:util', () => ({
   promisify: (fn: unknown) => fn,
 }));
 
+// ── Mock node:fs/promises ─────────────────────────────────────────────────────
+const mockAccess = vi.fn();
+vi.mock('node:fs/promises', () => ({
+  access: (...args: unknown[]) => mockAccess(...args),
+}));
+
 import { LlamaService } from './llama.service.js';
 
 function makeProc(pid = 1234) {
@@ -154,68 +160,128 @@ describe('LlamaService', () => {
       extraFlags: '',
     };
 
-    it('returns the spawned process and port', () => {
+    beforeEach(() => {
+      // Default: which resolves the binary path
+      mockExecFile.mockResolvedValue({
+        stdout: '/opt/homebrew/bin/llama-server\n',
+        stderr: '',
+      });
+    });
+
+    it('returns the spawned process and port', async () => {
       const proc = makeProc();
       mockSpawn.mockReturnValueOnce(proc);
-      const result = svc.launch(baseOptions);
+      const result = await svc.launch(baseOptions);
       expect(result.process).toBe(proc);
       expect(result.port).toBe(8001);
     });
 
-    it('includes --kv-unified flag when kvUnified=true', () => {
+    it('spawns with the resolved full binary path', async () => {
       const proc = makeProc();
       mockSpawn.mockReturnValueOnce(proc);
-      svc.launch(baseOptions);
+      await svc.launch(baseOptions);
+      expect(mockSpawn).toHaveBeenCalledWith(
+        '/opt/homebrew/bin/llama-server',
+        expect.any(Array),
+        expect.any(Object),
+      );
+    });
+
+    it('falls back to /opt/homebrew/bin when which fails', async () => {
+      mockExecFile.mockRejectedValueOnce(new Error('not found'));
+      mockAccess.mockResolvedValueOnce(undefined); // /opt/homebrew/bin exists
+      const proc = makeProc();
+      mockSpawn.mockReturnValueOnce(proc);
+      await svc.launch(baseOptions);
+      expect(mockSpawn).toHaveBeenCalledWith(
+        '/opt/homebrew/bin/llama-server',
+        expect.any(Array),
+        expect.any(Object),
+      );
+    });
+
+    it('falls back to /usr/local/bin when opt/homebrew is absent', async () => {
+      mockExecFile.mockRejectedValueOnce(new Error('not found'));
+      mockAccess
+        .mockRejectedValueOnce(new Error('ENOENT')) // /opt/homebrew/bin absent
+        .mockResolvedValueOnce(undefined); // /usr/local/bin exists
+      const proc = makeProc();
+      mockSpawn.mockReturnValueOnce(proc);
+      await svc.launch(baseOptions);
+      expect(mockSpawn).toHaveBeenCalledWith(
+        '/usr/local/bin/llama-server',
+        expect.any(Array),
+        expect.any(Object),
+      );
+    });
+
+    it('falls back to bare "llama-server" when all candidates miss', async () => {
+      mockExecFile.mockRejectedValueOnce(new Error('not found'));
+      mockAccess.mockRejectedValue(new Error('ENOENT'));
+      const proc = makeProc();
+      mockSpawn.mockReturnValueOnce(proc);
+      await svc.launch(baseOptions);
+      expect(mockSpawn).toHaveBeenCalledWith(
+        'llama-server',
+        expect.any(Array),
+        expect.any(Object),
+      );
+    });
+
+    it('includes --kv-unified flag when kvUnified=true', async () => {
+      const proc = makeProc();
+      mockSpawn.mockReturnValueOnce(proc);
+      await svc.launch(baseOptions);
       const args: string[] = mockSpawn.mock.calls[0][1];
       expect(args).toContain('--kv-unified');
     });
 
-    it('omits --kv-unified flag when kvUnified=false', () => {
+    it('omits --kv-unified flag when kvUnified=false', async () => {
       const proc = makeProc();
       mockSpawn.mockReturnValueOnce(proc);
-      svc.launch({ ...baseOptions, kvUnified: false });
+      await svc.launch({ ...baseOptions, kvUnified: false });
       const args: string[] = mockSpawn.mock.calls[0][1];
       expect(args).not.toContain('--kv-unified');
     });
 
-    it('omits --flash-attn when flashAttn=off', () => {
+    it('omits --flash-attn when flashAttn=off', async () => {
       const proc = makeProc();
       mockSpawn.mockReturnValueOnce(proc);
-      svc.launch({ ...baseOptions, flashAttn: 'off' });
+      await svc.launch({ ...baseOptions, flashAttn: 'off' });
       const args: string[] = mockSpawn.mock.calls[0][1];
       expect(args).not.toContain('--flash-attn');
     });
 
-    it('includes --flash-attn on when flashAttn=on', () => {
+    it('includes --flash-attn on when flashAttn=on', async () => {
       const proc = makeProc();
       mockSpawn.mockReturnValueOnce(proc);
-      svc.launch({ ...baseOptions, flashAttn: 'on' });
+      await svc.launch({ ...baseOptions, flashAttn: 'on' });
       const args: string[] = mockSpawn.mock.calls[0][1];
       expect(args).toContain('--flash-attn');
     });
 
-    it('omits --fit when fit=off', () => {
+    it('omits --fit when fit=off', async () => {
       const proc = makeProc();
       mockSpawn.mockReturnValueOnce(proc);
-      svc.launch({ ...baseOptions, fit: 'off' });
+      await svc.launch({ ...baseOptions, fit: 'off' });
       const args: string[] = mockSpawn.mock.calls[0][1];
       expect(args).not.toContain('--fit');
     });
 
-    it('splits extraFlags by whitespace', () => {
+    it('splits extraFlags by whitespace', async () => {
       const proc = makeProc();
       mockSpawn.mockReturnValueOnce(proc);
-      svc.launch({ ...baseOptions, extraFlags: '--no-mmap --threads 4' });
+      await svc.launch({ ...baseOptions, extraFlags: '--no-mmap --threads 4' });
       const args: string[] = mockSpawn.mock.calls[0][1];
       expect(args).toContain('--no-mmap');
       expect(args).toContain('--threads');
       expect(args).toContain('4');
     });
 
-    it('uses alias for --alias flag', () => {
+    it('uses alias for --alias flag', async () => {
       const proc = makeProc();
       mockSpawn.mockReturnValueOnce(proc);
-      svc.launch({ ...baseOptions, alias: 'CoolModel' });
+      await svc.launch({ ...baseOptions, alias: 'CoolModel' });
       const args: string[] = mockSpawn.mock.calls[0][1];
       const aliasIdx = args.indexOf('--alias');
       expect(args[aliasIdx + 1]).toBe('CoolModel');

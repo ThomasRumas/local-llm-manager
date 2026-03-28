@@ -3,6 +3,7 @@ import { Box, Text } from 'ink';
 import { useWindowSize } from '../hooks/use-window-size.js';
 import { useServer } from '../contexts/server-context.js';
 import { useApiServer } from '../hooks/use-api-server.js';
+import { useServiceStatusContext } from '../contexts/service-status-context.js';
 import { configService } from '../modules/config/config.service.js';
 import type { Screen } from '../hooks/use-screen.js';
 
@@ -14,6 +15,7 @@ const SCREEN_LABELS: Record<Screen, string> = {
   'model-config': 'Configure Model',
   'model-launch': 'Server Monitor',
   settings: 'Settings',
+  service: 'Service',
 };
 
 interface FullScreenProps {
@@ -39,6 +41,7 @@ export function FullScreen({
   const { columns, rows } = useWindowSize();
   const server = useServer();
   const apiStatus = useApiServer();
+  const serviceStatus = useServiceStatusContext();
 
   const screenLabel = SCREEN_LABELS[screen] ?? screen;
   const headerLeft = `  🦙 Local LLM Manager  │  ${screenLabel}`;
@@ -58,6 +61,28 @@ export function FullScreen({
   const apiColor = apiStatus.isRunning ? 'cyan' : 'gray';
   const apiInfo = apiStatus.isRunning ? `:${apiStatus.port}` : 'off';
 
+  const serviceDot = serviceStatus.loading
+    ? '…'
+    : serviceStatus.running
+      ? '●'
+      : serviceStatus.installed
+        ? '○'
+        : '✗';
+  const serviceColor = serviceStatus.loading
+    ? 'gray'
+    : serviceStatus.running
+      ? 'green'
+      : serviceStatus.installed
+        ? 'yellow'
+        : 'gray';
+  const serviceInfo = serviceStatus.loading
+    ? ''
+    : serviceStatus.running
+      ? 'running'
+      : serviceStatus.installed
+        ? 'stopped'
+        : 'not installed';
+
   return (
     <Box flexDirection="column" width={columns || 80} height={rows || 24}>
       {/* ── Header ───────────────────────────────────────── */}
@@ -74,6 +99,12 @@ export function FullScreen({
           {headerLeft}
         </Text>
         <Box gap={2}>
+          <Box gap={1}>
+            <Text color={serviceColor}>{serviceDot}</Text>
+            <Text color="gray">SVC</Text>
+            <Text color={serviceColor}>{serviceInfo}</Text>
+          </Box>
+          <Text color="gray">│</Text>
           <Box gap={1}>
             <Text color={apiColor}>{apiDot}</Text>
             <Text color="gray">API</Text>

@@ -106,6 +106,11 @@ export function generateLaunchdPlist(
   <string>${logsDir}/daemon.log</string>
   <key>StandardErrorPath</key>
   <string>${logsDir}/daemon.error.log</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
 </dict>
 </plist>
 `;

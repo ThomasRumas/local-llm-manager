@@ -7,7 +7,8 @@ export type Screen =
   | 'my-models'
   | 'model-config'
   | 'model-launch'
-  | 'settings';
+  | 'settings'
+  | 'service';
 
 export interface ScreenParams {
   modelFile?: string;

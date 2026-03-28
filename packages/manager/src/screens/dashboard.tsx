@@ -26,6 +26,7 @@ const ACTIONS: Action[] = [
   },
   { key: '3', shortcut: '3', screen: 'my-models', label: 'My Models' },
   { key: '4', shortcut: '4', screen: 'settings', label: 'Settings' },
+  { key: '5', shortcut: '5', screen: 'service', label: 'Service' },
 ];
 
 function formatUptime(seconds: number): string {

@@ -38,7 +38,11 @@ export class ServerManager extends EventEmitter {
     }
   }
 
-  start(config: ResolvedConfig, modelFile: string, configName: string): void {
+  async start(
+    config: ResolvedConfig,
+    modelFile: string,
+    configName: string,
+  ): Promise<void> {
     // Stop any existing server first
     if (this.processRef) {
       this.processRef.kill('SIGTERM');
@@ -46,7 +50,7 @@ export class ServerManager extends EventEmitter {
     }
     this.clearUptime();
 
-    const { process: proc } = llamaService.launch(config);
+    const { process: proc } = await llamaService.launch(config);
     this.processRef = proc;
 
     this.setState({
