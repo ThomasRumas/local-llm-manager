@@ -22,6 +22,7 @@ export default defineConfig({
         'src/hooks/use-system-stats.ts', // Polling hook; depends on systemStatsService
         'src/modules/huggingface/huggingface.service.ts', // External HF API; tested via integration
         'src/modules/system/system-stats.service.ts', // Platform-specific shell commands
+        'src/daemon.ts', // Headless entry point — top-level await, not unit-testable
         'src/**/*.test.*',
         'src/test-setup.ts',
         'src/**/*.types.ts', // Pure type files, no runtime logic
