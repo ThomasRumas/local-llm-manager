@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/ThomasRumas/local-llm-manager/compare/manager-v1.1.1...manager-v1.1.2) (2026-03-28)
+
+
+### Bug Fixes
+
+* **service:** fix issue and add information inside TUI ([ee33bc2](https://github.com/ThomasRumas/local-llm-manager/commit/ee33bc295bf0e6492bfebfde73083a8187a7d9de))
+
 ## [1.1.1](https://github.com/ThomasRumas/local-llm-manager/compare/manager-v1.1.0...manager-v1.1.1) (2026-03-28)
 
 
