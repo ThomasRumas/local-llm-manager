@@ -18,10 +18,10 @@
 
 This is a **npm workspaces monorepo** with two packages:
 
-| Package | Binary | Role |
-|---------|--------|------|
-| `packages/manager` | `llm-manager`, `llm-manager-daemon` | Interactive Ink TUI + background daemon |
-| `packages/client-cli` | `llm-client` | Thin REST CLI client for remote control |
+| Package               | Binary                              | Role                                    |
+| --------------------- | ----------------------------------- | --------------------------------------- |
+| `packages/manager`    | `llm-manager`, `llm-manager-daemon` | Interactive Ink TUI + background daemon |
+| `packages/client-cli` | `llm-client`                        | Thin REST CLI client for remote control |
 
 Both packages are **ESM-only** TypeScript compiled with `tsc`. No bundler.
 
@@ -76,9 +76,9 @@ Loads config, starts the optional embedded API server, sets up providers, and ro
 
 ### Providers
 
-| Provider | Where | What it shares |
-|----------|-------|----------------|
-| `ServerProvider` | `App` | `llama-server` process state + start/stop |
+| Provider                | Where | What it shares                                                   |
+| ----------------------- | ----- | ---------------------------------------------------------------- |
+| `ServerProvider`        | `App` | `llama-server` process state + start/stop                        |
 | `ServiceStatusProvider` | `App` | OS service status (installed / running / PID), polling every 5 s |
 
 Both run at the top of the tree so all screens and the header bar share a single polling instance.
@@ -269,10 +269,10 @@ npm run format:check  # CI check
 
 ### CI checks (must all pass)
 
-| Check | Command |
-|-------|---------|
-| Build | `npm run build` |
-| Lint | `npm run lint` |
-| Format | `npm run format:check` |
-| Tests | `npm test` |
+| Check    | Command                                         |
+| -------- | ----------------------------------------------- |
+| Build    | `npm run build`                                 |
+| Lint     | `npm run lint`                                  |
+| Format   | `npm run format:check`                          |
+| Tests    | `npm test`                                      |
 | Coverage | `npm run test:coverage` (80 % branches + lines) |

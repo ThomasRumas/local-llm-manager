@@ -65,19 +65,13 @@ const HELP: Record<string, Array<{ key: string; label: string }>> = {
 
 function AppShell() {
   const { screen, params, navigate, goBack } = useScreen();
-  const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    configService
-      .load()
-      .then((config) => {
-        setReady(true);
-        if (config.apiServer.enabled) {
-          return apiServer.start(config.apiServer.port);
-        }
-      })
-      .catch((err: unknown) => {
+    // Config is pre-loaded in index.tsx before render(), so get() is safe here.
+    const config = configService.get();
+    if (config.apiServer.enabled) {
+      apiServer.start(config.apiServer.port).catch((err: unknown) => {
         // EADDRINUSE means the daemon is already running on this port — the
         // TUI does not need its own API server in that case, so just continue.
         if (
@@ -88,6 +82,7 @@ function AppShell() {
         }
         setError(err instanceof Error ? err.message : String(err));
       });
+    }
 
     return () => {
       apiServer.stop();
@@ -98,14 +93,6 @@ function AppShell() {
     return (
       <Box>
         <Text color="red">Failed to load config: {error}</Text>
-      </Box>
-    );
-  }
-
-  if (!ready) {
-    return (
-      <Box>
-        <Text color="cyan">Loading...</Text>
       </Box>
     );
   }

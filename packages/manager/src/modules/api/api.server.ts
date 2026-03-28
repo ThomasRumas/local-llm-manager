@@ -13,9 +13,10 @@ export class ApiServer extends EventEmitter {
         return;
       }
       const server = createServer((req, res) => {
-        handleRequest(req, res).catch((err: Error) => {
+        handleRequest(req, res).catch((err: unknown) => {
+          const message = err instanceof Error ? err.message : String(err);
           res.writeHead(500, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: err.message }));
+          res.end(JSON.stringify({ error: message }));
         });
       });
 

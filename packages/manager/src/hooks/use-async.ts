@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, type DependencyList } from 'react';
 
 interface AsyncState<T> {
   data: T | null;
@@ -6,7 +6,7 @@ interface AsyncState<T> {
   error: string | null;
 }
 
-export function useAsync<T>(fn: () => Promise<T>, deps: unknown[] = []) {
+export function useAsync<T>(fn: () => Promise<T>, deps: DependencyList = []) {
   const [state, setState] = useState<AsyncState<T>>({
     data: null,
     loading: true,

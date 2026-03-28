@@ -18,6 +18,11 @@ if (args[0] === 'service') {
   process.exit(0);
 }
 
+// Pre-load config before rendering so configService.get() is available
+// synchronously in all providers (ServerProvider, etc.).
+import { configService } from './modules/config/config.service.js';
+await configService.load();
+
 process.stdout.write('\x1b[?1049h\x1b[2J\x1b[H');
 process.on('exit', () => {
   process.stdout.write('\x1b[?1049l');

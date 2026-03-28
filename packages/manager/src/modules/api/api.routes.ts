@@ -158,6 +158,7 @@ export async function handleRequest(
       pid: state.pid,
       uptimeSeconds: state.uptimeSeconds,
       error: state.error,
+      logs: state.logs,
     } satisfies ApiStatusResponse);
     return;
   }

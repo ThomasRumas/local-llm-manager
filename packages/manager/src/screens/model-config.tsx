@@ -2,7 +2,6 @@ import { useState, useCallback } from 'react';
 import { Box, Text, useInput } from 'ink';
 import { StatusBadge } from '../components/status-badge.js';
 import { configService } from '../modules/config/config.service.js';
-import { useServer } from '../contexts/server-context.js';
 import type { ResolvedConfig } from '../modules/config/config.types.js';
 import type { Screen, ScreenParams } from '../hooks/use-screen.js';
 
@@ -61,7 +60,6 @@ export function ModelConfig({
   const modelsDir = configService.getModelsDirectory();
   const modelPath = `${modelsDir}/${modelFile}`;
   const initial = configService.getEffective(modelFile, modelPath, configName);
-  const server = useServer();
 
   const [config, setConfig] = useState<ResolvedConfig>(initial);
   const [focusIndex, setFocusIndex] = useState(0);
@@ -96,16 +94,8 @@ export function ModelConfig({
 
   const handleLaunch = useCallback(async () => {
     await handleSave();
-    const modelsDir2 = configService.getModelsDirectory();
-    const modelPath2 = `${modelsDir2}/${modelFile}`;
-    const resolved = configService.getEffective(
-      modelFile,
-      modelPath2,
-      selectedConfigName,
-    );
-    server.start(resolved, modelFile, selectedConfigName);
     onNavigate('model-launch', { modelFile, configName: selectedConfigName });
-  }, [handleSave, onNavigate, modelFile, selectedConfigName, server]);
+  }, [handleSave, onNavigate, modelFile, selectedConfigName]);
 
   useInput((input, key) => {
     if (key.escape) {

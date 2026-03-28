@@ -5,7 +5,6 @@ import { Table, type TableColumn } from '../components/table.js';
 import { StatusBadge } from '../components/status-badge.js';
 import { modelsService } from '../modules/models/models.service.js';
 import { configService } from '../modules/config/config.service.js';
-import { useServer } from '../contexts/server-context.js';
 import { useAsync } from '../hooks/use-async.js';
 import type { LocalModel } from '../modules/models/models.types.js';
 import type { Screen, ScreenParams } from '../hooks/use-screen.js';
@@ -128,7 +127,6 @@ function handleActionsKey(
 }
 
 export function MyModels({ onBack, onNavigate }: Readonly<MyModelsProps>) {
-  const server = useServer();
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const modelsDir = configService.getModelsDirectory();
@@ -175,14 +173,6 @@ export function MyModels({ onBack, onNavigate }: Readonly<MyModelsProps>) {
           );
           if (savedConfigs.length > 0) {
             const configName = savedConfigs[0];
-            const dir = configService.getModelsDirectory();
-            const modelPath = `${dir}/${selectedModel.filename}`;
-            const resolved = configService.getEffective(
-              selectedModel.filename,
-              modelPath,
-              configName,
-            );
-            server.start(resolved, selectedModel.filename, configName);
             onNavigate('model-launch', {
               modelFile: selectedModel.filename,
               configName,
@@ -214,7 +204,7 @@ export function MyModels({ onBack, onNavigate }: Readonly<MyModelsProps>) {
           break;
       }
     },
-    [selectedModel, onNavigate, retry, server],
+    [selectedModel, onNavigate, retry],
   );
 
   useInput((_input, key) => {
@@ -238,7 +228,7 @@ export function MyModels({ onBack, onNavigate }: Readonly<MyModelsProps>) {
       {loading && (
         <StatusBadge status="loading" label="Scanning models directory…" />
       )}
-      {error && <StatusBadge status="error" label={error} />}
+      {error !== null ? <StatusBadge status="error" label={error} /> : null}
 
       {!loading && models && (
         <Box flexDirection="row" gap={2} height="100%">
@@ -295,9 +285,9 @@ export function MyModels({ onBack, onNavigate }: Readonly<MyModelsProps>) {
                   ))
                 )}
               </Box>
-              {state.deleteError && (
+              {state.deleteError !== null ? (
                 <Text color="red">{state.deleteError}</Text>
-              )}
+              ) : null}
             </Box>
           )}
         </Box>

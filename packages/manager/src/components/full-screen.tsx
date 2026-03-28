@@ -54,7 +54,7 @@ export function FullScreen({
       )
     : null;
   const serverInfo = server.running
-    ? `${serverDisplayName}  :${server.port}  ${formatUptime(server.uptimeSeconds)}`
+    ? `${serverDisplayName}  :${server.port}  ${formatUptime(server.uptimeSeconds)}${server.daemonManaged ? '  (daemon)' : ''}`
     : 'No server running';
 
   const apiDot = apiStatus.isRunning ? '●' : '○';

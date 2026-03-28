@@ -95,6 +95,7 @@ const BASE_STATE = {
   uptimeSeconds: 0,
   logs: [],
   error: null,
+  daemonManaged: false,
 };
 
 describe('handleRequest()', () => {
@@ -183,7 +184,21 @@ describe('handleRequest()', () => {
     expect(body.running).toBe(true);
     expect(body.port).toBe(8001);
   });
+  it('GET /api/status includes logs in response', async () => {
+    mockGetState.mockReturnValueOnce({
+      ...BASE_STATE,
+      logs: ['[info] Server started', '[info] listening on port 8001'],
+    } as ReturnType<typeof serverManager.getState>);
 
+    const req = makeReq('GET', '/api/status');
+    const res = makeRes();
+    await handleRequest(req, res);
+    const body = res.getBody() as { logs: string[] };
+    expect(body.logs).toEqual([
+      '[info] Server started',
+      '[info] listening on port 8001',
+    ]);
+  });
   // ── POST /api/stop ────────────────────────────────────────────────────────
   it('POST /api/stop calls serverManager.stop and returns success', async () => {
     const req = makeReq('POST', '/api/stop');
