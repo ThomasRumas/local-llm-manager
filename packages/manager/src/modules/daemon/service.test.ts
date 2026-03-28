@@ -30,6 +30,8 @@ import {
   startService,
   stopService,
   showLogs,
+  findDaemonBinary,
+  runServiceCli,
 } from './service.js';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -201,7 +203,7 @@ describe('getServiceStatus (linux)', () => {
   });
 
   it('returns running: true when systemctl is-active returns "active"', async () => {
-    vi.mocked(readFile).mockResolvedValue('[Unit]' as unknown as Buffer);
+    vi.mocked(readFile).mockResolvedValue('[Unit]');
     mockExecFile('active\n');
     expect(await getServiceStatus()).toEqual({
       installed: true,
@@ -210,7 +212,7 @@ describe('getServiceStatus (linux)', () => {
   });
 
   it('returns running: false when systemctl is-active returns "inactive"', async () => {
-    vi.mocked(readFile).mockResolvedValue('[Unit]' as unknown as Buffer);
+    vi.mocked(readFile).mockResolvedValue('[Unit]');
     mockExecFile('inactive\n');
     expect(await getServiceStatus()).toEqual({
       installed: true,
@@ -219,7 +221,7 @@ describe('getServiceStatus (linux)', () => {
   });
 
   it('returns running: false when systemctl exits with non-zero (stopped/failed)', async () => {
-    vi.mocked(readFile).mockResolvedValue('[Unit]' as unknown as Buffer);
+    vi.mocked(readFile).mockResolvedValue('[Unit]');
     mockExecFileError('inactive');
     expect(await getServiceStatus()).toEqual({
       installed: true,
@@ -242,7 +244,7 @@ describe('getServiceStatus (darwin)', () => {
   });
 
   it('returns running: true with pid when launchctl list includes PID', async () => {
-    vi.mocked(readFile).mockResolvedValue('<plist>' as unknown as Buffer);
+    vi.mocked(readFile).mockResolvedValue('<plist>');
     mockExecFile(
       '{\n\t"PID" = 5678;\n\t"Label" = "com.local-llm-manager.daemon";\n}',
     );
@@ -251,7 +253,7 @@ describe('getServiceStatus (darwin)', () => {
   });
 
   it('returns running: false when launchctl list has no PID (stopped)', async () => {
-    vi.mocked(readFile).mockResolvedValue('<plist>' as unknown as Buffer);
+    vi.mocked(readFile).mockResolvedValue('<plist>');
     mockExecFile('{\n\t"Label" = "com.local-llm-manager.daemon";\n}');
     expect(await getServiceStatus()).toEqual({
       installed: true,
@@ -260,7 +262,7 @@ describe('getServiceStatus (darwin)', () => {
   });
 
   it('returns running: false when launchctl exits non-zero (not loaded)', async () => {
-    vi.mocked(readFile).mockResolvedValue('<plist>' as unknown as Buffer);
+    vi.mocked(readFile).mockResolvedValue('<plist>');
     mockExecFileError('Could not find service');
     expect(await getServiceStatus()).toEqual({
       installed: true,
@@ -448,5 +450,222 @@ describe('uninstallService', () => {
     vi.mocked(unlink).mockRejectedValue(new Error('ENOENT'));
     mockExecFileError('not found');
     await expect(uninstallService()).resolves.toBeUndefined();
+  });
+});
+
+// ─── findDaemonBinary ────────────────────────────────────────────────────────
+
+describe('findDaemonBinary', () => {
+  it('returns the trimmed binary path when which succeeds', async () => {
+    mockExecFile('/usr/local/bin/llm-manager-daemon\n');
+    await expect(findDaemonBinary()).resolves.toBe(
+      '/usr/local/bin/llm-manager-daemon',
+    );
+  });
+
+  it('throws when which returns an empty string', async () => {
+    mockExecFile('');
+    await expect(findDaemonBinary()).rejects.toThrow(
+      'llm-manager-daemon not found',
+    );
+  });
+
+  it('throws when which exits with an error', async () => {
+    mockExecFileError('not found');
+    await expect(findDaemonBinary()).rejects.toThrow(
+      'llm-manager-daemon not found',
+    );
+  });
+});
+
+// ─── runServiceCli ───────────────────────────────────────────────────────────
+
+describe('runServiceCli', () => {
+  beforeEach(() => {
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+    vi.spyOn(process, 'exit').mockImplementation((() => {}) as never);
+    vi.spyOn(process.stdout, 'write').mockReturnValue(true);
+  });
+
+  it('prints help when called with no args', async () => {
+    await runServiceCli([]);
+    expect(console.log).toHaveBeenCalled();
+  });
+
+  it('prints help for --help', async () => {
+    await runServiceCli(['--help']);
+    expect(console.log).toHaveBeenCalled();
+  });
+
+  it('prints help for -h', async () => {
+    await runServiceCli(['-h']);
+    expect(console.log).toHaveBeenCalled();
+  });
+
+  describe('install', () => {
+    beforeEach(() => {
+      vi.spyOn(process, 'platform', 'get').mockReturnValue('linux');
+      vi.mocked(mkdir).mockResolvedValue(undefined);
+      vi.mocked(writeFile).mockResolvedValue(undefined);
+      vi.mocked(execFile)
+        .mockImplementationOnce((_cmd, _args, cb) => {
+          (
+            cb as (
+              err: null,
+              result: { stdout: string; stderr: string },
+            ) => void
+          )(null, {
+            stdout: '/usr/local/bin/llm-manager-daemon\n',
+            stderr: '',
+          });
+          return {} as ReturnType<typeof execFile>;
+        })
+        .mockImplementation((_cmd, _args, cb) => {
+          (
+            cb as (
+              err: null,
+              result: { stdout: string; stderr: string },
+            ) => void
+          )(null, { stdout: '', stderr: '' });
+          return {} as ReturnType<typeof execFile>;
+        });
+    });
+
+    it('calls installService and logs the installed path', async () => {
+      await runServiceCli(['install']);
+      expect(console.log).toHaveBeenCalledWith(
+        expect.stringContaining('Installed'),
+      );
+    });
+  });
+
+  describe('uninstall', () => {
+    beforeEach(() => {
+      vi.spyOn(process, 'platform', 'get').mockReturnValue('linux');
+      vi.mocked(unlink).mockResolvedValue(undefined);
+      mockExecFile();
+    });
+
+    it('calls uninstallService and logs success', async () => {
+      await runServiceCli(['uninstall']);
+      expect(console.log).toHaveBeenCalledWith(
+        expect.stringContaining('uninstalled'),
+      );
+    });
+  });
+
+  describe('start', () => {
+    beforeEach(() => {
+      vi.spyOn(process, 'platform', 'get').mockReturnValue('linux');
+      mockExecFile();
+    });
+
+    it('calls startService and logs success', async () => {
+      await runServiceCli(['start']);
+      expect(console.log).toHaveBeenCalledWith(
+        expect.stringContaining('started'),
+      );
+    });
+  });
+
+  describe('stop', () => {
+    beforeEach(() => {
+      vi.spyOn(process, 'platform', 'get').mockReturnValue('linux');
+      mockExecFile();
+    });
+
+    it('calls stopService and logs success', async () => {
+      await runServiceCli(['stop']);
+      expect(console.log).toHaveBeenCalledWith(
+        expect.stringContaining('stopped'),
+      );
+    });
+  });
+
+  describe('status', () => {
+    it('shows running state (linux)', async () => {
+      vi.spyOn(process, 'platform', 'get').mockReturnValue('linux');
+      vi.mocked(readFile).mockResolvedValue('[Unit]');
+      mockExecFile('active\n');
+      await runServiceCli(['status']);
+      expect(console.log).toHaveBeenCalledWith(
+        expect.stringContaining('running'),
+      );
+    });
+
+    it('shows stopped state (linux)', async () => {
+      vi.spyOn(process, 'platform', 'get').mockReturnValue('linux');
+      vi.mocked(readFile).mockResolvedValue('[Unit]');
+      mockExecFile('inactive\n');
+      await runServiceCli(['status']);
+      expect(console.log).toHaveBeenCalledWith(
+        expect.stringContaining('stopped'),
+      );
+    });
+
+    it('shows not-installed state', async () => {
+      vi.spyOn(process, 'platform', 'get').mockReturnValue('linux');
+      vi.mocked(readFile).mockRejectedValue(new Error('ENOENT'));
+      await runServiceCli(['status']);
+      expect(console.log).toHaveBeenCalledWith(
+        expect.stringContaining('not installed'),
+      );
+    });
+
+    it('shows pid when daemon is running on darwin', async () => {
+      vi.spyOn(process, 'platform', 'get').mockReturnValue('darwin');
+      vi.mocked(readFile).mockResolvedValue('<plist>');
+      mockExecFile('{\n\t"PID" = 9999;\n}');
+      await runServiceCli(['status']);
+      expect(console.log).toHaveBeenCalledWith(expect.stringContaining('9999'));
+    });
+  });
+
+  describe('logs', () => {
+    beforeEach(() => {
+      vi.spyOn(process, 'platform', 'get').mockReturnValue('linux');
+      mockExecFile('log output\n');
+    });
+
+    it('uses default 50 lines', async () => {
+      await runServiceCli(['logs']);
+      expect(execFile).toHaveBeenCalledWith(
+        'journalctl',
+        expect.arrayContaining(['-n', '50']),
+        expect.any(Function),
+      );
+    });
+
+    it('uses the --lines value when provided', async () => {
+      await runServiceCli(['logs', '--lines', '100']);
+      expect(execFile).toHaveBeenCalledWith(
+        'journalctl',
+        expect.arrayContaining(['-n', '100']),
+        expect.any(Function),
+      );
+    });
+
+    it('falls back to 50 lines when --lines has no following arg', async () => {
+      await runServiceCli(['logs', '--lines']);
+      expect(execFile).toHaveBeenCalledWith(
+        'journalctl',
+        expect.arrayContaining(['-n', '50']),
+        expect.any(Function),
+      );
+    });
+
+    it('falls back to 50 lines when --lines value is not a positive number', async () => {
+      await runServiceCli(['logs', '--lines', '-5']);
+      expect(execFile).toHaveBeenCalledWith(
+        'journalctl',
+        expect.arrayContaining(['-n', '50']),
+        expect.any(Function),
+      );
+    });
+  });
+
+  it('exits with code 1 for an unknown sub-command', async () => {
+    await runServiceCli(['unknown-command']);
+    expect(process.exit).toHaveBeenCalledWith(1);
   });
 });
