@@ -80,6 +80,7 @@ ${bold('Examples:')}
   llm-client status
   llm-client stop
 `);
+
 }
 
 // ─── Commands ────────────────────────────────────────────────────────────────
