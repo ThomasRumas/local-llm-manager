@@ -312,7 +312,7 @@ ${c.bold}Usage:${c.reset}
   llm-manager service ${c.cyan}<subcommand>${c.reset}
 
 ${c.bold}Subcommands:${c.reset}
-  ${c.cyan}install${c.reset}              Install as a system service (systemd / launchd) and enable at login
+  ${c.cyan}install${c.reset}              Install as a system service Linux(systemd)/ MacOS(launchd) and enable at login
   ${c.cyan}uninstall${c.reset}            Remove the system service
   ${c.cyan}start${c.reset}                Start the service
   ${c.cyan}stop${c.reset}                 Stop the service
