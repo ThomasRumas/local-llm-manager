@@ -100,7 +100,14 @@ async function handleStartModel(
     configName,
   );
 
-  await serverManager.start(launchConfig, filename, configName);
+  try {
+    await serverManager.start(launchConfig, filename, configName);
+  } catch (err) {
+    sendJson(res, 500, {
+      error: `Failed to start model: ${err instanceof Error ? err.message : String(err)}`,
+    } satisfies ApiErrorResponse);
+    return;
+  }
 
   const state = serverManager.getState();
   sendJson(res, 200, {

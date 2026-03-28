@@ -228,6 +228,7 @@ export class ConfigService {
       port: modelConfig.port ?? defaults.port ?? HARDCODED_DEFAULTS.port,
       ctxSize:
         modelConfig.ctxSize ?? defaults.ctxSize ?? HARDCODED_DEFAULTS.ctxSize,
+      host: modelConfig.host ?? defaults.host ?? HARDCODED_DEFAULTS.host,
       kvUnified: modelConfig.kvUnified ?? HARDCODED_DEFAULTS.kvUnified,
       cacheTypeK: modelConfig.cacheTypeK ?? HARDCODED_DEFAULTS.cacheTypeK,
       cacheTypeV: modelConfig.cacheTypeV ?? HARDCODED_DEFAULTS.cacheTypeV,

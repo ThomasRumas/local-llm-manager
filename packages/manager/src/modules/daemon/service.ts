@@ -63,6 +63,9 @@ export function generateSystemdUnit(
   nodePath: string,
   daemonPath: string,
 ): string {
+  // Capture the current PATH so the daemon (and llama-server it spawns) can
+  // find binaries installed via Homebrew or other non-standard locations.
+  const envPath = process.env['PATH'] ?? '/usr/local/bin:/usr/bin:/bin';
   return `[Unit]
 Description=Local LLM Manager Daemon
 After=network.target
@@ -73,6 +76,7 @@ ExecStart=${nodePath} ${daemonPath}
 Restart=on-failure
 RestartSec=5
 Environment=NODE_ENV=production
+Environment=PATH=${envPath}
 
 [Install]
 WantedBy=default.target
