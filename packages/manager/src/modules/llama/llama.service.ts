@@ -63,6 +63,10 @@ export class LlamaService {
     const args = this.buildArgs(options);
     const proc = spawn(binaryPath, args, {
       stdio: ['ignore', 'pipe', 'pipe'],
+      // detached: true gives the subprocess its own process group so that
+      // killing by negative PGID terminates the entire tree (handles the case
+      // where the resolved binary is a Homebrew wrapper script).
+      detached: true,
     });
 
     return { process: proc, port: options.port };

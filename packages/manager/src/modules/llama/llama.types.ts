@@ -1,3 +1,4 @@
+import type { CacheType, OnOffSetting } from '../config/config.types.js';
 import type { ChildProcess } from 'node:child_process';
 
 export interface LlamaStatus {
@@ -16,10 +17,10 @@ export interface LaunchOptions {
   port: number;
   ctxSize: number;
   kvUnified: boolean;
-  cacheTypeK: string;
-  cacheTypeV: string;
-  flashAttn: string;
-  fit: string;
+  cacheTypeK: CacheType;
+  cacheTypeV: CacheType;
+  flashAttn: OnOffSetting;
+  fit: OnOffSetting;
   extraFlags: string;
 }
 

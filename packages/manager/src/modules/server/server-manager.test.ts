@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { EventEmitter } from 'node:events';
 import type { ChildProcess } from 'node:child_process';
+import type { ApiStatusResponse } from '../api/api.types.js';
 
 // ── Mock llamaService ─────────────────────────────────────────────────────────
 vi.mock('../llama/llama.service.js', () => ({
@@ -198,6 +199,138 @@ describe('ServerManager', () => {
 
     it('is safe to call when not running', () => {
       expect(() => manager.stop()).not.toThrow();
+    });
+  });
+
+  // ── stop() clears daemonManaged ──────────────────────────────────────────
+  describe('stop() daemon flag', () => {
+    it('clears daemonManaged when stopping a daemon-managed server', () => {
+      manager.syncFromDaemon({
+        running: true,
+        modelFile: 'remote.gguf',
+        configName: 'default',
+        port: 9000,
+        pid: 9999,
+        uptimeSeconds: 60,
+        error: null,
+        logs: [],
+      });
+      expect(manager.getState().daemonManaged).toBe(true);
+      manager.stop();
+      expect(manager.getState().daemonManaged).toBe(false);
+    });
+  });
+
+  // ── syncFromDaemon() ───────────────────────────────────────────────────────
+  describe('syncFromDaemon()', () => {
+    const FAKE_STATUS: ApiStatusResponse = {
+      running: true,
+      modelFile: 'remote.gguf',
+      configName: 'default',
+      port: 9000,
+      pid: 9999,
+      uptimeSeconds: 120,
+      error: null,
+      logs: ['[info] llama-server started', '[info] listening on 9000'],
+    };
+
+    it('sets state fields from daemon status', () => {
+      manager.syncFromDaemon(FAKE_STATUS);
+      const s = manager.getState();
+      expect(s.running).toBe(true);
+      expect(s.modelFile).toBe('remote.gguf');
+      expect(s.configName).toBe('default');
+      expect(s.port).toBe(9000);
+      expect(s.pid).toBe(9999);
+      expect(s.uptimeSeconds).toBe(120);
+      expect(s.error).toBeNull();
+    });
+
+    it('sets daemonManaged to true', () => {
+      manager.syncFromDaemon(FAKE_STATUS);
+      expect(manager.getState().daemonManaged).toBe(true);
+    });
+
+    it('syncs logs array from daemon status', () => {
+      manager.syncFromDaemon(FAKE_STATUS);
+      expect(manager.getState().logs).toEqual(FAKE_STATUS.logs);
+    });
+
+    it('emits state-changed event', () => {
+      const listener = vi.fn();
+      manager.on('state-changed', listener);
+      manager.syncFromDaemon(FAKE_STATUS);
+      expect(listener).toHaveBeenCalledOnce();
+    });
+
+    it('updates state on repeated calls (e.g. uptimeSeconds progresses)', () => {
+      manager.syncFromDaemon(FAKE_STATUS);
+      manager.syncFromDaemon({ ...FAKE_STATUS, uptimeSeconds: 125 });
+      expect(manager.getState().uptimeSeconds).toBe(125);
+    });
+
+    it('propagates error field from daemon status', () => {
+      manager.syncFromDaemon({
+        ...FAKE_STATUS,
+        running: false,
+        error: 'crash',
+      });
+      expect(manager.getState().error).toBe('crash');
+    });
+  });
+
+  // ── clearDaemonState() ─────────────────────────────────────────────────────
+  describe('clearDaemonState()', () => {
+    it('resets state to initial when daemonManaged=true', () => {
+      manager.syncFromDaemon({
+        running: true,
+        modelFile: 'remote.gguf',
+        configName: 'default',
+        port: 9000,
+        pid: 9999,
+        uptimeSeconds: 60,
+        error: null,
+        logs: ['a', 'b'],
+      });
+      manager.clearDaemonState();
+      const s = manager.getState();
+      expect(s.running).toBe(false);
+      expect(s.modelFile).toBeNull();
+      expect(s.pid).toBeNull();
+      expect(s.logs).toEqual([]);
+      expect(s.daemonManaged).toBe(false);
+    });
+
+    it('is a no-op when daemonManaged=false', () => {
+      // initial state has daemonManaged=false
+      manager.clearDaemonState();
+      const s = manager.getState();
+      expect(s.running).toBe(false);
+      expect(s.modelFile).toBeNull();
+    });
+
+    it('does not emit state-changed when daemonManaged=false', () => {
+      const listener = vi.fn();
+      manager.on('state-changed', listener);
+      manager.clearDaemonState();
+      expect(listener).not.toHaveBeenCalled();
+    });
+
+    it('emits state-changed when daemonManaged=true', () => {
+      manager.syncFromDaemon({
+        running: true,
+        modelFile: 'remote.gguf',
+        configName: 'default',
+        port: 9000,
+        pid: 9999,
+        uptimeSeconds: 60,
+        error: null,
+        logs: [],
+      });
+      const listener = vi.fn();
+      manager.on('state-changed', listener);
+      manager.clearDaemonState();
+      expect(listener).toHaveBeenCalledOnce();
     });
   });
 

@@ -30,6 +30,7 @@ export interface ApiStatusResponse {
   pid: number | null;
   uptimeSeconds: number;
   error: string | null;
+  logs: string[];
 }
 
 export interface ApiStopResponse {

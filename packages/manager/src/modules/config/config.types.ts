@@ -1,3 +1,13 @@
+export type CacheType =
+  | 'f16'
+  | 'f32'
+  | 'q8_0'
+  | 'q4_0'
+  | 'q4_1'
+  | 'q5_0'
+  | 'q5_1';
+export type OnOffSetting = 'on' | 'off';
+
 export interface Defaults {
   port: number;
   ctxSize: number;
@@ -12,10 +22,10 @@ export interface ModelConfig {
   port?: number;
   ctxSize?: number;
   kvUnified?: boolean;
-  cacheTypeK?: string;
-  cacheTypeV?: string;
-  flashAttn?: string;
-  fit?: string;
+  cacheTypeK?: CacheType;
+  cacheTypeV?: CacheType;
+  flashAttn?: OnOffSetting;
+  fit?: OnOffSetting;
   extraFlags?: string;
 }
 
@@ -42,10 +52,10 @@ export interface ResolvedConfig {
   port: number;
   ctxSize: number;
   kvUnified: boolean;
-  cacheTypeK: string;
-  cacheTypeV: string;
-  flashAttn: string;
-  fit: string;
+  cacheTypeK: CacheType;
+  cacheTypeV: CacheType;
+  flashAttn: OnOffSetting;
+  fit: OnOffSetting;
   extraFlags: string;
 }
 

@@ -33,11 +33,11 @@ export function ModelLaunch({
   const stats = useSystemStats(server.pid);
 
   // Start the server only if not already running for this model.
-  // model-config already calls server.start() before navigating here,
-  // so we only start directly when arriving without that prior call.
+  // Skip if the daemon is already managing a server — it owns the process.
   useEffect(() => {
     if (!modelFile) return;
     if (server.running && server.modelFile === modelFile) return;
+    if (server.daemonManaged) return;
     const modelsDir = configService.getModelsDirectory();
     const modelPath = `${modelsDir}/${modelFile}`;
     const resolved = configService.getEffective(
@@ -110,7 +110,9 @@ export function ModelLaunch({
             value={formatUptime(server.uptimeSeconds)}
             color={server.running ? 'green' : 'gray'}
           />
-          {server.pid && <InfoRow label="PID" value={String(server.pid)} />}
+          {server.pid !== null ? (
+            <InfoRow label="PID" value={String(server.pid)} />
+          ) : null}
         </Box>
 
         {/* System resources */}
@@ -156,13 +158,13 @@ export function ModelLaunch({
             </Text>
           </Box>
         )}
-        {server.error && (
+        {server.error !== null ? (
           <Box marginTop={1}>
             <Text color="red" wrap="wrap">
               {server.error}
             </Text>
           </Box>
-        )}
+        ) : null}
       </Box>
 
       {/* Logs panel */}

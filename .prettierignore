@@ -3,3 +3,12 @@ coverage
 node_modules
 package-lock.json
 **/CHANGELOG.md
+**/README.md
+**/CONTRIBUTING.md
+**/CODE_OF_CONDUCT.md
+**/SUPPORT.md
+**/SECURITY.md
+**/docs
+**/examples
+**/tests
+**/*.md

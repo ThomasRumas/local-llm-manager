@@ -89,6 +89,7 @@ The form should also support adding arbitrary extra flags as raw text for advanc
 - The service status is shared via `ServiceStatusProvider` context so both the header and the Service screen share a single polling instance
 
 **Daemon entry point** (`src/daemon.ts` → `dist/daemon.js`, binary `llm-manager-daemon`):
+
 1. `checkExistingDaemon()` — exits if PID file is alive
 2. `configService.load()`
 3. `writePid(process.pid)`
@@ -96,6 +97,7 @@ The form should also support adding arbitrary extra flags as raw text for advanc
 5. SIGTERM/SIGINT → `apiServer.stop()` + `removePid()`
 
 **Module layout** (`src/modules/daemon/`):
+
 - `pid-file.ts` — write / read / remove PID file, stale-file cleanup
 - `service.ts` — OS service templates, install/uninstall/start/stop/status/logs, `runServiceCli()` command handler
 

@@ -117,10 +117,10 @@ The daemon only runs the API server — it does **not** auto-launch a model. Mod
 
 **Files created by the service:**
 
-| Platform | Service file | Log directory |
-| -------- | ------------ | ------------- |
-| macOS | `~/Library/LaunchAgents/com.local-llm-manager.daemon.plist` | `~/.local-llm-manager/logs/` |
-| Linux | `~/.config/systemd/user/local-llm-manager.service` | via `journalctl --user` |
+| Platform | Service file                                                | Log directory                |
+| -------- | ----------------------------------------------------------- | ---------------------------- |
+| macOS    | `~/Library/LaunchAgents/com.local-llm-manager.daemon.plist` | `~/.local-llm-manager/logs/` |
+| Linux    | `~/.config/systemd/user/local-llm-manager.service`          | via `journalctl --user`      |
 
 No `sudo` required — both service managers run at user level.
 
