@@ -35,9 +35,7 @@ async function start(): Promise<void> {
   const port = config.apiServer.port;
   await apiServer.start(port);
 
-  console.log(
-    `[daemon] Started. PID=${process.pid} API port=${port}`,
-  );
+  console.log(`[daemon] Started. PID=${process.pid} API port=${port}`);
 
   process.on('SIGTERM', () => void shutdown('SIGTERM'));
   process.on('SIGINT', () => void shutdown('SIGINT'));

@@ -59,11 +59,7 @@ describe('writePid', () => {
 
   it('writes the PID as a plain string to the PID file', async () => {
     await writePid(12345);
-    expect(writeFile).toHaveBeenCalledWith(
-      getPidFilePath(),
-      '12345',
-      'utf-8',
-    );
+    expect(writeFile).toHaveBeenCalledWith(getPidFilePath(), '12345', 'utf-8');
   });
 });
 

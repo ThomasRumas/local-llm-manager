@@ -41,10 +41,12 @@ import {
 function mockExecFile(stdout = '', stderr = '') {
   vi.mocked(execFile).mockImplementation(
     (_cmd: unknown, _args: unknown, callback: unknown) => {
-      (callback as (err: null, result: { stdout: string; stderr: string }) => void)(
-        null,
-        { stdout, stderr },
-      );
+      (
+        callback as (
+          err: null,
+          result: { stdout: string; stderr: string },
+        ) => void
+      )(null, { stdout, stderr });
       return {} as ReturnType<typeof execFile>;
     },
   );
@@ -108,7 +110,10 @@ describe('getLogsDir', () => {
 // ─── generateSystemdUnit ──────────────────────────────────────────────────────
 
 describe('generateSystemdUnit', () => {
-  const unit = generateSystemdUnit('/usr/bin/node', '/usr/local/bin/llm-manager-daemon');
+  const unit = generateSystemdUnit(
+    '/usr/bin/node',
+    '/usr/local/bin/llm-manager-daemon',
+  );
 
   it('contains [Unit], [Service], and [Install] sections', () => {
     expect(unit).toContain('[Unit]');
@@ -173,9 +178,7 @@ describe('generateLaunchdPlist', () => {
   });
 
   it('writes stdout and stderr log paths inside logsDir', () => {
-    expect(plist).toContain(
-      '/home/user/.local-llm-manager/logs/daemon.log',
-    );
+    expect(plist).toContain('/home/user/.local-llm-manager/logs/daemon.log');
     expect(plist).toContain(
       '/home/user/.local-llm-manager/logs/daemon.error.log',
     );
@@ -191,25 +194,37 @@ describe('getServiceStatus (linux)', () => {
 
   it('returns { installed: false } when unit file is missing', async () => {
     vi.mocked(readFile).mockRejectedValue(new Error('ENOENT'));
-    expect(await getServiceStatus()).toEqual({ installed: false, running: false });
+    expect(await getServiceStatus()).toEqual({
+      installed: false,
+      running: false,
+    });
   });
 
   it('returns running: true when systemctl is-active returns "active"', async () => {
     vi.mocked(readFile).mockResolvedValue('[Unit]' as unknown as Buffer);
     mockExecFile('active\n');
-    expect(await getServiceStatus()).toEqual({ installed: true, running: true });
+    expect(await getServiceStatus()).toEqual({
+      installed: true,
+      running: true,
+    });
   });
 
   it('returns running: false when systemctl is-active returns "inactive"', async () => {
     vi.mocked(readFile).mockResolvedValue('[Unit]' as unknown as Buffer);
     mockExecFile('inactive\n');
-    expect(await getServiceStatus()).toEqual({ installed: true, running: false });
+    expect(await getServiceStatus()).toEqual({
+      installed: true,
+      running: false,
+    });
   });
 
   it('returns running: false when systemctl exits with non-zero (stopped/failed)', async () => {
     vi.mocked(readFile).mockResolvedValue('[Unit]' as unknown as Buffer);
     mockExecFileError('inactive');
-    expect(await getServiceStatus()).toEqual({ installed: true, running: false });
+    expect(await getServiceStatus()).toEqual({
+      installed: true,
+      running: false,
+    });
   });
 });
 
@@ -220,12 +235,17 @@ describe('getServiceStatus (darwin)', () => {
 
   it('returns { installed: false } when plist file is missing', async () => {
     vi.mocked(readFile).mockRejectedValue(new Error('ENOENT'));
-    expect(await getServiceStatus()).toEqual({ installed: false, running: false });
+    expect(await getServiceStatus()).toEqual({
+      installed: false,
+      running: false,
+    });
   });
 
   it('returns running: true with pid when launchctl list includes PID', async () => {
     vi.mocked(readFile).mockResolvedValue('<plist>' as unknown as Buffer);
-    mockExecFile('{\n\t"PID" = 5678;\n\t"Label" = "com.local-llm-manager.daemon";\n}');
+    mockExecFile(
+      '{\n\t"PID" = 5678;\n\t"Label" = "com.local-llm-manager.daemon";\n}',
+    );
     const status = await getServiceStatus();
     expect(status).toEqual({ installed: true, running: true, pid: 5678 });
   });
@@ -233,13 +253,19 @@ describe('getServiceStatus (darwin)', () => {
   it('returns running: false when launchctl list has no PID (stopped)', async () => {
     vi.mocked(readFile).mockResolvedValue('<plist>' as unknown as Buffer);
     mockExecFile('{\n\t"Label" = "com.local-llm-manager.daemon";\n}');
-    expect(await getServiceStatus()).toEqual({ installed: true, running: false });
+    expect(await getServiceStatus()).toEqual({
+      installed: true,
+      running: false,
+    });
   });
 
   it('returns running: false when launchctl exits non-zero (not loaded)', async () => {
     vi.mocked(readFile).mockResolvedValue('<plist>' as unknown as Buffer);
     mockExecFileError('Could not find service');
-    expect(await getServiceStatus()).toEqual({ installed: true, running: false });
+    expect(await getServiceStatus()).toEqual({
+      installed: true,
+      running: false,
+    });
   });
 });
 
@@ -252,15 +278,13 @@ describe('installService (linux)', () => {
     vi.mocked(writeFile).mockResolvedValue(undefined);
     // First execFile call = which (findDaemonBinary), rest = systemctl
     vi.mocked(execFile)
-      .mockImplementationOnce(
-        (_cmd: unknown, _args: unknown, cb: unknown) => {
-          (cb as (err: null, result: { stdout: string; stderr: string }) => void)(
-            null,
-            { stdout: '/usr/local/bin/llm-manager-daemon\n', stderr: '' },
-          );
-          return {} as ReturnType<typeof execFile>;
-        },
-      )
+      .mockImplementationOnce((_cmd: unknown, _args: unknown, cb: unknown) => {
+        (cb as (err: null, result: { stdout: string; stderr: string }) => void)(
+          null,
+          { stdout: '/usr/local/bin/llm-manager-daemon\n', stderr: '' },
+        );
+        return {} as ReturnType<typeof execFile>;
+      })
       .mockImplementation((_cmd: unknown, _args: unknown, cb: unknown) => {
         (cb as (err: null, result: { stdout: string; stderr: string }) => void)(
           null,

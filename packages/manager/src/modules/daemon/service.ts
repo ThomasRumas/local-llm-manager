@@ -34,12 +34,7 @@ export function getSystemdUnitPath(): string {
 }
 
 export function getLaunchdPlistPath(): string {
-  return join(
-    homedir(),
-    'Library',
-    'LaunchAgents',
-    `${LAUNCHD_LABEL}.plist`,
-  );
+  return join(homedir(), 'Library', 'LaunchAgents', `${LAUNCHD_LABEL}.plist`);
 }
 
 export function getLogsDir(): string {
@@ -126,9 +121,17 @@ export async function installService(): Promise<void> {
   if (platform === 'linux') {
     const unitPath = getSystemdUnitPath();
     await mkdir(dirname(unitPath), { recursive: true });
-    await writeFile(unitPath, generateSystemdUnit(nodePath, daemonPath), 'utf-8');
+    await writeFile(
+      unitPath,
+      generateSystemdUnit(nodePath, daemonPath),
+      'utf-8',
+    );
     await execFileAsync('systemctl', ['--user', 'daemon-reload']);
-    await execFileAsync('systemctl', ['--user', 'enable', SYSTEMD_SERVICE_NAME]);
+    await execFileAsync('systemctl', [
+      '--user',
+      'enable',
+      SYSTEMD_SERVICE_NAME,
+    ]);
     console.log(`✔ Installed: ${unitPath}`);
     console.log(`✔ Enabled to start at login`);
   } else {
@@ -151,12 +154,20 @@ export async function uninstallService(): Promise<void> {
 
   if (platform === 'linux') {
     try {
-      await execFileAsync('systemctl', ['--user', 'stop', SYSTEMD_SERVICE_NAME]);
+      await execFileAsync('systemctl', [
+        '--user',
+        'stop',
+        SYSTEMD_SERVICE_NAME,
+      ]);
     } catch {
       // already stopped — ignore
     }
     try {
-      await execFileAsync('systemctl', ['--user', 'disable', SYSTEMD_SERVICE_NAME]);
+      await execFileAsync('systemctl', [
+        '--user',
+        'disable',
+        SYSTEMD_SERVICE_NAME,
+      ]);
     } catch {
       // already disabled — ignore
     }
@@ -238,7 +249,10 @@ export async function getServiceStatus(): Promise<ServiceStatus> {
       return { installed: false, running: false };
     }
     try {
-      const { stdout } = await execFileAsync('launchctl', ['list', LAUNCHD_LABEL]);
+      const { stdout } = await execFileAsync('launchctl', [
+        'list',
+        LAUNCHD_LABEL,
+      ]);
       // launchctl list output contains "PID" = <number>; when the job is running
       const pidMatch = /"PID" = (\d+);/.exec(stdout);
       const pid = pidMatch ? parseInt(pidMatch[1], 10) : undefined;
@@ -266,7 +280,11 @@ export async function showLogs(lines: number = 50): Promise<string> {
   } else {
     const logFile = join(getLogsDir(), 'daemon.log');
     try {
-      const { stdout } = await execFileAsync('tail', ['-n', String(lines), logFile]);
+      const { stdout } = await execFileAsync('tail', [
+        '-n',
+        String(lines),
+        logFile,
+      ]);
       return stdout;
     } catch {
       return '(no logs yet)';
@@ -382,4 +400,3 @@ export async function runServiceCli(args: string[]): Promise<void> {
   console.error(`  Valid sub-commands: ${validSubs}`);
   process.exit(1);
 }
-

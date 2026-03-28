@@ -10,7 +10,9 @@ if (args[0] === 'service') {
   try {
     await runServiceCli(args.slice(1));
   } catch (err) {
-    console.error(`\x1b[31m✖ ${err instanceof Error ? err.message : String(err)}\x1b[0m`);
+    console.error(
+      `\x1b[31m✖ ${err instanceof Error ? err.message : String(err)}\x1b[0m`,
+    );
     process.exit(1);
   }
   process.exit(0);
