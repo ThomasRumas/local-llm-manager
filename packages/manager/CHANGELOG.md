@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.4](https://github.com/ThomasRumas/local-llm-manager/compare/manager-v1.1.3...manager-v1.1.4) (2026-03-28)
+
+
+### Bug Fixes
+
+* **service:** not launching correctly on Linux system  ([1fe6b88](https://github.com/ThomasRumas/local-llm-manager/commit/1fe6b8809885bc75d68003656c3cfb6f8fa706db))
+
 ## [1.1.3](https://github.com/ThomasRumas/local-llm-manager/compare/manager-v1.1.2...manager-v1.1.3) (2026-03-28)
 
 
