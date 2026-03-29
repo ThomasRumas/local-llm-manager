@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/ThomasRumas/local-llm-manager/compare/manager-v1.1.4...manager-v1.2.0) (2026-03-29)
+
+
+### Features
+
+* **ik_llama:** support ik version of llama.cpp for Linux and CUDA ([04054d1](https://github.com/ThomasRumas/local-llm-manager/commit/04054d15bcb102b71cec0b7882ba80b271a15c80))
+
 ## [1.1.4](https://github.com/ThomasRumas/local-llm-manager/compare/manager-v1.1.3...manager-v1.1.4) (2026-03-28)
 
 
