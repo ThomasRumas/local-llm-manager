@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/ThomasRumas/local-llm-manager/compare/client-v1.1.4...client-v1.2.0) (2026-03-29)
+
+
+### Miscellaneous Chores
+
+* **client:** Synchronize local-llm-manager versions
+
 ## [1.1.4](https://github.com/ThomasRumas/local-llm-manager/compare/client-v1.1.3...client-v1.1.4) (2026-03-28)
 
 
