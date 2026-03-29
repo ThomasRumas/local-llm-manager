@@ -24,6 +24,8 @@ type Field =
   | 'cacheTypeV'
   | 'flashAttn'
   | 'fit'
+  | 'kvUnified'
+  | 'gpuLayers'
   | 'extraFlags';
 
 const FIELDS: Field[] = [
@@ -38,10 +40,12 @@ const FIELDS: Field[] = [
   'cacheTypeV',
   'flashAttn',
   'fit',
+  'kvUnified',
+  'gpuLayers',
   'extraFlags',
 ];
 
-const CACHE_TYPES = [
+const CACHE_TYPES_BASE = [
   'f16',
   'f32',
   'q8_0',
@@ -50,6 +54,8 @@ const CACHE_TYPES = [
   'q5_0',
   'q5_1',
 ] as const;
+const CACHE_TYPES_IK = [...CACHE_TYPES_BASE, 'iq4_nl'] as const;
+type CacheTypeItem = (typeof CACHE_TYPES_IK)[number];
 
 export function ModelConfig({
   modelFile,
@@ -60,6 +66,7 @@ export function ModelConfig({
   const modelsDir = configService.getModelsDirectory();
   const modelPath = `${modelsDir}/${modelFile}`;
   const initial = configService.getEffective(modelFile, modelPath, configName);
+  const isIkLlama = configService.get().defaults.isIkLlama ?? false;
 
   const [config, setConfig] = useState<ResolvedConfig>(initial);
   const [focusIndex, setFocusIndex] = useState(0);
@@ -205,8 +212,23 @@ export function ModelConfig({
           {isFocused(10) && <Text color="gray"> (←/→)</Text>}
         </Box>
         <Box>
-          <Text color={isFocused(11) ? 'cyan' : 'white'}>Extra Flags: </Text>
-          <Text color={isFocused(11) ? 'white' : 'gray'}>
+          <Text color={isFocused(11) ? 'cyan' : 'white'}>KV Unified: </Text>
+          <Text color={config.kvUnified ? 'green' : 'gray'}>
+            {config.kvUnified ? 'on' : 'off'}
+          </Text>
+          {isFocused(11) && <Text color="gray"> (←/→)</Text>}
+          {isIkLlama && <Text color="magenta"> ik</Text>}
+        </Box>
+        <Box>
+          <Text color={isFocused(12) ? 'cyan' : 'white'}>GPU Layers: </Text>
+          <Text color={isFocused(12) ? 'white' : 'gray'}>
+            {config.gpuLayers}
+          </Text>
+          {isFocused(12) && <Text color="gray"> (←/→ ±1, shift ±10)</Text>}
+        </Box>
+        <Box>
+          <Text color={isFocused(13) ? 'cyan' : 'white'}>Extra Flags: </Text>
+          <Text color={isFocused(13) ? 'white' : 'gray'}>
             {config.extraFlags || '(none)'}
           </Text>
         </Box>
@@ -217,6 +239,7 @@ export function ModelConfig({
         focusIndex={focusIndex}
         config={config}
         updateField={updateField}
+        isIkLlama={isIkLlama}
       />
 
       <Box marginTop={1}>
@@ -237,10 +260,19 @@ interface FieldEditorProps {
     field: K,
     value: ResolvedConfig[K],
   ) => void;
+  isIkLlama: boolean;
 }
 
-function FieldEditor({ focusIndex, config, updateField }: FieldEditorProps) {
+function FieldEditor({
+  focusIndex,
+  config,
+  updateField,
+  isIkLlama,
+}: FieldEditorProps) {
   const fieldIdx = focusIndex - 1;
+  const cacheTypes: readonly CacheTypeItem[] = isIkLlama
+    ? CACHE_TYPES_IK
+    : CACHE_TYPES_BASE;
 
   useInput((input, key) => {
     if (fieldIdx < 0 || fieldIdx >= FIELDS.length) return;
@@ -299,16 +331,15 @@ function FieldEditor({ focusIndex, config, updateField }: FieldEditorProps) {
         break;
       case 'cacheTypeK':
       case 'cacheTypeV': {
-        const idx = CACHE_TYPES.indexOf(
-          config[field] as (typeof CACHE_TYPES)[number],
-        );
+        const idx = cacheTypes.indexOf(config[field] as CacheTypeItem);
+        const safeIdx = idx < 0 ? 0 : idx;
         if (key.leftArrow)
           updateField(
             field,
-            CACHE_TYPES[(idx - 1 + CACHE_TYPES.length) % CACHE_TYPES.length]!,
+            cacheTypes[(safeIdx - 1 + cacheTypes.length) % cacheTypes.length]!,
           );
         if (key.rightArrow)
-          updateField(field, CACHE_TYPES[(idx + 1) % CACHE_TYPES.length]!);
+          updateField(field, cacheTypes[(safeIdx + 1) % cacheTypes.length]!);
         break;
       }
       case 'flashAttn':
@@ -316,6 +347,19 @@ function FieldEditor({ focusIndex, config, updateField }: FieldEditorProps) {
         if (key.leftArrow || key.rightArrow) {
           updateField(field, config[field] === 'on' ? 'off' : 'on');
         }
+        break;
+      }
+      case 'kvUnified': {
+        if (key.leftArrow || key.rightArrow) {
+          updateField('kvUnified', !config.kvUnified);
+        }
+        break;
+      }
+      case 'gpuLayers': {
+        const step = key.shift ? 10 : 1;
+        if (key.leftArrow)
+          updateField('gpuLayers', Math.max(0, config.gpuLayers - step));
+        if (key.rightArrow) updateField('gpuLayers', config.gpuLayers + step);
         break;
       }
     }

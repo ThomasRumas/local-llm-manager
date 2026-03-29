@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04
 # Install systemd + dbus so that systemctl (including --user) works inside the container.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-       systemd systemd-sysv dbus dbus-user-session \
+       systemd systemd-sysv dbus dbus-user-session build-essential git libcurl4-openssl-dev curl libgomp1 cmake \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Mask units that are unnecessary (or harmful) inside a container.

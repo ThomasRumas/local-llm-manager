@@ -5,13 +5,15 @@ export type CacheType =
   | 'q4_0'
   | 'q4_1'
   | 'q5_0'
-  | 'q5_1';
+  | 'q5_1'
+  | 'iq4_nl'; // Not supported by llama.cpp, only for ik_llama.cpp
 export type OnOffSetting = 'on' | 'off';
 
 export interface Defaults {
   port: number;
   ctxSize: number;
   host: string;
+  isIkLlama: boolean;
 }
 
 export interface ModelConfig {
@@ -29,6 +31,7 @@ export interface ModelConfig {
   flashAttn?: OnOffSetting;
   fit?: OnOffSetting;
   extraFlags?: string;
+  gpuLayers?: number;
 }
 
 export interface ApiServerConfig {
@@ -60,6 +63,7 @@ export interface ResolvedConfig {
   flashAttn: OnOffSetting;
   fit: OnOffSetting;
   extraFlags: string;
+  gpuLayers: number;
 }
 
 export const HARDCODED_DEFAULTS: Required<
@@ -74,11 +78,12 @@ export const HARDCODED_DEFAULTS: Required<
   port: 8001,
   ctxSize: 131072,
   host: '0.0.0.0',
-  kvUnified: true,
+  kvUnified: false, //Not working with ik_llama.cpp, user need to set it manually if they want to use it with models that support it
   cacheTypeK: 'q8_0',
   cacheTypeV: 'q8_0',
   flashAttn: 'on',
   fit: 'on',
+  gpuLayers: 999, // A very high number to indicate "use GPU for all layers that can fit", since the actual number of GPU layers that can fit will depend on the model and GPU VRAM, and we don't want to set an arbitrary limit that might be too low for some users
   extraFlags: '',
 };
 
@@ -93,6 +98,7 @@ export const DEFAULT_CONFIG: AppConfig = {
     port: HARDCODED_DEFAULTS.port,
     ctxSize: HARDCODED_DEFAULTS.ctxSize,
     host: HARDCODED_DEFAULTS.host,
+    isIkLlama: false,
   },
   apiServer: { ...DEFAULT_API_SERVER },
   configurations: {},

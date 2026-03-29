@@ -4,6 +4,7 @@ import { render } from 'ink-testing-library';
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 vi.mock('../modules/config/config.service.js', () => ({
   configService: {
+    get: vi.fn(),
     getModelsDirectory: vi.fn(),
     getEffective: vi.fn(),
     getModelConfigNames: vi.fn(),
@@ -33,11 +34,23 @@ const DEFAULT_RESOLVED = {
   flashAttn: 'on' as const,
   fit: 'on' as const,
   extraFlags: '',
+  gpuLayers: 0,
   modelPath: '/models/my-model.gguf',
 };
 
 describe('ModelConfig', () => {
   beforeEach(() => {
+    vi.mocked(configService.get).mockReturnValue({
+      defaults: {
+        isIkLlama: false,
+        port: 8001,
+        ctxSize: 131072,
+        host: '0.0.0.0',
+      },
+      modelsDirectory: '/models',
+      apiServer: { enabled: false, port: 3333 },
+      configurations: {},
+    } as any);
     vi.mocked(configService.getModelsDirectory).mockReturnValue('/models');
     vi.mocked(configService.getEffective).mockReturnValue(
       DEFAULT_RESOLVED as any,
