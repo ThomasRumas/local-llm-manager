@@ -235,6 +235,7 @@ export class ConfigService {
       flashAttn: modelConfig.flashAttn ?? HARDCODED_DEFAULTS.flashAttn,
       fit: modelConfig.fit ?? HARDCODED_DEFAULTS.fit,
       extraFlags: modelConfig.extraFlags ?? HARDCODED_DEFAULTS.extraFlags,
+      gpuLayers: modelConfig.gpuLayers ?? HARDCODED_DEFAULTS.gpuLayers,
     };
   }
 }

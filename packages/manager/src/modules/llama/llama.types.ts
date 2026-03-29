@@ -23,6 +23,7 @@ export interface LaunchOptions {
   flashAttn: OnOffSetting;
   fit: OnOffSetting;
   extraFlags: string;
+  gpuLayers: number;
 }
 
 export interface LaunchResult {

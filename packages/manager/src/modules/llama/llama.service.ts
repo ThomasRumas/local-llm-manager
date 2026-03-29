@@ -144,7 +144,11 @@ export class LlamaService {
     }
 
     if (options.fit && options.fit !== 'off') {
-      args.push('--fit', options.fit); // e.g. 'on'
+      args.push('--fit');
+    }
+
+    if (options.gpuLayers > 0) {
+      args.push('--gpu-layers', String(options.gpuLayers));
     }
 
     if (options.extraFlags) {

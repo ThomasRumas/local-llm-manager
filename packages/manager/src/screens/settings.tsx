@@ -16,7 +16,8 @@ type SettingsField =
   | 'host'
   | 'hfToken'
   | 'apiEnabled'
-  | 'apiPort';
+  | 'apiPort'
+  | 'isIkLlamaCpp';
 const SETTINGS_FIELDS: SettingsField[] = [
   'modelsDir',
   'port',
@@ -25,6 +26,7 @@ const SETTINGS_FIELDS: SettingsField[] = [
   'hfToken',
   'apiEnabled',
   'apiPort',
+  'isIkLlamaCpp',
 ];
 
 type TextSetter = React.Dispatch<React.SetStateAction<string>>;
@@ -39,6 +41,7 @@ interface FieldSetters {
   setHfToken: TextSetter;
   setApiEnabled: BoolSetter;
   setApiPortStr: TextSetter;
+  setIsIkLlamaCpp: BoolSetter;
   setSaved: SavedSetter;
 }
 
@@ -93,6 +96,12 @@ function handleFieldKey(
     case 'apiPort':
       changed = editText(s.setApiPortStr, input, key, isTextKey, true);
       break;
+    case 'isIkLlamaCpp':
+      if (key.leftArrow || key.rightArrow) {
+        s.setIsIkLlamaCpp((p) => !p);
+        changed = true;
+      }
+      break;
   }
   if (changed) s.setSaved(false);
 }
@@ -105,6 +114,7 @@ interface SaveParams {
   hfToken: string;
   apiEnabled: boolean;
   apiPortStr: string;
+  isIkLlamaCpp: boolean;
 }
 
 async function applySave(
@@ -137,6 +147,7 @@ async function applySave(
       port: portNum,
       ctxSize: ctxSizeNum,
       host: p.host.trim(),
+      isIkLlama: p.isIkLlamaCpp,
     });
     await configService.setHfToken(p.hfToken.trim());
     await configService.setApiServerConfig({
@@ -168,6 +179,9 @@ export function Settings({ onBack }: Readonly<SettingsProps>) {
   const [apiPortStr, setApiPortStr] = useState(
     String(appConfig.apiServer.port),
   );
+  const [isIkLlamaCpp, setIsIkLlamaCpp] = useState(
+    appConfig.defaults.isIkLlama ?? false,
+  );
   const [focusIndex, setFocusIndex] = useState(0);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -179,11 +193,29 @@ export function Settings({ onBack }: Readonly<SettingsProps>) {
 
   const handleSave = useCallback(() => {
     applySave(
-      { modelsDir, portStr, ctxSizeStr, host, hfToken, apiEnabled, apiPortStr },
+      {
+        modelsDir,
+        portStr,
+        ctxSizeStr,
+        host,
+        hfToken,
+        apiEnabled,
+        apiPortStr,
+        isIkLlamaCpp,
+      },
       setError,
       setSaved,
     );
-  }, [modelsDir, portStr, ctxSizeStr, host, hfToken, apiEnabled, apiPortStr]);
+  }, [
+    modelsDir,
+    portStr,
+    ctxSizeStr,
+    host,
+    hfToken,
+    apiEnabled,
+    apiPortStr,
+    isIkLlamaCpp,
+  ]);
 
   useInput((input, key) => {
     if (key.escape) {
@@ -216,6 +248,7 @@ export function Settings({ onBack }: Readonly<SettingsProps>) {
         setApiEnabled,
         setApiPortStr,
         setSaved,
+        setIsIkLlamaCpp,
       });
     }
 
@@ -287,6 +320,19 @@ export function Settings({ onBack }: Readonly<SettingsProps>) {
           <Text color={focusIndex === 6 ? 'cyan' : 'white'}>API Port: </Text>
           <Text color={focusIndex === 6 ? 'white' : 'gray'}>{apiPortStr}</Text>
           {focusIndex === 6 && <Text color="cyan">▎</Text>}
+        </Box>
+      </Box>
+
+      <Box marginTop={1} flexDirection="column">
+        <Text color="gray" dimColor>
+          ── Backend ────────────────────────
+        </Text>
+        <Box>
+          <Text color={focusIndex === 7 ? 'cyan' : 'white'}>Backend: </Text>
+          <Text color={isIkLlamaCpp ? 'magenta' : 'gray'}>
+            {isIkLlamaCpp ? 'ik_llama.cpp' : 'llama.cpp'}
+          </Text>
+          {focusIndex === 7 && <Text color="cyan"> ← →</Text>}
         </Box>
       </Box>
 
